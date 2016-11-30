@@ -6,7 +6,7 @@
 // Handler for GPIO interrupt.
 void do_on_button_press()
 {
-	system("/home/root/get_flag/detect.sh");
+	system("/home/root/EE180DA-B/detect.sh");
 }
 
 int main()
