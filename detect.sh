@@ -1,3 +1,8 @@
 #!/bin/bash
 
-iwlist wlan0 scan | sed -n -e 's/^.*\(Address\)/\1/p; s/^.*\(Signal\)/\1/p' | awk '!(NR%2){print p "\t" $0} {p=$0}' 
+count=0
+while [ $count -lt 1 ]; do
+	iwlist wlan0 scan | grep 'Address\|Signal' | sed 's/^.*Address: //; s/^.*level=-\([0-9]\{2\}\) dBm/\1/' > E1.txt
+	let count=count+1
+	#sleep 15
+done
