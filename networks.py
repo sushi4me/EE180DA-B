@@ -16,8 +16,9 @@ def getPairs(filename):
     
     return MAC_ADDR
 
-def compareAddresses(dict1, dict2):
-    return {x:dict1[x] for x in dict1 if x in dict2}
+def compareAddresses(myaddrs):
+    mysets = (set(x.items()) for x in myaddrs)
+    return reduce(lambda a,b: a.intersection(b), mysets)
  
 def main():
     version_msg = "%prog 1.0"
@@ -30,23 +31,21 @@ def main():
 
     options, args = parser.parse_args(sys.argv[1:])
 
-    if len(args) != 2:
+    if len(args) < 2:
         parser.error("Wrong number of operands.")
 
-    deviceFile1 = args[0]
-    deviceFile2 = args[1]
+    addresses = []
+    for file in args:
+        addresses.append(getPairs(file))
+
+    commonAddr = compareAddresses(addresses)
     
-    MAC_ADDR1 = getPairs(deviceFile1)
-    MAC_ADDR2 = getPairs(deviceFile2)
-
-    commonAddr = compareAddresses(MAC_ADDR1, MAC_ADDR2)
-
     if options.file is not None:
         with open(options.file, "a") as f:
-            for key,val in commonAddr.items():
+            for key,val in commonAddr:
                 f.write(key + " " + val + "\n")
     else:
-        for key,val in commonAddr.items():
+        for key,val in commonAddr:
             print key, val
 
 if __name__=="__main__":
