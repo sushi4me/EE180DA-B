@@ -1,14 +1,12 @@
 #!/usr/bin/python
 #
-# copyright (c) 2015 Max Vilimpoc
+# copyright (c) 2016 Edison Vallejo
 #
 # References:
-# http://stackoverflow.com/questions/24196932/how-can-i-get-the-ip-address-of-eth0-in-python
-
-# https://github.com/intel-iot-devkit/upm/blob/master/examples/python/rgb-lcd.py
-
+# http://www.instructables.com/id/Show-the-Intel-Edison-WiFi-IP-Address-on-a-Grove-L/step2/Run-the-Code/
+#
 # Permission is hereby granted, free of charge, to any person obtaining
-
+#
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
 # without limitation the rights to use, copy, modify, merge, publish,
@@ -27,22 +25,23 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import socket
+#----------------------------
+# Modules
+#----------------------------
 import fcntl
 import struct
-import sys
-import time
 import pyupm_i2clcd as lcd
 
-#def get_ip_address(ifname):
-#
-#    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#    return socket.inet_ntoa(fcntl.ioctl(
-#        s.fileno(),
-#        0x8915,  # SIOCGIFADDR
-#        struct.pack('256s', ifname[:15])
-#    )[20:24])
+#----------------------------
+# Globals
+#----------------------------
+R="red"
+G="green"
+B="blue"
 
+#----------------------------
+# LCD Class
+#----------------------------
 class lcd:
 
 	# Initialize Jhd1313m1 at 0x3E (LCD_ADDRESS) and 0x62 (RGB_ADDRESS)
@@ -51,8 +50,9 @@ class lcd:
 	# Clear
 	myLcd.clear()
 
-	def display(self, string, color=None):
-		# Green
+	def display(self, string, posX, posY, color=None):
+                myLcd.clear()
+                # Green
 		if color == 'green':
 			self.myLcd.setColor(255, 255, 0)
 		# Red
@@ -64,10 +64,10 @@ class lcd:
 		# Default: White
 		else:
 			self.myLcd.setColor(255, 255, 255)
-		# Zero the cursor
-		self.myLcd.setCursor(0,0)
+		
+                # Set the cursor
+		self.myLcd.setCursor(posX,posY)
 		# Print it.
 		self.myLcd.write(string)
-		time.sleep(15)
 
 
