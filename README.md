@@ -1,6 +1,6 @@
 # EE180DA-B
 getFlag() Project
-Edison Vallejo
+Edison David Vallejo
 Fernando Pacheco
 Justine Figuerres
 Nathan Kong
