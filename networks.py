@@ -1,25 +1,23 @@
 #!/usr/bin/python
 
-# Takes two files containing MAC addresses and
-# signal values formatted in columns. Script
-# will output addresses contained in both files.
+# Takes any number of files containing MAC addresses and
+# signal values formatted in columns.
+# Output will be the intersection of the addresses.
 
 import sys
 from optparse import OptionParser
-
-def getPairs(filename):
-    MAC_ADDR = {}
-    with open(filename) as f:
-        for line in f:
-            key, val = line.split()
-            MAC_ADDR[key] = val
+from utilities import getPairs
     
-    return MAC_ADDR
+def intersect(macAddrs):
+    return list(set(macAddrs[0]).intersection(*macAddrs[1:]))
 
-def compareAddresses(myaddrs):
-    mysets = (set(x.items()) for x in myaddrs)
-    return reduce(lambda a,b: a.intersection(b), mysets)
- 
+def extractAddress(dictList):
+    macAddr = []
+    for dict in dictList:
+        macAddr.append(dict.keys())
+
+    return macAddr
+
 def main():
     version_msg = "%prog 1.0"
     usage_msg = """%prog [OPTION]... MACADDR_FILE1 MACADDR_FILE2
@@ -34,19 +32,23 @@ def main():
     if len(args) < 2:
         parser.error("Wrong number of operands.")
 
-    addresses = []
+    # Read MAC addresses and signal strength from files.
+    dictList = []
     for file in args:
-        addresses.append(getPairs(file))
+        dictList.append(getPairs(file))
 
-    commonAddr = compareAddresses(addresses)
-    
+    # Extract MAC addresss values from each dictionary
+    # and find intersection.
+    macAddr = extractAddress(dictList) 
+    commonAddr = intersect(macAddr)
+
+    # Write output to specified file or stdout.
     if options.file is not None:
-        with open(options.file, "a") as f:
-            for key,val in commonAddr:
-                f.write(key + " " + val + "\n")
+        with open(options.file, "w") as f:
+            f.writelines(commonAddr)
     else:
-        for key,val in commonAddr:
-            print key, val
+        for addr in commonAddr:
+            sys.stdout.write(addr)
 
 if __name__=="__main__":
     main()
