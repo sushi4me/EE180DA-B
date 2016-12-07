@@ -6,6 +6,6 @@ def getPairs(filename):
     with open(filename) as f:
         for line in f:
             key, val = line.split()
-            dict[key + "\n"] = val
+            dict[key + "\n"] = int(val)
 
     return dict

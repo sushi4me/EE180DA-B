@@ -9,7 +9,7 @@ from optparse import OptionParser
 from utilities import getPairs
     
 def intersect(macAddrs):
-    return list(set(macAddrs[0]).intersection(*macAddrs[1:0]))
+    return list(set(macAddrs[0]).intersection(*macAddrs[1:]))
 
 def extractAddress(dictList):
     macAddr = []

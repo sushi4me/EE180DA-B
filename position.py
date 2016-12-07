@@ -30,12 +30,16 @@ def main():
     with open(networksFile) as f:
         networksList = f.readlines()
 
-   dist1 = []
-   dist2 = []
-
-   for line in networksList:
-       dist1.append(pow(rawInput[line] - loc1[line], 2))
-       dist2.append(pow(rawInput[line] - loc2[line], 2))
+    dist1 = []
+    dist2 = []
+    
+    for line in networksList:
+        if line in rawInput:
+            dist1.append(pow(rawInput[line] - loc1[line], 2))
+            dist2.append(pow(rawInput[line] - loc2[line], 2))
+        else:
+            dist1.append(0)
+            dist2.append(0)
     
     score1 = sum(dist1)
     score2 = sum(dist2)
