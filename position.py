@@ -20,8 +20,33 @@ def main():
         parser.error("Wrong number of operands.")
 
     inputFile = args[0]
+    networksFile = "locations_data/networks.txt"
+    locData1 = "locations_data/location1.txt"
+    locData2 = "locations_data/location2.txt"
 
     rawInput = getPairs(inputFile)
+    loc1 = getPairs(locData1)
+    loc2 = getPairs(locData2)
+    with open(networksFile) as f:
+        networksList = f.readlines()
+
+   dist1 = []
+   dist2 = []
+
+   for line in networksList:
+       dist1.append(pow(rawInput[line] - loc1[line], 2))
+       dist2.append(pow(rawInput[line] - loc2[line], 2))
+    
+    score1 = sum(dist1)
+    score2 = sum(dist2)
+
+    msg = ""
+    if score1 < score2:
+        msg = "You are probably at position 1"
+    else:
+        msg = "You are probably at position 2"
+
+    print msg
 
 if __name__ == "__main__":
     main()
