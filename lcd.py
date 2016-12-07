@@ -49,9 +49,10 @@ class lcd:
 
 	# Clear
 	myLcd.clear()
-
+        
+        # Takes 4 Parameters: string, posX, posY, color=DefaultWhite
 	def display(self, string, posX, posY, color=None):
-                myLcd.clear()
+                self.myLcd.clear()
                 # Green
 		if color == 'green':
 			self.myLcd.setColor(255, 255, 0)
