@@ -15,6 +15,8 @@ def main():
     parser = OptionParser(version=version_msg, usage=usage_msg)
     parser.add_option("-o", "--output", action="store", dest="file",
             help="Write position to FILE")
+    parser.add_option("-d", "--directory", action="store", dest="dir",
+            help="Use DIR as reference database.")
 
     options, args = parser.parse_args(sys.argv[1:])
 
@@ -24,7 +26,10 @@ def main():
     inputFile = args[0]
 
     # Collect files from reference db.
-    locationsDir = "locations_data"
+    if options.dir is not None:
+        locationsDir = options.dir
+    else:
+        locationsDir = "locations_data"
     locationFiles = [join(locationsDir, f) for f in listdir(locationsDir) if isfile(join(locationsDir, f))]
     
     # Parse RSSI, place in dictionary with MAC address as key.
