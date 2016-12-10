@@ -4,7 +4,16 @@ import sys
 from os import listdir
 from os.path import isfile, join
 from optparse import OptionParser
-from utilities import getPairs
+
+def getPairs(filename):
+    dict = {}
+
+    with open(filename) as f:
+        for line in f:
+            key, val = line.split()
+            dict[key + "\n"] = int(val)
+
+    return dict
 
 def main():
     version_msg = "%prog 1.0"
