@@ -118,4 +118,4 @@ class lcd:
                     self.display(message, 0, 0, T)
                     time.sleep(sleeptime)
                     posX += 1
-            posY +=2
+            posY += 1
