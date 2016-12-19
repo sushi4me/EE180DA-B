@@ -1,9 +1,13 @@
-# EE180DA-B
+# EE180D: Systems Design
 getFlag() Project
 
+## Contributors
 Edison David Vallejo
+
 Fernando Pacheco
+
 Justine Figuerres
+
 Nathan Kong
 
 ## client.py & server.py
