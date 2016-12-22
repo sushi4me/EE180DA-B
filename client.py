@@ -6,14 +6,36 @@ Takes in one argument which is the hostname of the server.
 
 import socket
 import sys
+from optparse import OptionParser
 
-#Create a socket that TCP/IP socket
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+def main():
+	version_msg = "client_12.22.16"
+	usage_msg = """%prog [OPTIONS] ...
+	Connects client to HOST found on same network."""
 
-server_name = (sys.argv[1], 8000)
-s.connect(server_name)
+	parser = OptionParser(version=version_msg, usage=usage_msg)	
+	parser.add_option("-s", "--specific", action="store", 
+		dest="specific_host", help="Use spcific HOST.")
 
-try:
-	print s.recv(1024)
-finally:
-	s.close
+	options, args = parser.parse_args(sys.argv[1:])
+
+	#Create a socket that TCP/IP socket
+	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+	if options.specific_host is not None:
+		host_name = options.specific_host
+	else:
+		host_name = "Nathan-Laptop.hawaii.rr.com"
+	
+	#Connect
+	server_name = (host_name, 8000)
+	s.connect(server_name)
+
+	#Print what is sent from the server
+	try:
+		print s.recv(1024)
+	finally:
+		s.close
+
+if __name__ == "__main__":
+	main()
