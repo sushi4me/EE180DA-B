@@ -19,6 +19,7 @@ s.bind(server_address)
 s.listen(5)
 
 while True:
+	TO-DO: forking new processes for each Intel Edison
 	c, client_address = s.accept()
 	try:	
 		print 'Got connection from: ', client_address

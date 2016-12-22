@@ -9,6 +9,7 @@ import sys
 from optparse import OptionParser
 
 def main():
+	#Define option parse messages/options
 	version_msg = "client_12.22.16"
 	usage_msg = """%prog [OPTIONS] ...
 	Connects client to HOST found on same network."""
@@ -25,7 +26,7 @@ def main():
 	if options.specific_host is not None:
 		host_name = options.specific_host
 	else:
-		host_name = "Nathan-Laptop.hawaii.rr.com"
+		host_name = "Nathan-Laptop.hawaii.rr.com" #default host
 	
 	#Connect
 	server_name = (host_name, 8000)
@@ -33,6 +34,7 @@ def main():
 
 	#Print what is sent from the server
 	try:
+		#TO-DO: [WHILE 1]Get info from Intel Edison & send it
 		print s.recv(1024)
 	finally:
 		s.close
