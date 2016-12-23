@@ -20,7 +20,7 @@ def main():
 
 	options, args = parser.parse_args(sys.argv[1:])
 
-	#Create a socket that TCP/IP socket
+	#Create a TCP/IP socket
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 	if options.specific_host is not None:
