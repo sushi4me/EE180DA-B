@@ -11,9 +11,9 @@ Justine Figuerres
 Nathan Kong
 
 ## client.py & server.py
-Both programs take a single argument - the host name.
-You can find this using the **host** command. Both devices must also be
-connected to the same network.
-First host the server.py on a device, next connect using client.py.  Upon
-connection the server should report that a connection had been made by the
-device.
+The host is defaulted to Nathan's machine (this will need to be changed
+to eduroam).  Using the **-s** command you can specify the domain name
+and target, for server and client respectively.  A successful connection
+by the client should be aknowledged by the server and client side.
+You can find the necessary **domain name pointer** by using the command
+**host [IP_ADDRESS]**.
