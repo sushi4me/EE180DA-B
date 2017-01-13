@@ -1,4 +1,4 @@
-#!/usr/bin/python
+B#!/usr/bin/python
 #******************************************************************************
 # Module: Game.py
 #
@@ -14,9 +14,9 @@
 #----------------------------
 # Modules
 #----------------------------
-import Player
-import Object
-import Map
+import player
+import object_
+import map_
 import sys
 #----------------------------
 # Globals
