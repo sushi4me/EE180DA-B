@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]
+if [ $# -ne 1 ]
 then
 	echo -e "Error: Wrong number of operands\nUsage: $0 FILE_PREFIX"
 	exit 1
