@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# UCLA EE 180D data collection script.
+# The script expects one argument:
+# 	./detect.sh position(num)
+#
+# This argument must not contain any
+# spaces.
+#
+# example:
+#	./detect.sh position5
+
 if [ $# -ne 1 ]
 then
 	echo -e "Error: Wrong number of operands\nUsage: $0 FILE_PREFIX"
