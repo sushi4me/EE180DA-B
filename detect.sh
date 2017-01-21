@@ -7,7 +7,7 @@ fi
 printf "Choose a spot <0, 17, 25, 35, 41, 47> : "
 read POSITION
 
-while [ "$POSITION" -ne 59 ] && [ "$POSITION" -ne 17 ] && [ "$POSITION" -ne 25 ] && [ "$POSITION" -ne 35 ] && [ "$POSITION" -ne 41 ] && [ "$POSITION" -ne 47 ]; do
+while [ "$POSITION" -ne 0 ] && [ "$POSITION" -ne 17 ] && [ "$POSITION" -ne 25 ] && [ "$POSITION" -ne 35 ] && [ "$POSITION" -ne 41 ] && [ "$POSITION" -ne 47 ]; do
 	printf "Wrong starting location, try again: "
 	unset POSITION
 	read POSITION
