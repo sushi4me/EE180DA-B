@@ -24,7 +24,7 @@ while [ 0 ]; do
 	iwlist wlan0 scan | grep 'Address:\|Signal' | sed 's/.*Address: //; s/.*\([0-9]\{2\}\) dBm/\1/' | sed 'N; s/\n/ /' > $FILENAME
 	printf "DONE SCANNING!\n"	
 
-[D	printf "Go to next position (n) or rescan current position (r).  Use (q) to quit <n, r, q> : "
+	printf "Go to next position (n) or rescan current position (r).  Use (q) to quit <n, r, q> : "
 	read VAR
 
 	case $VAR in
@@ -32,8 +32,9 @@ while [ 0 ]; do
 		printf "Quitting!\n"
 		exit
 		;;
-	"f")
+	"n")
 		if [ $POSITION == 60 ]
+		then
 			POSITION=0
 		fi
 		((POSITION++))
