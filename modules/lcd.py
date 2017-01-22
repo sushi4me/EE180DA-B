@@ -29,6 +29,7 @@
 #----------------------------
 import pyupm_i2clcd as lcd
 import time
+
 #----------------------------
 # Globals
 #----------------------------
@@ -41,6 +42,21 @@ T="teal"
 OFF="off"
 #----------------------------
 # LCD Class
+# 
+# Description: Instantiates a Jhd1313m1 lcd and clears the screen.  The
+#        LCD class will be responsible for displaying game status and 
+#        notifications to the players.  The LCD class accepts contains
+#        member functions that accept color.  These colors are defined in
+#        the Globals section of this file.
+#
+# Member Functions:
+#        display(self, string, posX, posY, color=None)
+#        gameStatus(self, string, teamColor)
+#        capturedFlag(self)
+#        droppedFlag(self)
+#        frozen(self)
+#        gotPowerUp(self, string)
+#
 #----------------------------
 class lcd:
 
@@ -50,7 +66,7 @@ class lcd:
 	# Clear
 	myLcd.clear()
        
-        # Takes 4 Parameters: string, posX, posY, color=DefaultWhite
+        # Takes 4 Parameters: string, posX, posY, color=None
 	def display(self, string, posX, posY, color=None):
 		# Clear
 		self.myLcd.clear()
@@ -86,18 +102,23 @@ class lcd:
                 if color == OFF:
                     self.myLcd.clear()
 
-        def gameStatus(self, string):
-            self.display(string, 0, 0, Y)
+        # Displays game status string and color should indicate team color
+        def gameStatus(self, string, teamcolor):
+            self.display(string, 0, 0, teamcolor)
         
+        # Captured the Flag
         def capturedFlag(self):
             self.display("CAPTURED FLAG!", 0, 0, G)
         
+        # Dropped the Flag
         def droppedFlag(self):
             self.display("DROPPED FLAG!", 0, 0, R)
 
+        # Player Frozen
         def frozen(self):
             self.display("FROZEN! burr!", 0, 0, B)
 
+        # Picked up Power Up
         def gotPowerUp(self, string):
             message = string + " POWERUP!"
             sleeptime = 0.2
