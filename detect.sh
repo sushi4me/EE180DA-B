@@ -4,13 +4,16 @@ if [ ! -d "locations_data" ]; then
 	mkdir locations_data
 fi
 
-printf "(0)  Hallway 1              41----47
+printf "=============================================== 
+UCLA EIV 4th Floor WLAN SCAN ACCESS POINTS SSID
+===============================================
+(0)  Hallway 1              41----47
 (17) Hallway 2               |    |
 (25) Hallway 3      25------35    |
 (35) Hallway 4       |            |
 (41) Hallway 5       |            |
 (47) Hallway 6      17------------0 (EIV 44110)
-===============================================
+================================================
 Choose a starting position < 0, 17, 25, 35, 41, 47 > : "
 read POSITION
 
@@ -29,11 +32,11 @@ while [ 0 ]; do
 
 	printf "SCANNING Position $POSITION... PLEASE WAIT!\n"
 	iwlist wlan0 scan | grep 'Address:\|Signal' | sed 's/.*Address: //; s/.*\([0-9]\{2\}\) dBm/\1/' | sed 'N; s/\n/ /' > $FILENAME
-	printf "DONE SCANNING!\n"	
+	printf "DONE SCANNING!\n\n"	
 
 	if [ $POSITION == 60 ]
 	then
-		printf "Reached last position.  Selecting (n) will take you to position 0\n"	
+		printf "REACHED LAST POSITION!\nSELECTING (n) WILL SCAN POSITION 0\n"	
 	fi
 
 	printf "Go to next position (n) or rescan current position (r).  Use (q) to quit <n, r, q> : "
