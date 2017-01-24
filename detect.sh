@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if [ ! -d "locations_data" ]; then
-	mkdir locations_data
-fi
-
 printf "=============================================== 
 UCLA EIV 4th Floor WLAN SCAN ACCESS POINTS SSID
 ===============================================
@@ -22,6 +18,11 @@ while [ "$POSITION" -ne 0 ] && [ "$POSITION" -ne 17 ] && [ "$POSITION" -ne 25 ] 
 	unset POSITION
 	read POSITION
 done
+
+# Create "locations_data" directory in working directory to store data files
+if [ ! -d "locations_data" ]; then
+	mkdir locations_data
+fi
 
 while [ 0 ]; do
 
