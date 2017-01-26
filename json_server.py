@@ -54,7 +54,8 @@ def main():
 		if input() == 'q': break
 	"""
 
-	host = 'wifi-131-179-2-179.host.ucla.edu'
+	#host = 'wifi-131-179-2-179.host.ucla.edu'
+	host = 'localhost'	
 	port = 8888
 	server = Server(host, port)
 

@@ -46,7 +46,8 @@ def main():
 		s.close
 	"""
 
-	host = 'wifi-131-179-3-10.host.ucla.edu'
+	#host = 'wifi-131-179-3-10.host.ucla.edu'
+	host = 'localhost'	
 	port = 8888
 
 	while True:
