@@ -32,7 +32,7 @@ while [ 0 ]; do
 
 
 	printf "SCANNING Position $POSITION... PLEASE WAIT!\n"
-	iwlist wlan0 scan | grep 'Address:\|Signal' | sed 's/.*Address: //; s/.*\([0-9]\{2\}\) dBm/\1/' | sed 'N; s/\n/ /' > $FILENAME
+	iwlist wlan0 scan | grep 'Address:\|Signal' | sed 's/.*Address: //; s/.*\([0-9]\{2\}\) dBm/\1/' | sed 'N; s/\n/ /' | sort > $FILENAME
 	printf "DONE SCANNING!\n\n"	
 
 	if [ $POSITION == 60 ]
