@@ -1,21 +1,5 @@
 #!/bin/bash
 
-<<<<<<< HEAD
-# UCLA EE 180D data collection script.
-# The script expects one argument:
-# 	./detect.sh position(num)
-#
-# This argument must not contain any
-# spaces.
-#
-# example:
-#	./detect.sh position5
-
-if [ $# -ne 1 ]
-then
-	echo -e "Error: Wrong number of operands\nUsage: $0 FILE_PREFIX"
-	exit 1
-=======
 printf "=============================================== 
 UCLA EIV 4th Floor WLAN SCAN ACCESS POINTS SSID
 ===============================================
@@ -38,7 +22,6 @@ done
 # Create "locations_data" directory in working directory to store data files
 if [ ! -d "locations_data" ]; then
 	mkdir locations_data
->>>>>>> bfa7d1adbbbb5bced7b456a144c10fd439d2be45
 fi
 
 while [ 0 ]; do
