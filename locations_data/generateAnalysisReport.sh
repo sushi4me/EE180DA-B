@@ -2,7 +2,7 @@
 
 # Analysis File Name
 TSTAMP=$(date +%s)
-AF=ANALYSIS.TXT.$TSTAMP
+AF=ANALYSIS_$TSTAMP.txt
 touch $AF
 
 # Position Index
