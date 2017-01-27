@@ -1,15 +1,15 @@
 #!/usr/bin/python
 
 import json
-from jsonsocket import Server
+from modules.jsonsocket import Server
 from optparse import OptionParser
-import os
 import socket
+from subprocess import call
 import sys
 
-def new_socket_connection(c):
+def new_socket_connection(server):
 	while True:	
-		print c.recv()
+		print server.recv()
 	'''
 		try:	
 			print 'Got connection from: ', client_address
@@ -54,7 +54,8 @@ def main():
 		if input() == 'q': break
 	"""
 
-	host = 'wifi-131-179-3-10.host.ucla.edu'
+	#host = 'wifi-131-179-2-179.host.ucla.edu'
+	host = 'localhost'	
 	port = 8888
 	server = Server(host, port)
 
@@ -64,6 +65,7 @@ def main():
 		if newpid == 0:
 			while True:
 				data = server.recv()
+				print data
 
 	server.close()
 if __name__ == "__main__":

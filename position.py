@@ -4,16 +4,7 @@ import sys
 from os import listdir
 from os.path import isfile, join
 from optparse import OptionParser
-
-def getPairs(filename):
-    dict = {}
-
-    with open(filename) as f:
-        for line in f:
-            key, val = line.split()
-            dict[key + "\n"] = int(val)
-
-    return dict
+from posutils import parse_as_dict, write_to_file
 
 def main():
     version_msg = "%prog 1.0"
@@ -32,18 +23,15 @@ def main():
     if len(args) != 1:
         parser.error("Wrong number of operands.")
 
-    inputFile = args[0]
+    input_file = args[0]
 
     # Collect files from reference db.
-    if options.dir is not None:
-        locationsDir = options.dir
-    else:
-        locationsDir = "locations_data"
-    locationFiles = [join(locationsDir, f) for f in listdir(locationsDir) if isfile(join(locationsDir, f))]
+    db = "reference_database" if options.dir is None else options.dir
+    files = [join(db, f) for f in listdir(db) if isfile(join(db, f))]
     
     # Parse RSSI, place in dictionary with MAC address as key.
-    rssiObserved = getPairs(inputFile)
-    rssiReferences = [getPairs(file) for file in locationFiles]
+    rssiObserved = parse_as_dict(input_file)
+    rssiReferences = [parse_as_dict(f) for f in files]
 
     distances = [[] for i in range(len(rssiReferences))] # Euclidean distances.
 
@@ -63,7 +51,7 @@ def main():
     pos = scores.index(min(scores))
 
     # TO-DO: Print coordinates of location instead of location filename.
-    msg = "You are probably at " + locationFiles[pos]
+    msg = "You are probably at " + files[pos]
     if options.file is not None:
         with open(options.file, "w") as f:
             f.write(msg + "\n")

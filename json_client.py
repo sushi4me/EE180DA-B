@@ -5,8 +5,10 @@ Takes in one argument which is the hostname of the server.
 """
 
 from modules.jsonsocket import Client
+import mraa
 from optparse import OptionParser
 import socket
+from subprocess import call
 import sys
 import time
 
@@ -44,21 +46,23 @@ def main():
 		s.close
 	"""
 
-	host = 'wifi-131-179-3-10.host.ucla.edu'
+	#host = 'wifi-131-179-3-10.host.ucla.edu'
+	host = 'localhost'	
 	port = 8888
 
 	while True:
-		pos = input('What is your position (1-10): ')
+		name = input('Enter any string to be sent: ')
+		test_dict = dict([('wifi1', 1), ('wifi2', 2)]);
 		data = {
 			'player': 1,
-			'position': pos,
-			'use':	0
+			'name': name,
+			'use':	0,
+			'wifi_list' : test_dict
 		}		
 		client = Client()
 		client.connect(host, port)
 		client.send(data)
 		client.close()
-		time.sleep(1)
 
 if __name__ == "__main__":
 	main()
