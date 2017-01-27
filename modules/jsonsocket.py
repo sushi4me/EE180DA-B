@@ -129,7 +129,7 @@ def _recv(socket):
     recv_size = socket.recv_into(view[next_offset:], total - next_offset)
     next_offset += recv_size
   try:
-    deserialized = json.loads(view.tobytes())
+    deserialized = json.dumps(json.loads(view.tobytes()))
   except (TypeError, ValueError), e:
     raise Exception('Data received was not in JSON format')
   return deserialized

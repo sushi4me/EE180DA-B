@@ -51,7 +51,7 @@ def main():
 	port = 8888
 
 	while True:
-		name = input('Enter any string to be sent: ')
+		name = raw_input('Enter any string to be sent: ')
 		test_dict = dict([('wifi1', 1), ('wifi2', 2)]);
 		data = {
 			'player': 1,
