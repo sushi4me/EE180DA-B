@@ -59,7 +59,7 @@ class lcd:
 			self.myLcd.setColor(0, 255, 0)
 		# Red
 		elif color == R:
-			self.myLcd.setColor(150, 0, 0)
+			self.myLcd.setColor(100, 0, 0)
 		# Blue
 		elif color == B:
 			self.myLcd.setColor(25, 25, 255)
