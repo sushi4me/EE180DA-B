@@ -27,6 +27,7 @@ Development environment specifics:
 #include <stdio.h>
 #include <mraa/i2c.h>
 #include "LSM9DS0.h"
+#include <unistd.h>
 
 #define XM_ADDR 0x1d
 #define GYRO_ADDR 0x6B

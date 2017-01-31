@@ -4,6 +4,7 @@
 #include "MadgwickAHRS.h"
 #include <math.h>
 #include <string.h>
+#include <unistd.h>
 
 #define pi 3.14159265359
 #define degToRad pi/180.f //would be faster as a constant
@@ -26,10 +27,9 @@ struct Angle
 const double time_interval = (double)microSeconds/1000000;
 
 int main() {
-	data_t accel_data, gyro_data, mag_data;
+	data_t accel_data, gyro_data;
 	data_t gyro_offset;
-	int16_t temperature;
-	float a_res, g_res, m_res;
+	float a_res, g_res;
 	mraa_i2c_context accel, gyro, mag;
 	accel_scale_t a_scale = A_SCALE_4G;
 	gyro_scale_t g_scale = G_SCALE_2000DPS;
@@ -54,7 +54,6 @@ int main() {
 	
 	mag = mag_init();
 	set_mag_scale(mag, m_scale);
-	m_res = calc_mag_res(m_scale);
 
 	//print header
 	printHeader();
