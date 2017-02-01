@@ -1,10 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <mraa/i2c.h>
 #include "LSM9DS0.h"
 #include "MadgwickAHRS.h"
 #include <math.h>
 #include <string.h>
 #include <unistd.h>
+#include <time.h>
 
 #define pi 3.14159265359
 #define degToRad pi/180.f //would be faster as a constant
@@ -30,10 +32,19 @@ int main() {
 	data_t accel_data, gyro_data;
 	data_t gyro_offset;
 	float a_res, g_res;
-	mraa_i2c_context accel, gyro, mag;
-	accel_scale_t a_scale = A_SCALE_4G;
-	gyro_scale_t g_scale = G_SCALE_2000DPS;
-	mag_scale_t m_scale = M_SCALE_2GS;
+	mraa_i2c_context accel, gyro;
+	accel_scale_t a_scale = A_SCALE_2G;	//accel scale set to 2g (changed from 4)
+	gyro_scale_t g_scale = G_SCALE_245DPS;	//gyro scale set to 245 dps (changed from 2000)
+
+	//generate timestamp
+	time_t rawtime;
+	struct tm *timeinfo;
+	const int NAME_SIZE = 25;
+	char filename[NAME_SIZE], timestamp[NAME_SIZE];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	strftime(timestamp, NAME_SIZE, "%Y%m%d_%X", timeinfo);
 
 	//initialize Omega to zero and prev_data
 	Omega.x = 0;
@@ -52,8 +63,6 @@ int main() {
 	set_gyro_scale(gyro, g_scale);
 	g_res = calc_gyro_res(g_scale);
 	
-	mag = mag_init();
-	set_mag_scale(mag, m_scale);
 
 	//print header
 	printHeader();
@@ -63,6 +72,7 @@ int main() {
 	
 	//print offsets
 	printf("x_offset: %f y_offset: %f z_offset: %f\n", gyro_offset.x, gyro_offset.y, gyro_offset.z);
+	
 	
 	//Prompt user for gesture and print sensor data
 	while(1) {
@@ -75,6 +85,7 @@ int main() {
 		printf("ERROR: Invalid gesture number!\n");
 		continue;
 	      }
+
 	      switch(i){
 	      case 1:
 	      case 2:
@@ -82,6 +93,23 @@ int main() {
 	      case 4:
 	      case 5:
 		{
+
+		//Create new text file
+		
+		//snprintf(filename, NAME_SIZE, "%i_%s.txt", i, timestamp);
+		sprintf(filename, "%i_%s.txt", i, timestamp);
+		
+		FILE *f = fopen(filename, "w");
+
+		if (f == NULL)
+		{
+			printf("Error opening file!\n");
+			exit(1);
+		}
+
+		//fprintf(f, "\n\t\tGyroscope\t\t\t||");
+		//fprintf(f, "\t\t\t\tAccelerometer\t\t\t\t\t||\n");
+
 		  for (i=0; i < numDataPoints; i++){
 		accel_data = read_accel(accel, a_res);
 		gyro_data = read_gyro(gyro, g_res);
@@ -111,9 +139,13 @@ int main() {
 		Omega.x *= 180 / pi;
 		Omega.y *= 180 / pi;
 		Omega.z *= 180 / pi;
-  		printf("X: %f\t Y: %f\t Z: %f\t", gyro_data.x - gyro_offset.x, gyro_data.y - gyro_offset.y, gyro_data.z - gyro_offset.z);
-		printf("OmegaX %f\tOmegaY %f \tOmegaZ %f\t\n", Omega.x,Omega.y,Omega.z);
+
+  		fprintf(f, "X: %f\t Y: %f\t Z: %f\t||", gyro_data.x - gyro_offset.x, gyro_data.y - gyro_offset.y, gyro_data.z - gyro_offset.z);
+		fprintf(f, "\tOmegaX: %f\t OmegaY: %f\t OmegaZ: %f\t||\n", Omega.x,Omega.y,Omega.z);
+
 		usleep(microSeconds);
+		fclose(f);
+
 		  }
 		break;
 		}
