@@ -15,7 +15,8 @@ import time
 
 def dof_function():
 		dof  = DOFsensor()
-		print "Done"
+		dof.update_values()
+		print "Here: ", dof.getAX()
 
 def network_connect(host_name, post):
 	while True:
@@ -47,7 +48,7 @@ def main():
 
 	parser.add_option("-s", "--specific", action="store", 
 		dest="specific_host", help="Use spcific HOST.")
-	parser.add_option("-t", "--test", action="store_true",
+	parser.add_option("-t", "--test", action="store_true", default=False,
 		dest="dof_test", help="Enables DOF testing.")
 
 	options, args = parser.parse_args(sys.argv[1:])
@@ -59,9 +60,9 @@ def main():
 	port = 8888
 
 	# Option select
-	if dof_test == True:
+	if options.dof_test == True:
 		dof_function()
-	elif dof != True:
+	elif options.dof_test == False:
 		network_connect(host_name, post)
 
 if __name__ == "__main__":
