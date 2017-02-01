@@ -11,8 +11,8 @@
 #define microSeconds  100000 //0.1s or 10Hz
 #define testTimeMS 4000000 // 5.0s each gesture will be recorded for testTime seconds
 #define numDataPoints testTimeMS / microSeconds
-char buffer[256];
 
+char buffer[256];
 
 void printHeader(void);
 
