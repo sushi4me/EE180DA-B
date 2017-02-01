@@ -26,13 +26,6 @@ imu.mag_range("2GAUSS")     # leave blank for default of "2GAUSS"
 # Specify Options: "245DPS", "500DPS", "2000DPS" 
 imu.gyro_range("245DPS")    # leave blank for default of "245DPS"
 
-# count and occurences used to detect gesture
-gestureoccured = 10
-posthreshold = 0.8
-negthreshold = -0.8
-count = 0
-occurence = 0
-
 # Loop and read accel, mag, and gyro
 while(1):
     imu.read_accel()
