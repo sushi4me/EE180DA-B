@@ -2,6 +2,7 @@
 
 """
 Notes:
+	0 is PRESSED, 1 is NOT PRESSED
 	BUTTON_UP	47
 	BUTTON_DOWN	44
 	BUTTON_LEFT	165
@@ -13,7 +14,7 @@ Notes:
 
 from modules.jsonsocket import Client
 from modules.dof import DOFsensor
-from modules.oled import OLED as o
+from modules.oled import OLED
 import mraa
 from optparse import OptionParser
 import socket
@@ -21,13 +22,13 @@ from subprocess import call
 import sys
 import time
 
-BUTTON_UP = 	mraa.Gpio(47)
-BUTTON_DOWN = 	mraa.Gpio(44)
-BUTTON_LEFT = 	mraa.Gpio(165)
-BUTTON_RIGHT = 	mraa.Gpio(45)
-BUTTON_SELECT = mraa.Gpio(48)
-BUTTON_A = 	mraa.Gpio(49)
-BUTTON_B = 	mraa.Gpio(46)
+BUTTON_UP = 	mraa.Gpio(47, owner=False, raw=True)
+BUTTON_DOWN = 	mraa.Gpio(44, owner=False, raw=True)
+BUTTON_LEFT = 	mraa.Gpio(165, owner=False, raw=True)
+BUTTON_RIGHT = 	mraa.Gpio(45, owner=False, raw=True)
+BUTTON_SELECT = mraa.Gpio(48, owner=False, raw=True)
+BUTTON_A = 	mraa.Gpio(49, owner=False, raw=True)
+BUTTON_B = 	mraa.Gpio(46, owner=False, raw=True)
 
 BUTTON_UP.dir(mraa.DIR_IN)
 BUTTON_DOWN.dir(mraa.DIR_IN)
@@ -38,9 +39,10 @@ BUTTON_A.dir(mraa.DIR_IN)
 BUTTON_B.dir(mraa.DIR_IN)
 
 def dof_function():
+	m_OLED = OLED()
 	while True:
-		if BUTTON_A.read() == 1
-			o.write("Hello")
+		if BUTTON_A.read() == 0:
+			m_OLED.write("Hello")
 
 def network_connect(host_name, post):
 	while True:
