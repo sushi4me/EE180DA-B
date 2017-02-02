@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from SF_9DOF import IMU
+from subprocess import call
 import time
 
 # Create IMU object
@@ -51,6 +52,7 @@ while(1):
     
     if abs(occurence) >= gestureoccured:
         print("SHOTS FIRED!!!!!!")
+        call(["./freeze"])
         occurence = 0
         count = 0
     
@@ -60,3 +62,6 @@ while(1):
 
     # Sleep for 2/10th of a second
     time.sleep(0.05)
+
+
+
