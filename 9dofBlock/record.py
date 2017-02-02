@@ -2,6 +2,17 @@
 
 from SF_9DOF import IMU
 import time
+import os
+from time import gmtime, strftime
+
+# Globals 
+WAITSECS = 0.1;
+NUMDATAPOINTS = 40;
+DIRECTORY = "gesture_data"
+
+# Create Directory for file if does not exist
+if not os.path.exists(DIRECTORY):
+    os.makedirs(DIRECTORY)
 
 # Create IMU object
 imu = IMU() # To select a specific I2C port, use IMU(n). Default is 1. 
@@ -26,21 +37,41 @@ imu.mag_range("2GAUSS")     # leave blank for default of "2GAUSS"
 # Specify Options: "245DPS", "500DPS", "2000DPS" 
 imu.gyro_range("245DPS")    # leave blank for default of "245DPS"
 
-# count and occurences used to detect gesture
-gestureoccured = 10
-posthreshold = 0.8
-negthreshold = -0.8
-count = 0
-occurence = 0
 
-# Loop and read accel, mag, and gyro
+def recordData(x):
+    tstamp = strftime("_%Y-%m-%d%H:%M:%S", gmtime())
+    file = DIRECTORY + '/' + str(x) + tstamp
+    fd = open(file, 'w')
+
+    # Loop and read accel, mag, and gyro
+    for i in range(NUMDATAPOINTS):
+
+        imu.read_accel()
+        imu.read_gyro()
+
+        # Print the results
+        fd.write("Accel-X: %.8f\tY: %.8f\tZ: %.8f\t|  Gyro-X: %.8f\tY: %.8f\tZ: %.8f\n\
+        " % (imu.ax*10, imu.ay*10, imu.az*10, imu.gx, imu.gy, imu.gz))
+
+        # Sleep for 1/10th of a second
+        time.sleep(WAITSECS)
+    fd.close()
+
 while(1):
-    imu.read_accel()
-    imu.read_gyro()
+    try:
+        input = int(raw_input('Choose a gesture (1-5): '))
+    except ValueError: # just catch the exceptions you know!
+        print("That\'s not a number!")
+    else:
+        if 1 <= input < 6: # this is faster
+            print("Will begin recording in: ")
+            for i in range(3):
+                print(str(3 - i))
+                time.sleep(1)
+            print("RECORDING DATA...")
+            recordData(input)
+            print("COMPLETE!")
+        else:
+            print 'Not a valid entry. Try again'
 
-    # Print the results
-    print("Accel-X: %.8f\tY: %.8f\tZ: %.8f\t|  Gyro-X: %.8f\tY: %.8f\tZ: %.8f\
-            " % (imu.ax*10, imu.ay*10, imu.az*10, imu.gx, imu.gy, imu.gz))
 
-    # Sleep for 1/20th of a second
-    time.sleep(0.05)
