@@ -1,12 +1,19 @@
 #!/usr/bin/python
 
 """
-Takes in one argument which is the hostname of the server.
+Notes:
+	BUTTON_UP	47
+	BUTTON_DOWN	44
+	BUTTON_LEFT	165
+	BUTTON_RIGHT	45
+	BUTTON_SELECT	48
+	BUTTON_A	49
+	BUTTON_B	46
 """
 
 from modules.jsonsocket import Client
 from modules.dof import DOFsensor
-from modules.oled import OLED
+from modules.oled import OLED as o
 import mraa
 from optparse import OptionParser
 import socket
@@ -14,10 +21,26 @@ from subprocess import call
 import sys
 import time
 
+BUTTON_UP = 	mraa.Gpio(47)
+BUTTON_DOWN = 	mraa.Gpio(44)
+BUTTON_LEFT = 	mraa.Gpio(165)
+BUTTON_RIGHT = 	mraa.Gpio(45)
+BUTTON_SELECT = mraa.Gpio(48)
+BUTTON_A = 	mraa.Gpio(49)
+BUTTON_B = 	mraa.Gpio(46)
+
+BUTTON_UP.dir(mraa.DIR_IN)
+BUTTON_DOWN.dir(mraa.DIR_IN)
+BUTTON_LEFT.dir(mraa.DIR_IN)
+BUTTON_RIGHT.dir(mraa.DIR_IN)
+BUTTON_SELECT.dir(mraa.DIR_IN)
+BUTTON_A.dir(mraa.DIR_IN)
+BUTTON_B.dir(mraa.DIR_IN)
+
 def dof_function():
-		dof  = DOFsensor()
-		dof.update_values()
-		print "Here: ", dof.getAX()
+	while True:
+		if BUTTON_A.read() == 1
+			o.write("Hello")
 
 def network_connect(host_name, post):
 	while True:
