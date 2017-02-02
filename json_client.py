@@ -6,6 +6,7 @@ Takes in one argument which is the hostname of the server.
 
 from modules.jsonsocket import Client
 from modules.dof import DOFsensor
+from modules.oled import OLED
 import mraa
 from optparse import OptionParser
 import socket
