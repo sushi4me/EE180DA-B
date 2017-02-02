@@ -1,3 +1,4 @@
+import mraa
 import pyupm_i2clcd as oledObj
 
 class OLED:
