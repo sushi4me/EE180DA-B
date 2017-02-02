@@ -26,7 +26,9 @@ import time
 def dof_function():
 	m_OLED = OLED()
 	while True:
-		if m_OLED.BUTTON_A.read() == 0:
+		if m_OLED.BUTTON_A.read() == 0 and m_OLED.BUTTON_B.read() == 0:
+			exit()
+		elif m_OLED.BUTTON_A.read() == 0:
 			m_OLED.clear()
 			m_OLED.write("Hello")
 
