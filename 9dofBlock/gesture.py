@@ -28,7 +28,7 @@ imu.mag_range("2GAUSS")     # leave blank for default of "2GAUSS"
 imu.gyro_range("245DPS")    # leave blank for default of "245DPS"
 
 # count and occurences used to detect gesture
-gestureoccured = 10
+gestureoccured = 10 
 posthreshold = 0.8
 negthreshold = -0.8
 count = 0
@@ -51,7 +51,6 @@ while(1):
         count += 1
     
     if abs(occurence) >= gestureoccured:
-        print("SHOTS FIRED!!!!!!")
         call(["./freeze"])
         occurence = 0
         count = 0
