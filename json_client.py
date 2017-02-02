@@ -5,6 +5,7 @@ Takes in one argument which is the hostname of the server.
 """
 
 from modules.jsonsocket import Client
+from modules.9dof import
 import mraa
 from optparse import OptionParser
 import socket
