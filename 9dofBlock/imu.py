@@ -36,4 +36,4 @@ while(1):
             " % (imu.ax*10, imu.ay*10, imu.az*10, imu.gx, imu.gy, imu.gz))
 
     # Sleep for 1/20th of a second
-    time.sleep(0.05)
+    time.sleep(0.02)
