@@ -6,8 +6,8 @@ import os
 from time import gmtime, strftime
 
 # Globals 
-WAITSECS = 0.1;
-NUMDATAPOINTS = 40;
+WAITSECS = 0.02;
+NUMDATAPOINTS = 100;
 DIRECTORY = "gesture_data"
 
 # Create Directory for file if does not exist
@@ -45,7 +45,6 @@ def recordData(x):
 
     # Loop and read accel, mag, and gyro
     for i in range(NUMDATAPOINTS):
-
         imu.read_accel()
         imu.read_gyro()
 
