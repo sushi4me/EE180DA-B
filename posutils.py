@@ -1,15 +1,14 @@
 import sys
 
-def parse_as_dict(filename):
+def parse_as_dict(dataobj):
     dict = {}
 
-    with open(filename) as f:
-        for line in f:
-            try: 
-                key, val = line.split()
-                dict[key] = int(val)
-            except ValueError:
-                continue
+    for line in dataobj:
+        try: 
+            key, val = line.split()
+            dict[key] = int(val)
+        except ValueError:
+            continue
 
     return dict
 

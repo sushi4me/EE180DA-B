@@ -1,5 +1,6 @@
-#file:jsonsocket.py
-#https://github.com/mdebbar/jsonsocket
+# FILE:	jsonsocket.py
+# FROM: //github.com/mdebbar/jsonsocket
+
 import json, socket
 
 class Server(object):
