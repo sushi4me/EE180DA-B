@@ -10,8 +10,8 @@ from subprocess import call
 import sys
 
 def client_connect(server, num):
-	print "Someone connected!"
-	server.send({'player_num' : num})
+	print 'Connecting to player %d!' % num
+	server.send({'player_num': num})
 	while True:	
 		print server.recv()
 	'''
@@ -65,16 +65,16 @@ def main():
 	port = 8888
 	server = Server(host, port)
 	client_process_list = []
-	count = 0
+	num = 1
 
 	# Accept incoming connections and make a thread for it
 	print "Set-up complete!"
 	while True:
-		print "Hello"
+		print "Awaiting for a player to connect..."
 		server.accept()
-		print "Done with accept"
-		process = Process(target=client_connect, name=count, args=(server, count ))
-		count += 1
+		print "Player connected! Creating new process!"
+		process = Process(target=client_connect, args=(server, num ))
+		num += 1
 		client_process_list.append(process)
 		process.start()
 
@@ -83,3 +83,4 @@ def main():
 
 if __name__ == "__main__":
 	main()
+

@@ -13,6 +13,7 @@ Notes:
 		BUTTON_B	46
 """
 
+import json
 from modules.jsonsocket import Client
 from modules.dof import DOFsensor
 from modules.oled import OLED
@@ -34,12 +35,15 @@ def dof_function():
 
 def network_connect(client, conn):
 	print "You are now connected!"
-	player_num = client.recv()
+	raw_player_num = client.recv()
+	temp = json.loads(raw_player_num)
+	player_num = temp['player_num']
 
 	while True:
-		print "Hello"
+		print "Polling..."
 		if conn.poll():
-			conn.recv()	
+			conn.recv()
+			# Interrupted main section here, set condition	
 		name = raw_input('Enter any string to be sent: ')
 		test_dict = dict([('fake_wifi', 100)]);
 
@@ -56,6 +60,7 @@ def network_connect(client, conn):
 
 def waiting_function(client, conn):
 	response = client.recv()
+	# May have to parse in here
 	conn.send([response])
 	conn.close()
 
@@ -87,10 +92,10 @@ def main():
 
 	# GENERATE DICTIONARIES
 
+	network_connect(client, parent_conn)
+
 	process = Process(target=waiting_function, args=(client, child_conn, ))
 	process.start()
-
-	network_connect(client, parent_conn)
 	print "3"
 	# OPEN A WAITING PROCESS
 
