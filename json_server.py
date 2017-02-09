@@ -10,6 +10,7 @@ from subprocess import call
 import sys
 
 def client_connect(server, num):
+	print "Someone connected!"
 	server.send({'player_num' : num})
 	while True:	
 		print server.recv()
@@ -67,12 +68,15 @@ def main():
 	count = 0
 
 	# Accept incoming connections and make a thread for it
+	print "Set-up complete!"
 	while True:
+		print "Hello"
 		server.accept()
+		print "Done with accept"
 		process = Process(target=client_connect, name=count, args=(server, count ))
 		count += 1
 		client_process_list.append(process)
-		process.start
+		process.start()
 
 	# Join & close server
 	server.close()
