@@ -4,6 +4,7 @@ from SF_9DOF import IMU
 import time
 import os
 from time import gmtime, strftime
+import sys
 
 # Globals 
 WAITSECS = 0.02;
@@ -13,6 +14,12 @@ DIRECTORY = "gesture_data"
 # Create Directory for file if does not exist
 if not os.path.exists(DIRECTORY):
     os.makedirs(DIRECTORY)
+
+# Print Program Header
+print("\
+=======================================\n\
+STARTING GESTURE RECORDING TOOL\n\
+=======================================")
 
 # Create IMU object
 imu = IMU() # To select a specific I2C port, use IMU(n). Default is 1. 
@@ -58,15 +65,18 @@ def recordData(x):
 
 while(1):
     try:
-        input = int(raw_input('Choose a gesture (1-5): '))
+        input = int(raw_input('Choose a gesture (1-9): '))
     except ValueError: # just catch the exceptions you know!
         print("That\'s not a number!")
     else:
-        if 1 <= input < 6: # this is faster
-            print("Will begin recording in: ")
+        if 1 <= input <= 9: # this is faster
             for i in range(3):
-                print(str(3 - i))
+                os.system('clear')
+                sys.stdout.write("Will begin recording in: ")
+                sys.stdout.write(str(3 - i))
+                sys.stdout.flush()
                 time.sleep(1)
+            print("")
             print("RECORDING DATA...")
             recordData(input)
             print("COMPLETE!")
