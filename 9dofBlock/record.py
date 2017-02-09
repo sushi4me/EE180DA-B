@@ -6,8 +6,8 @@ import os
 from time import gmtime, strftime
 
 # Globals 
-WAITSECS = 0.1;
-NUMDATAPOINTS = 40;
+WAITSECS = 0.02;
+NUMDATAPOINTS = 100;
 DIRECTORY = "gesture_data"
 
 # Create Directory for file if does not exist
@@ -40,12 +40,11 @@ imu.gyro_range("245DPS")    # leave blank for default of "245DPS"
 
 def recordData(x):
     tstamp = strftime("_%Y-%m-%d%H:%M:%S", gmtime())
-    file = DIRECTORY + '/' + str(x) + tstamp
+    file = DIRECTORY + '/' + str(x) + tstamp + ".txt"
     fd = open(file, 'w')
 
     # Loop and read accel, mag, and gyro
     for i in range(NUMDATAPOINTS):
-
         imu.read_accel()
         imu.read_gyro()
 

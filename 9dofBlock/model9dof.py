@@ -44,9 +44,14 @@ def clearGrid():
                 grid[i][j] = '_'
 
 def printImage(x, y):
+    r = max(0, int(rows/2) - x)
+    r = min(rows - 1, (int(rows/2) - x))
+    c = max(0, (int(cols/2) + y))
+    c = min(cols - 1, (int(cols/2) + y))
+    
     clearGrid()
-    grid[int(rows/2) - x][int(cols/2) + y] = '*'
-    grid[-(int(rows/2) - x)][-(int(cols/2) + y)] = '*'
+    grid[r][c] = '*'
+    grid[-r][-c] = '*'
     for i in range(rows):
         print(*grid[i], sep='')
 
