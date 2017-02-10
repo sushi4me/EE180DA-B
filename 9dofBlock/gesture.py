@@ -1,8 +1,34 @@
 #!/usr/bin/python
-
+#---------------------------------
+# Modules
+#---------------------------------
 from SF_9DOF import IMU
 from subprocess import call
 import time
+
+#---------------------------------
+# Globals
+#---------------------------------
+# Occurence Threshold for gesture occured
+SLEEP_TIME = 0.05
+
+# Gesture 1 Constants
+#--------------------
+gesturedetected = 0
+gestureoccured = 9
+# Position Threshold to start recording gesture
+posthreshold = 0.8
+negthreshold = -0.8
+count = 0
+occurence = 0
+
+# Gesture 2 Constants
+#--------------------
+
+
+#---------------------------------
+# Initialize IMU
+#---------------------------------
 
 # Create IMU object
 imu = IMU() # To select a specific I2C port, use IMU(n). Default is 1. 
@@ -27,40 +53,35 @@ imu.mag_range("2GAUSS")     # leave blank for default of "2GAUSS"
 # Specify Options: "245DPS", "500DPS", "2000DPS" 
 imu.gyro_range("245DPS")    # leave blank for default of "245DPS"
 
-# count and occurences used to detect gesture
-gestureoccured = 9 
-posthreshold = 0.8
-negthreshold = -0.8
-count = 0
-occurence = 0
+#----------------------------------
+# run Module
+#----------------------------------
+def run():
+	# Loop and read accel, mag, and gyro
+	while(1):
+    		imu.read_accel()
+    		imu.read_gyro()
 
-# Loop and read accel, mag, and gyro
-while(1):
-    imu.read_accel()
-    imu.read_gyro()
-
-    # Print the results
-    #print("Accel-X: %.8f\tY: %.8f\tZ: %.8f\t|  Gyro-X: %.8f\tY: %.8f\tZ: %.8f\
-    #        " % (imu.ax*10, imu.ay*10, imu.az*10, imu.gx, imu.gy, imu.gz))
-
-    if imu.az > posthreshold:
-        occurence += 1
-    elif imu.az < negthreshold:
-        occurence -= 1
-    else:
-        count += 1
+    		if imu.az > posthreshold:
+        		occurence += 1
+    		elif imu.az < negthreshold:
+        		occurence -= 1
+    		else:
+        		count += 1
     
-    if abs(occurence) >= gestureoccured:
-        call(["./freeze"])
-        occurence = 0
-        count = 0
+    		if abs(occurence) >= gestureoccured:
+        		print "gesture received"
+        		occurence = 0
+        		count = 0
     
-    if count > 5:
-        occurence = 0
-        count = 0
+    		if count > 5:
+        		occurence = 0
+        		count = 0
 
-    # Sleep for 2/10th of a second
-    time.sleep(0.05)
+    		# Sleep for SLEEP_TIME seconds
+    		time.sleep(SLEEP_TIME)
 
 
-
+def reset():
+	# Reset gesturedetected value
+	gesturedetected = 0
