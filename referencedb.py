@@ -4,7 +4,7 @@ import sys
 from os import listdir
 from os.path import isdir, isfile, join
 from optparse import OptionParser
-from posutils import parse_as_dict, write_to_file
+from posutils import parse_as_dict, file_as_dict, write_to_file
 
 def calculate_average_rssi(files):
     dicts = []
@@ -12,7 +12,7 @@ def calculate_average_rssi(files):
     # Let's parse each file...
     for f in files:
         print "Parsing %s..." % f
-        dicts.append(parse_as_dict(f))
+        dicts.append(file_as_dict(f))
         print "Done parsing %s..." % f
 
     # Create a new dictionary to contain all "found" MAC addresses.

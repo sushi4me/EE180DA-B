@@ -6,7 +6,7 @@ from operator import itemgetter
 from os import listdir
 from os.path import isfile, join
 from optparse import OptionParser
-from posutils import parse_as_dict, write_to_file
+from posutils import parse_as_dict, file_as_dict, write_to_file
 
 def sample_current_location():
     # Spawn child process and read stdout.
@@ -19,9 +19,9 @@ def sample_current_location():
     rssiObserved = parse_as_dict(output)
     
     # Keep only the "strongest" signals.
-    trunc_rssi = dict(sorted(rssiObserved.iteritems(), key=itemgetter(1), reverse=True)[:35])
+    #trunc_rssi = dict(sorted(rssiObserved.iteritems(), key=itemgetter(1), reverse=True)[:35])
 
-    return trunc_rssi
+    return rssiObserved
 
 def main():
     version_msg = "%prog 1.0"
@@ -43,7 +43,7 @@ def main():
     
     # Parse RSSI, place in dictionary with MAC address as key.
     rssiObserved = sample_current_location()
-    rssiReferences = [parse_as_dict(f) for f in files]
+    rssiReferences = [file_as_dict(f) for f in files]
 
     distances = [[] for i in range(len(rssiReferences))] # Euclidean distances.
 
