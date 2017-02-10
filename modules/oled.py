@@ -20,8 +20,8 @@ class OLED:
 	BUTTON_A.dir(mraa.DIR_IN)
 	BUTTON_B.dir(mraa.DIR_IN)
 
-	def __init__():
-		self.oled.setTextWrap(1)
+	def __init__(self):
+		#self.oled.setTextWrap(1)
 		self.oled.clear()
 
 	def write(self, string):

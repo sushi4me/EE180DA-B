@@ -86,8 +86,10 @@ def main():
 		host = options.specific_host
 	else:
 		host = 'localhost'
+
 	port = 8888
 	client = Client()
+	print 'Trying to connect to %s...' % host
 	client.connect(host, port)
 
 	# GENERATE DICTIONARIES
