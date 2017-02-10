@@ -59,9 +59,12 @@ def main():
 		if input() == 'q': break
 	"""
 
+	if options.specific_host is not None:
+		host = options.specific_host
+	else:
+		host = 'localhost'
+
 	# Set up server variables
-	#host = 'wifi-131-179-2-179.host.ucla.edu'
-	host = 'localhost'	
 	port = 8888
 	server = Server(host, port)
 	client_process_list = []
