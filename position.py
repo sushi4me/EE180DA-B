@@ -1,10 +1,27 @@
 #!/usr/bin/python
 
 import sys
+from subprocess import Popen, PIPE
+from operator import itemgetter
 from os import listdir
 from os.path import isfile, join
 from optparse import OptionParser
-from posutils import parse_as_dict, write_to_file
+from posutils import parse_as_dict, file_as_dict, write_to_file
+
+def sample_current_location():
+    # Spawn child process and read stdout.
+    p = Popen(["./sample.sh"], stdout=PIPE)
+    op = p.communicate(None)[0]
+    
+    # Convert raw output to list.
+    output = op.split('\n')
+
+    rssiObserved = parse_as_dict(output)
+    
+    # Keep only the "strongest" signals.
+    #trunc_rssi = dict(sorted(rssiObserved.iteritems(), key=itemgetter(1), reverse=True)[:35])
+
+    return rssiObserved
 
 def main():
     version_msg = "%prog 1.0"
@@ -20,18 +37,13 @@ def main():
 
     options, args = parser.parse_args(sys.argv[1:])
 
-    if len(args) != 1:
-        parser.error("Wrong number of operands.")
-
-    input_file = args[0]
-
     # Collect files from reference db.
     db = "reference_database" if options.dir is None else options.dir
     files = [join(db, f) for f in listdir(db) if isfile(join(db, f))]
     
     # Parse RSSI, place in dictionary with MAC address as key.
-    rssiObserved = parse_as_dict(input_file)
-    rssiReferences = [parse_as_dict(f) for f in files]
+    rssiObserved = sample_current_location()
+    rssiReferences = [file_as_dict(f) for f in files]
 
     distances = [[] for i in range(len(rssiReferences))] # Euclidean distances.
 

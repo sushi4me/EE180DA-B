@@ -1,15 +1,18 @@
 import sys
 
-def parse_as_dict(filename):
+def file_as_dict(filename):
+    with open(filename) as f:
+        return parse_as_dict(f)
+    
+def parse_as_dict(data):
     dict = {}
 
-    with open(filename) as f:
-        for line in f:
-            try: 
-                key, val = line.split()
-                dict[key] = int(val)
-            except ValueError:
-                continue
+    for line in data:
+        try: 
+            key, val = line.split()
+            dict[key] = int(val)
+        except ValueError:
+            continue
 
     return dict
 
