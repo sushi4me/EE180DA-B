@@ -39,6 +39,9 @@ def network_connect(client, conn):
 	temp = json.loads(raw_player_num)
 	player_num = temp['player_num']
 
+	process = Process(target=waiting_function, args=(client, child_conn, ))
+	process.start()
+
 	while True:
 		print "Polling..."
 		if conn.poll():
@@ -65,16 +68,12 @@ def waiting_function(client, conn):
 	conn.close()
 
 def main():
-	# Set-up
-	parent_conn, child_conn = Pipe()
-	
 	# Define option parse messages/options
 	version_msg = "client_12.22.16"
 	usage_msg = """%prog [OPTIONS] ...
 	Connects client to HOST found on same network."""
 
 	parser = OptionParser(version=version_msg, usage=usage_msg)	
-
 	parser.add_option("-s", "--specific", action="store", 
 		dest="specific_host", help="Use spcific HOST.")
 	parser.add_option("-t", "--test", action="store_true", default=False,
@@ -86,7 +85,9 @@ def main():
 		host = options.specific_host
 	else:
 		host = 'localhost'
-
+	
+	# Set up client variables
+	parent_conn, child_conn = Pipe()
 	port = 8888
 	client = Client()
 	print 'Trying to connect to %s...' % host
@@ -96,9 +97,6 @@ def main():
 
 	network_connect(client, parent_conn)
 
-	process = Process(target=waiting_function, args=(client, child_conn, ))
-	process.start()
-	print "3"
 	# OPEN A WAITING PROCESS
 
 if __name__ == "__main__":

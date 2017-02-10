@@ -10,17 +10,11 @@ from subprocess import call
 import sys
 
 def client_connect(server, num):
+	# Connect to a player and give them a player ID
 	print 'Connecting to player %d!' % num
 	server.send({'player_num': num})
 	while True:	
 		print server.recv()
-	'''
-		try:	
-			print 'Got connection from: ', client_address
-			c.send('You have connected!')
-		finally:
-			c.close()
-	'''
 
 def main():
 	# Define option parse messages/options
@@ -33,31 +27,6 @@ def main():
 		dest="specific_host", help="Hosts onto specific HOST.")
 
 	options, args = parser.parse_args(sys.argv[1:])
-	
-	"""	
-	# Create a TCP/IP socket
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-	if options.specific_host is not None:
-		server_name = options.specific_host
-	else:
-		server_name = "Nathan-Laptop.hawaii.rr.com" #default host
-
-	# Connect
-	server_address = (server_name, 8000)
-	s.bind(server_address)
-
-	s.listen(5)
-
-	while True:
-		c, client_address = s.accept()
-		newpid = os.fork()
-		if newpid == 0:
-			new_socket_connection(c);
-		else
-			print 'Dropped someone?!'
-		if input() == 'q': break
-	"""
 
 	if options.specific_host is not None:
 		host = options.specific_host
