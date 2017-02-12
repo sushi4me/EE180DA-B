@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 class Player:
-<<<<<<< HEAD
 	m_client = None;
 	m_location = None;
 	m_player_num = None;
@@ -30,23 +29,3 @@ class Player:
 
 	def getStatus(self):        
 		return self.status
-=======
-    team = 0
-    position = 0
-
-
-    def __init__(self, team):
-        self.team = team
-    
-    def setTeam(self):
-        return team
-
-    def getTeam(self):
-        return team
-
-    def setPosition(self, pos):
-        self.position = pos
-
-    def getPosition(self)
-        return pos
->>>>>>> 080680c866ad75b2ac7164e4d4098e05a55ccddc
