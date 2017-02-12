@@ -9,8 +9,10 @@ from optparse import OptionParser
 from posutils import parse_as_dict, file_as_dict, write_to_file
 
 def sample_current_location():
+    exe = "/home/root/EE180DA-B/position_estimation/sample.sh"
+    
     # Spawn child process and read stdout.
-    p = Popen(["./sample.sh"], stdout=PIPE)
+    p = Popen([exe], stdout=PIPE)
     op = p.communicate(None)[0]
     
     # Convert raw output to list.
@@ -19,9 +21,9 @@ def sample_current_location():
     rssiObserved = parse_as_dict(output)
     
     # Keep only the "strongest" signals.
-    #trunc_rssi = dict(sorted(rssiObserved.iteritems(), key=itemgetter(1), reverse=True)[:35])
+    trunc_rssi = dict(sorted(rssiObserved.iteritems(), key=itemgetter(1), reverse=True)[:25])
 
-    return rssiObserved
+    return trunc_rssi
 
 def main():
     version_msg = "%prog 1.0"
@@ -38,7 +40,7 @@ def main():
     options, args = parser.parse_args(sys.argv[1:])
 
     # Collect files from reference db.
-    db = "reference_database" if options.dir is None else options.dir
+    db = "/home/root/EE180DA-B/reference_database" if options.dir is None else options.dir
     files = [join(db, f) for f in listdir(db) if isfile(join(db, f))]
     
     # Parse RSSI, place in dictionary with MAC address as key.
