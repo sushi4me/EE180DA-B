@@ -13,17 +13,23 @@ Notes:
 		BUTTON_B	46
 """
 
+from modules.jsonsocket	import Client
+from modules.dof 	import DOFsensor
+from modules.oled 	import OLED
+from multiprocessing 	import Process, Pipe
+from optparse 		import OptionParser
+from subprocess 	import call
+
 import json
-from modules.jsonsocket import Client
-from modules.dof import DOFsensor
-from modules.oled import OLED
-from multiprocessing import Process, Pipe
 import mraa
-from optparse import OptionParser
 import socket
-from subprocess import call
 import sys
+from threading 	import Thread
 import time
+
+player_num = 0
+game_start = 0
+frozen = 0
 
 def dof_function():
 	m_OLED = OLED()
@@ -33,52 +39,45 @@ def dof_function():
 		m_OLED.clear()
 		m_OLED.write("Hello")
 
-def network_connect(client, conn):
+def connection_init(client):
 	print "You are now connected!"
 	raw_player_num = client.recv()
 	temp = json.loads(raw_player_num)
 	player_num = temp['player_num']
 
-	process = Process(target=waiting_function, args=(client, child_conn, ))
-	process.start()
+	# Wait for a game_start signal
+	raw_game_start = client.recv()
+	temp = json.loads(raw_game_start)
+	game_start = temp['signal']
 
+def waiting_server(client, lock):
 	while True:
-		print "Polling..."
-		if conn.poll():
-			conn.recv()
-			# Interrupted main section here, set condition	
-		name = raw_input('Enter any string to be sent: ')
-		test_dict = dict([('fake_wifi', 100)]);
+		response = client.recv()
+		temp = json.loads(response)
+		status = temp['status']
 
-		data = {
-			'player':	player_num,
-			'name':		name,
-			'use':		0,
-			'wifi_list': 	test_dict
-		}		
+		print status
 
-		client.send(data)
-	
-	client.close()
-
-def waiting_function(client, conn):
-	response = client.recv()
-	# May have to parse in here
-	conn.send([response])
-	conn.close()
+		lock.acquire()
+		frozen = status
+		lock.release()
 
 def main():
+	# Globals
+	global frozen
+	global game_start
+	global player_num
+	lock = threading.Lock()	
+	
 	# Define option parse messages/options
 	version_msg = "client_12.22.16"
 	usage_msg = """%prog [OPTIONS] ...
 	Connects client to HOST found on same network."""
 
+	# Option parser
 	parser = OptionParser(version=version_msg, usage=usage_msg)	
 	parser.add_option("-s", "--specific", action="store", 
 		dest="specific_host", help="Use spcific HOST.")
-	parser.add_option("-t", "--test", action="store_true", default=False,
-		dest="dof_test", help="Enables DOF testing.")
-
 	options, args = parser.parse_args(sys.argv[1:])
 
 	if options.specific_host is not None:
@@ -95,9 +94,13 @@ def main():
 
 	# GENERATE DICTIONARIES
 
-	network_connect(client, parent_conn)
+	connection_init(client)
 
-	# OPEN A WAITING PROCESS
+	wait_thread = Thread(target=wait_server, args=(client, lock, ))
+	wait_thread.start()
+
+	# while game_start is not 0:
+		
 
 if __name__ == "__main__":
 	main()

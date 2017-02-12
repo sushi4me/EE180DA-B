@@ -24,6 +24,20 @@
 #----------------------------
 class Player:
     team = 0
+    position = 0
+
+
     def __init__(self, team):
         self.team = team
-        
+    
+    def setTeam(self):
+        return team
+
+    def getTeam(self):
+        return team
+
+    def setPosition(self, pos):
+        self.position = pos
+
+    def getPosition(self)
+        return pos

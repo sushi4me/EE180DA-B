@@ -49,36 +49,59 @@ imu.gyro_range("245DPS")    # leave blank for default of "245DPS"
 #----------------------------------
 def run():
 	
-    # Gesture 1 Constants
+    # Gesture  Constants
     #--------------------
-    gesturedetected = 0
+    gesturedetected = 0  #1 = freeze; 2 = cloak
     gestureoccured = 9
-    # Position Threshold to start recording gesture
-    posthreshold = 0.8
-    negthreshold = -0.8
-    count = 0
-    occurence = 0
+    downcount1 = 0
+    downcount2 = 0
+    occurence1 = 0
+    occurence2 = 0
 
-    # Loop and read accel, mag, and gyro
+    # Position Threshold to start recording gesture
+    threshold1_az = 0.85
+    threshold2_ax = -.85  
+
+    # Loop and read accel, and gyro
     while(1):
         imu.read_accel()
     	imu.read_gyro()
-
-    	if imu.az > posthreshold:
-            occurence += 1
-    	elif imu.az < negthreshold:
-            occurence -= 1
+        
+        # Gesture 1 Detection
+    	if imu.az > threshold1_az:
+            if imu.ax < 0 and imu.ax > -4:
+                occurence1 += 1
+                downcount1 = 0
     	else:
-            count += 1
+            downcount1 += 1
     
-    	if abs(occurence) >= gestureoccured:
-            print "gesture received"
-            occurence = 0
-            count = 0
+    	if occurence1 >= gestureoccured:
+            print "gesture 1 received"
+            gesturedetected = 1
+            occurence1 = 0
+            downcount1 = 0
     
-    	if count > 5:
-            occurence = 0
-            count = 0
+    	if downcount1 > 5:
+            occurence1 = 0
+            downcount1 = 0
+
+        #Gesture 2 Detection
+        if imu.ax <= threshold2_ax:
+            if imu.az < 2 and imu.az > -2:
+                occurence2 += 1
+                downcount2 = 0
+        else:
+            downcount2 += 1
+        
+        if occurence2 >= gestureoccured:
+            print "gesture 2 received"
+            gesturedetected = 2
+            occurence2 = 0
+            downcount2 = 0
+
+        if downcount2 > 5:
+            occurence2 = 0
+            downcount2 = 0
 
     	# Sleep for SLEEP_TIME seconds
     	time.sleep(SLEEP_TIME)
