@@ -54,7 +54,7 @@ def main():
 		player_count += 1
 		client_process_list.append(process)
 		process.start()
-		if player_count == 5
+		if player_count == 5:
 			server.send({'status': 1})
 			break
 
