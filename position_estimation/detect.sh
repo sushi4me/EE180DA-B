@@ -12,7 +12,8 @@ COUNT=0
 while [ $COUNT -lt 10 ]; do
 
 TIMESTAMP=$(date +%s)
-FILENAME="locations_data/${POSITION}_${TIMESTAMP}.txt"
+DIR="/home/root/EE180DA-B/locations_data"
+FILENAME="${DIR}/${POSITION}_${TIMESTAMP}.txt"
 
 iwlist wlan0 scan | grep 'Address:\|Signal' | sed 's/.*\([0-9]\{2\}\) dBm/\1/' | sed 'N; s/\n/ /' > $FILENAME
 
