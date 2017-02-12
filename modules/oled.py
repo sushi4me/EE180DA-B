@@ -1,3 +1,4 @@
+import time
 import mraa
 import pyupm_i2clcd as oledObj
 
@@ -25,7 +26,6 @@ class OLED:
 	    self.oled.clear()
 
 	def write(self, string):
-            self.oled.setCursor(0, 0)
             self.oled.write(string)
             self.oled.refresh()
 
@@ -33,4 +33,16 @@ class OLED:
             self.oled.clear()
             self.oled.clearScreenBuffer()
 
+        def resetCursor(self):
+            self.oled.setCursor(0,0)
+
+        def run(self):
+            while(1):
+                self.clear()
+                if int(self.BUTTON_UP.read()) != 0:
+                    self.write("UP > 0")
+                if int(self.BUTTON_DOWN.read()) != 0:
+                    self.write("DOWN > 0")
+                self.resetCursor()
+                time.sleep(0.5)
 
