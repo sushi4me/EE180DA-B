@@ -21,9 +21,9 @@ def sample_current_location():
     rssiObserved = parse_as_dict(output)
     
     # Keep only the "strongest" signals.
-    trunc_rssi = dict(sorted(rssiObserved.iteritems(), key=itemgetter(1), reverse=True)[:25])
+    #trunc_rssi = dict(sorted(rssiObserved.iteritems(), key=itemgetter(1), reverse=True)[:25])
 
-    return trunc_rssi
+    return rssiObserved
 
 def main():
     version_msg = "%prog 1.0"

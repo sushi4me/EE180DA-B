@@ -35,7 +35,7 @@ def calculate_average_rssi(files):
     for addr in all_addrs:
         average_rssi[addr] = running_sum[addr] / num_occurrences[addr]
 
-    trunc_rssi = dict(sorted(average_rssi.iteritems(), key=itemgetter(1), reverse=True)[:25])
+    #trunc_rssi = dict(sorted(average_rssi.iteritems(), key=itemgetter(1), reverse=True)[:25])
 
     return average_rssi
 
