@@ -36,13 +36,4 @@ class OLED:
         def resetCursor(self):
             self.oled.setCursor(0,0)
 
-        def run(self):
-            while(1):
-                self.clear()
-                self.resetCursor()
-                print int(self.BUTTON_UP.read())
-                self.write("UP > 0")
-                print int(self.BUTTON_DOWN.read())
-                self.write("DOWN > 0")
-                time.sleep(0.5)
 
