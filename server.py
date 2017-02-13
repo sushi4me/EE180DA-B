@@ -26,13 +26,14 @@ PLAYER_LIST = []
 PLAYER_COUNT = 0
 PLAYER_IDS = 1
 GAME_START = False
+MAX_PLAYERS_TO_START = 2
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
 	def connectionMade(self):
-		global PLAYER_LIST, PLAYER_COUNT, PLAYER_IDS, GAME_START
+		global PLAYER_LIST, PLAYER_COUNT, PLAYER_IDS, GAME_START, MAX_PLAYERS_TO_START
 		# Decline connections if we are over the maximum
-		if PLAYER_COUNT == 2:
+		if PLAYER_COUNT == MAX_PLAYERS_TO_START:
 			print "DECLINED!"
 			self.transport.write(json.dumps({"request": "FULL"}))
 		else:
@@ -50,11 +51,12 @@ class ServerProtocol(protocol.Protocol):
 				PLAYER_IDS   += 1
 				self.transport.write(response)
 			# Allow processing in dataReceived			
-			if PLAYER_COUNT == 1:
+			if PLAYER_COUNT == MAX_PLAYERS_TO_START:
 				GAME_START = True
 
 	def dataReceived(self, data):
 		global GAME_START
+		print "Data received!"
 		if GAME_START:
 			processResponse(data)
 
@@ -81,6 +83,10 @@ def handleAction(decoded_data):
 
 def handleQuit(decoded_data):	
 	global PLAYER_LIST
+	delete_player = decoded_data["player_num"]
+	for players in PLAYER_LIST:
+		if delete_player == players.m_player_num:
+			PLAYER_LIST.remove(players)
 
 def processResponse(data):
 	decoded_data = json.loads(data)			
