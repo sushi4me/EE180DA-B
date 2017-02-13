@@ -1,3 +1,4 @@
+import time
 import mraa
 import pyupm_i2clcd as oledObj
 
@@ -21,8 +22,18 @@ class OLED:
 	BUTTON_B.dir(mraa.DIR_IN)
 
 	def __init__(self):
-		#self.oled.setTextWrap(1)
-		self.oled.clear()
+	    self.oled.setTextWrap(1)
+	    self.oled.clear()
 
 	def write(self, string):
-		self.oled.write(string)
+            self.oled.write(string)
+            self.oled.refresh()
+
+        def clear(self):
+            self.oled.clear()
+            self.oled.clearScreenBuffer()
+
+        def resetCursor(self):
+            self.oled.setCursor(0,0)
+
+
