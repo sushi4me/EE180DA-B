@@ -6,7 +6,7 @@ NOTES:
 
 """
 
-from Modules.BUZZER		import Buzzer
+from Modules.Buzzer		import Buzzer
 #from Modules.DOF 		import DOFsensor
 from Modules.JSONsocket		import Client
 #from Modules.OLED		import OLED
