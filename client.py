@@ -6,6 +6,7 @@ NOTES:
 
 """
 
+from Modules.BUZZER		import Buzzer
 #from Modules.DOF 		import DOFsensor
 from Modules.JSONsocket		import Client
 #from Modules.OLED		import OLED
@@ -16,7 +17,7 @@ from twisted.internet.task	import LoopingCall		#IMPORTANT!
 from twisted.python		import log
 
 import json
-#import mraa
+import mraa
 import os
 import sys
 import time
@@ -24,6 +25,7 @@ import time
 # GLOBALS
 PLAYER_NUM = 0
 STATUS = 0
+BUZZER = Buzzer()
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
@@ -41,9 +43,11 @@ class ClientProtocol(protocol.Protocol):
 			pass
 
 	def connectionMade(self):
+		global BUZZER
 		print "Connected to server."
 		lp = LoopingCall(self.periodic)
 		lp.start(1)
+		BUZZER.connected()
 		#self.transport.loseConnection()
 
 	def dataReceived(self, data):
@@ -55,8 +59,9 @@ class ClientProtocol(protocol.Protocol):
 			pass
 
 	def connectionLost(self, reason):
-		global PLAYER_NUM
-		self.transport.write(json.dumps({"request": "QUIT", "player_num": PLAYER_NUM}))
+		global PLAYER_NUM, BUZZER
+		self.transport.write(json.dumps({"request": "QUIT", "player_num": PLAYER_NUM}))		
+		BUZZER.disconnected()
 		print "Protocol::Connection lost."
 
 class ClientFactory(protocol.ClientFactory):
