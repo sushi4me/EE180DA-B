@@ -54,14 +54,19 @@ def run():
     gesturedetected = 0  #1 = freeze; 2 = cloak
     gestureoccured = 9
     downcount1 = 0
+    downcount1z = 0
     downcount2 = 0
+    downcount2y = 0
+    prereq1 = 0
+    prereq2 = 0
     occurence1 = 0
     occurence2 = 0
 
     # Position Threshold to start recording gesture
     threshold1_az = 0.85
+    threshold1low_az = 0.20
     threshold2_ax = -.85  
-
+    threshold2_ay = -.85
     # Loop and read accel, and gyro
     while(1):
         imu.read_accel()
@@ -70,40 +75,62 @@ def run():
         # Gesture 1 Detection
     	if imu.az > threshold1_az:
             if imu.ax < 0 and imu.ax > -4:
-                occurence1 += 1
+                occurence1 += prereq1
                 downcount1 = 0
     	else:
             downcount1 += 1
     
+        if imu.az > threshold1low_az:
+            downcount1z += 1
+        else:
+            downcount1z = 0
+            prereq1 = 1
+
     	if occurence1 >= gestureoccured:
-            print "gesture 1 received"
+            return 1
             gesturedetected = 1
             occurence1 = 0
             downcount1 = 0
+            prereq1 = 0
     
     	if downcount1 > 5:
             occurence1 = 0
             downcount1 = 0
 
+        if downcount1z > 11:
+            occurence1 = 0
+            prereq1 = 0
+
         #Gesture 2 Detection
         if imu.ax <= threshold2_ax:
             if imu.az < 2 and imu.az > -2:
-                occurence2 += 1
+                occurence2 += prereq2
                 downcount2 = 0
         else:
             downcount2 += 1
         
+        if imu.ay > threshold2_ay:
+            downcount2y += 1
+        else:
+            downcount2y = 0
+            prereq2 = 1
+
         if occurence2 >= gestureoccured:
-            print "gesture 2 received"
+            return 2
             gesturedetected = 2
             occurence2 = 0
             downcount2 = 0
+            prereq2 = 0
 
         if downcount2 > 5:
             occurence2 = 0
             downcount2 = 0
 
-    	# Sleep for SLEEP_TIME seconds
+        if downcount2y > 11:
+            occurence2 = 0
+            prereq2 = 0
+    	
+        # Sleep for SLEEP_TIME seconds
     	time.sleep(SLEEP_TIME)
 
 

@@ -42,16 +42,16 @@ class Buzzer:
     beat_hit = [ 12, 8 ]
    
     #------------------------
-    # Cloak
-    #------------------------
-    sound_cloak = [ 0, 8, 0, 7, 0, 6, 0, 5, 0, 4, 0, 3, 0, 2, 0, 1, 0, 0 ]
-    beat_cloak = [ 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5 ]
-
-    #------------------------
     # Power Up
     #------------------------
-    sound_powerUp = [ 1, 1, 1, 4, 8 ] 
-    beat_powerup = [ 4, 4, 4, 32, 16 ] 
+    sound_powerUp = [ 0, 8, 0, 7, 0, 6, 0, 5, 0, 4, 0, 3, 0, 2, 0, 1, 0, 0 ]
+    beat_powerUp = [ 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5 ]
+
+    #------------------------
+    # Cloak
+    #------------------------
+    sound_cloak = [ 1, 1, 1, 4, 8 ] 
+    beat_cloak = [ 4, 4, 4, 32, 16 ] 
 
     
     def __init__(self):
@@ -69,7 +69,7 @@ class Buzzer:
     # Play sound
     def play(self, sound, beat):
         for i in range (0, len(sound)):
-            print self.buzzer.playSound(self.chords[sound[i]], 
+            self.buzzer.playSound(self.chords[sound[i]], 
                     beat[i] * self.tick)
             time.sleep(self.sleeptime)
 
