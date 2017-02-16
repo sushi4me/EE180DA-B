@@ -5,11 +5,9 @@ NOTES:
 	Requires pyupm to run, intended for the Intel Edison.
 
 """
-
 from Modules.Buzzer		import Buzzer
-#from Modules.DOF 		import DOFsensor
-from Modules.JSONsocket		import Client
-#from Modules.OLED		import OLED
+from Modules.DOF 		import DOFsensor
+from Modules.OLED		import OLED
 from optparse			import OptionParser
 from random			import randint
 from twisted.internet		import reactor, protocol
@@ -17,7 +15,7 @@ from twisted.internet.task	import LoopingCall		#IMPORTANT!
 from twisted.python		import log
 
 import json
-import mraa
+#import mraa
 import os
 import sys
 import time
@@ -47,7 +45,7 @@ class ClientProtocol(protocol.Protocol):
 		print "Connected to server."
 		lp = LoopingCall(self.periodic)
 		lp.start(1)
-		BUZZER.connected()
+		#BUZZER.connected()
 		#self.transport.loseConnection()
 
 	def dataReceived(self, data):
@@ -61,7 +59,7 @@ class ClientProtocol(protocol.Protocol):
 	def connectionLost(self, reason):
 		global PLAYER_NUM, BUZZER
 		self.transport.write(json.dumps({"request": "QUIT", "player_num": PLAYER_NUM}))		
-		BUZZER.disconnected()
+		#BUZZER.disconnected()
 		print "Protocol::Connection lost."
 
 class ClientFactory(protocol.ClientFactory):
@@ -116,6 +114,11 @@ def main():
 		dest="verbose", 
 		default=False, 
 		help="Prints debugging statements on console.")
+	parser.add_option("-l", "--laptop",
+		action="store_true",
+		dest="ie_lib",
+		default=False,
+		help="Does not import Intel Edison only files.")
 
 	options, args = parser.parse_args(sys.argv[1:])
 

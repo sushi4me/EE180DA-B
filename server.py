@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-from Modules.JSONsocket import Server			# Not applicable
 from Modules.Player	import Player
 from optparse 		import OptionParser
 from twisted.internet 	import reactor, protocol
