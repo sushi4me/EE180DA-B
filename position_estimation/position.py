@@ -1,29 +1,53 @@
 #!/usr/bin/python
 
 import sys
-from subprocess import Popen, PIPE
+import subprocess
 from operator import itemgetter
 from os import listdir
 from os.path import isfile, join
 from optparse import OptionParser
-from posutils import parse_as_dict, file_as_dict, write_to_file
+from posutils import file_as_dict, write_to_file
 
 def sample_current_location():
+    # Run sample collection script.
     exe = "/home/root/EE180DA-B/position_estimation/sample.sh"
+    subprocess.call([exe])
     
-    # Spawn child process and read stdout.
-    p = Popen([exe], stdout=PIPE)
-    op = p.communicate(None)[0]
-    
-    # Convert raw output to list.
-    output = op.split('\n')
+    # Need to parse the five files generated from script.
+    sampledir = "/home/root/EE180DA-B/position_estimation/observed_rssi"
+    samplefiles = [join(sampledir, f) for f in listdir(sampledir) if isfile(join(sampledir, f))]
 
-    rssiObserved = parse_as_dict(output)
+    rssiObserved = [file_as_dict(f) for f in samplefiles]
     
     # Keep only the "strongest" signals.
     #trunc_rssi = dict(sorted(rssiObserved.iteritems(), key=itemgetter(1), reverse=True)[:25])
 
     return rssiObserved
+
+def compute_distance_scores(rssiObserved, rssiReferences):    
+    distances = [[] for i in range(len(rssiReferences))] # Euclidean distances.
+
+    # For each file in reference db, compute euclidean distance
+    # between observed RSSI and reference RSSI.
+    for i, rssiReference in enumerate(rssiReferences):
+        for addr, rssi in rssiReference.items():
+            if addr in rssiObserved:
+                dist = pow(rssiObserved[addr] - rssi, 2)
+            else: # MAC Address not found, add arbitrarily large value.
+                dist = 100 # TO-DO: Replace value.
+
+            distances[i].append(dist)
+
+    scores = [sum(d) for d in distances]
+    return scores
+
+def position_estimates(rssiObserved, rssiReferences):
+    position_indices = []
+    for sample in rssiObserved:
+        scores = compute_distance_scores(sample, rssiReferences)
+        position_indices.append(scores.index(min(scores)))
+
+    return position_indices
 
 def main():
     version_msg = "%prog 1.0"
@@ -47,23 +71,11 @@ def main():
     rssiObserved = sample_current_location()
     rssiReferences = [file_as_dict(f) for f in files]
 
-    distances = [[] for i in range(len(rssiReferences))] # Euclidean distances.
+    position_indices = position_estimates(rssiObserved, rssiReferences)
 
-    # For each file in reference db, compute euclidean distance
-    # between observed RSSI and reference RSSI.
-    for i, rssiReference in enumerate(rssiReferences):
-        for addr, rssi in rssiReference.items():
-            if addr in rssiObserved:
-                dist = pow(rssiObserved[addr] - rssi, 2)
-            else: # MAC Address not found, add arbitrarily large value.
-                dist = 100 # TO-DO: Replace value.
-
-            distances[i].append(dist)
-
-    scores = [sum(d) for d in distances]
-
-    pos = scores.index(min(scores))
-
+    # Our guess will be the mode of the estimates acquired.
+    pos = max(set(position_indices), key=position_indices.count)
+    
     # TO-DO: Print coordinates of location instead of location filename.
     msg = "You are probably at " + files[pos]
     if options.file is not None:
