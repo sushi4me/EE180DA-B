@@ -45,7 +45,7 @@ class ClientProtocol(protocol.Protocol):
 		print "Connected to server."
 		lp = LoopingCall(self.periodic)
 		lp.start(1)
-		#BUZZER.connected()
+		BUZZER.connected()
 		#self.transport.loseConnection()
 
 	def dataReceived(self, data):
@@ -59,7 +59,7 @@ class ClientProtocol(protocol.Protocol):
 	def connectionLost(self, reason):
 		global PLAYER_NUM, BUZZER
 		self.transport.write(json.dumps({"request": "QUIT", "player_num": PLAYER_NUM}))		
-		#BUZZER.disconnected()
+		BUZZER.disconnected()
 		print "Protocol::Connection lost."
 
 class ClientFactory(protocol.ClientFactory):
