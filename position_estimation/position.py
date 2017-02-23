@@ -19,9 +19,6 @@ def sample_current_location():
 
     rssiObserved = [file_as_dict(f) for f in samplefiles]
     
-    # Keep only the "strongest" signals.
-    #trunc_rssi = dict(sorted(rssiObserved.iteritems(), key=itemgetter(1), reverse=True)[:25])
-
     return rssiObserved
 
 def compute_distance_scores(rssiObserved, rssiReferences):    
@@ -32,22 +29,30 @@ def compute_distance_scores(rssiObserved, rssiReferences):
     for i, rssiReference in enumerate(rssiReferences):
         for addr, rssi in rssiReference.items():
             if addr in rssiObserved:
-                dist = pow(rssiObserved[addr] - rssi, 2)
+                euclDist = pow(rssiObserved[addr] - rssi, 2)
             else: # MAC Address not found, add arbitrarily large value.
-                dist = 100 # TO-DO: Replace value.
+                euclDist = 100 # TO-DO: Replace value.
 
-            distances[i].append(dist)
+            distances[i].append(euclDist)
 
-    scores = [sum(d) for d in distances]
+    # Compute a score for each reference file.
+    scores = [sum(d) for d in distances] 
+    
     return scores
 
-def position_estimates(rssiObserved, rssiReferences):
-    position_indices = []
+def position_estimate(rssiObserved, rssiReferences):
+    indicesOfMinScores = [] # Collect indices of minimum scores.
+   
+    # For each observed sample, make a 
+    # guess at the probable position.
     for sample in rssiObserved:
         scores = compute_distance_scores(sample, rssiReferences)
-        position_indices.append(scores.index(min(scores)))
+        indicesOfMinScores.append(scores.index(min(scores)))
 
-    return position_indices
+    # Our guess will be the mode of the set.
+    position = max(set(indicesOfMinScores), key=indicesOfMinScores.count)
+
+    return position
 
 def main():
     version_msg = "%prog 1.0"
@@ -71,10 +76,7 @@ def main():
     rssiObserved = sample_current_location()
     rssiReferences = [file_as_dict(f) for f in files]
 
-    position_indices = position_estimates(rssiObserved, rssiReferences)
-
-    # Our guess will be the mode of the estimates acquired.
-    pos = max(set(position_indices), key=position_indices.count)
+    pos = position_estimate(rssiObserved, rssiReferences)
     
     # TO-DO: Print coordinates of location instead of location filename.
     msg = "You are probably at " + files[pos]
