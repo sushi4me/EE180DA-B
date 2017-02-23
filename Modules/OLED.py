@@ -32,6 +32,7 @@ class OLED:
         def clear(self):
             self.oled.clear()
             self.oled.clearScreenBuffer()
+            self.oled.setCursor(0,0)
 
         def resetCursor(self):
             self.oled.setCursor(0,0)
