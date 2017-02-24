@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from Modules.Player	import Player
+#from Modules.Player	import Player
 from optparse 		import OptionParser
 from twisted.internet 	import reactor, protocol
 from twisted.python	import log
@@ -19,6 +19,9 @@ NOTES:
 	{"request": "ACTION", "player_num": player_num, "powerup": powerup}
 	{"request": "QUIT", "player_num": player_num}
 """
+class Player:
+    def __init__(self, id):
+        self.p_id = id
 
 # GLOBALS
 PLAYER_LIST = []

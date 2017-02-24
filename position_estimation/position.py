@@ -4,7 +4,7 @@ import sys
 import subprocess
 
 from os       import listdir
-from os.path  import isfile, join
+from os.path  import isfile, join, basename
 from posutils import file_as_dict, write_to_file
 
 def sample_current_location():
@@ -54,9 +54,9 @@ def position_estimate(rssiObserved, rssiReferences):
     return position
 
 def extract_position(filename):
-    base = os.path.basename(filename)
+    base = basename(filename)
 
-    return [int(s) for s in base.strip() if s.isdigit()](0)
+    return int(filter(str.isdigit, base))
 
 def position():
     # Collect files from reference db.
