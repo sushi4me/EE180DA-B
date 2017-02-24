@@ -2,10 +2,9 @@
 
 import sys
 import subprocess
-from operator import itemgetter
-from os import listdir
-from os.path import isfile, join
-from optparse import OptionParser
+
+from os       import listdir
+from os.path  import isfile, join
 from posutils import file_as_dict, write_to_file
 
 def sample_current_location():
@@ -54,20 +53,12 @@ def position_estimate(rssiObserved, rssiReferences):
 
     return position
 
-def main():
-    version_msg = "%prog 1.0"
-    usage_msg = """%prog [OPTION]... FILE
-    Output best guess at player's position
-    based on RSSI values found in FILE."""
+def extract_position(filename):
+    base = os.path.basename(filename)
 
-    parser = OptionParser(version=version_msg, usage=usage_msg)
-    parser.add_option("-o", "--output", action="store", dest="file",
-            help="Write position to FILE")
-    parser.add_option("-d", "--directory", action="store", dest="dir",
-            help="Use DIR as reference database.")
+    return [int(s) for s in base.strip() if s.isdigit()](0)
 
-    options, args = parser.parse_args(sys.argv[1:])
-
+def position():
     # Collect files from reference db.
     db = "/home/root/EE180DA-B/reference_database" if options.dir is None else options.dir
     files = [join(db, f) for f in listdir(db) if isfile(join(db, f))]
@@ -78,13 +69,5 @@ def main():
 
     pos = position_estimate(rssiObserved, rssiReferences)
     
-    # TO-DO: Print coordinates of location instead of location filename.
-    msg = "You are probably at " + files[pos]
-    if options.file is not None:
-        with open(options.file, "w") as f:
-            f.write(msg + "\n")
-    else:
-        print msg
+    return extract_position(files[pos])
 
-if __name__ == "__main__":
-    main()
