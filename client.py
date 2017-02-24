@@ -5,14 +5,15 @@ NOTES:
 	Requires pyupm to run, intended for the Intel Edison.
 
 """
-from Modules.Buzzer		import Buzzer
-from Modules.DOF 		import DOFsensor
-from Modules.OLED		import OLED
+#from Modules.Buzzer		import Buzzer
+#from Modules.DOF 		import DOFsensor
+#from Modules.OLED		import OLED
 from optparse			import OptionParser
 from random			import randint
 from twisted.internet		import reactor, protocol
 from twisted.internet.task	import LoopingCall		#IMPORTANT!
 from twisted.python		import log
+from position_esitmation.position import position
 
 import json
 #import mraa
@@ -23,7 +24,7 @@ import time
 # GLOBALS
 PLAYER_NUM = 0
 STATUS = 0
-BUZZER = Buzzer()
+#BUZZER = Buzzer()
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
@@ -32,7 +33,7 @@ class ClientProtocol(protocol.Protocol):
 		# Get player data and dump in this function
 		if PLAYER_NUM != 0:
 			print "About to send"
-			random_location = randint(0, 10)
+			random_location = position()
 			self.transport.write(json.dumps({"request": "UPDATE", 
 				"player_num": PLAYER_NUM, 
 				"location": random_location}))
@@ -41,11 +42,11 @@ class ClientProtocol(protocol.Protocol):
 			pass
 
 	def connectionMade(self):
-		global BUZZER
+		#global BUZZER
 		print "Connected to server."
 		lp = LoopingCall(self.periodic)
 		lp.start(1)
-		BUZZER.connected()
+		#BUZZER.connected()
 		#self.transport.loseConnection()
 
 	def dataReceived(self, data):
@@ -57,9 +58,9 @@ class ClientProtocol(protocol.Protocol):
 			pass
 
 	def connectionLost(self, reason):
-		global PLAYER_NUM, BUZZER
+		#global PLAYER_NUM, BUZZER
 		self.transport.write(json.dumps({"request": "QUIT", "player_num": PLAYER_NUM}))		
-		BUZZER.disconnected()
+		#BUZZER.disconnected()
 		print "Protocol::Connection lost."
 
 class ClientFactory(protocol.ClientFactory):
