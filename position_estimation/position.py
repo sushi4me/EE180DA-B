@@ -60,7 +60,7 @@ def extract_position(filename):
 
 def position():
     # Collect files from reference db.
-    db = "/home/root/EE180DA-B/reference_database" if options.dir is None else options.dir
+    db = "/home/root/EE180DA-B/reference_database"
     files = [join(db, f) for f in listdir(db) if isfile(join(db, f))]
     
     # Parse RSSI, place in dictionary with MAC address as key.
