@@ -37,7 +37,7 @@ class ClientProtocol(protocol.Protocol):
 			self.transport.write(json.dumps({"request": "UPDATE", 
 				"player_num": PLAYER_NUM, 
 				"location": random_location}))
-			print "Sent!"		
+			print random_location	
 		else:
 			pass
 
