@@ -14,6 +14,7 @@ import time
 NOTES:
 	SEND:
 	{"request": "NEWPLAYER", "player_num": player_count}
+	{"request": "GAMESTART"}
 	RECEIVE:	
 	{"request": "UPDATE", "player_num": player_num, "location": location}
 	{"request": "ACTION", "player_num": player_num, "powerup": powerup}
@@ -55,6 +56,8 @@ class ServerProtocol(protocol.Protocol):
 			# Allow processing in dataReceived			
 			if PLAYER_COUNT == MAX_PLAYERS_TO_START:
 				GAME_START = True
+				response = json.dumps({"request": "GAMESTART"})
+				self.transport.write(response)
 
 	def dataReceived(self, data):
 		global GAME_START
@@ -64,7 +67,7 @@ class ServerProtocol(protocol.Protocol):
 
 	def connectionLost(self, reason):
 		global PLAYER_COUNT, PLAYER_IDS
-		print "Player disconnected - {}".format(reason)
+		print "LOG - {}".format(reason)
 		PLAYER_IDS -= 1
 		PLAYER_COUNT -= 1
 
@@ -72,6 +75,15 @@ class ServerFactory(protocol.Factory):
 	protocol = ServerProtocol
 
 # HELPER FUNCTIONS
+def processResponse(data):
+	decoded_data = json.loads(data)			
+	request = decoded_data["request"]
+	print request
+	response = {"UPDATE" : handleUpdate,
+		    "ACTION" : handleAction,
+		    "QUIT" : handleQuit
+		   }[request](decoded_data)
+
 def handleUpdate(decoded_data):
 	global PLAYER_LIST
 	player_num = decoded_data["player_num"]
@@ -88,16 +100,8 @@ def handleQuit(decoded_data):
 	delete_player = decoded_data["player_num"]
 	for players in PLAYER_LIST:
 		if delete_player == players.m_player_num:
+			print "Player %d is quitting." % delete_player
 			PLAYER_LIST.remove(players)
-
-def processResponse(data):
-	decoded_data = json.loads(data)			
-	request = decoded_data["request"]
-	print request
-	response = {"UPDATE" : handleUpdate,
-		    "ACTION" : handleAction,
-		    "QUIT" : handleQuit
-		   }[request](decoded_data)
 
 # MAIN
 def main():
