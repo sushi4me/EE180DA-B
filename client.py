@@ -10,13 +10,13 @@ NOTES:
 #from Modules.OLED		import OLED
 from optparse			import OptionParser
 from random			import randint
-from twisted.internet		import reactor, protocol
+from twisted.internet		import reactor, protocol, defer
 from twisted.internet.task	import LoopingCall		#IMPORTANT!
 from twisted.python		import log
 from position_estimation.position import position
 
 import json
-#import mraa
+import mraa
 import os
 import sys
 import time
@@ -129,6 +129,9 @@ def main():
 	# Start
 	if options.verbose:
 		print "Starting client."
+
+	log.startLogging(sys.stdout)
+
 	reactor.connectTCP(HOST, PORT, ClientFactory())
 	reactor.run()
 
