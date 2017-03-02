@@ -32,27 +32,28 @@ class ClientProtocol(protocol.Protocol):
 		global PLAYER_NUM	
 		# Get player data and dump in this function
 		if PLAYER_NUM != 0:
-			print "About to send"
-			random_location = position()
+			location = position()
 			self.transport.write(json.dumps({"request": "UPDATE", 
 				"player_num": PLAYER_NUM, 
-				"location": random_location}))
-			print random_location	
+				"location": location}))
+			if options.verbose:
+				print "Location sent: %d" % location	
 		else:
 			pass
 
 	def connectionMade(self):
 		#global BUZZER
-		print "Connected to server."
+		if options.verbose:
+			print "Connected to server."
 		lp = LoopingCall(self.periodic)
 		lp.start(1)
 		#BUZZER.connected()
 		#self.transport.loseConnection()
 
 	def dataReceived(self, data):
-		print "Data received from server."
 		try:
-			print "data: %s" % data
+			if options.verbose:
+				print "Data recieved from server: %s" % data
 			processResponse(data)
 		except:
 			pass
@@ -61,19 +62,22 @@ class ClientProtocol(protocol.Protocol):
 		#global PLAYER_NUM, BUZZER
 		self.transport.write(json.dumps({"request": "QUIT", "player_num": PLAYER_NUM}))		
 		#BUZZER.disconnected()
-		print "Protocol::Connection lost."
+		if options.verbose:
+			print "Protocol::Connection lost."
 
 class ClientFactory(protocol.ClientFactory):
 	protocol = ClientProtocol	
 
 	def clientConnectionLost(self, connector, reason):
-		print "Factory::Connection lost."
+		if options.verbose:
+			print "Factory::Connection lost."
 
 # HELPER FUNCTIONS
 def handleSetPlayerNumber(decoded_data):
 	global PLAYER_NUM
 	PLAYER_NUM = decoded_data['player_num']
-	print PLAYER_NUM
+	if options.verbose:
+		print "You are player %d" % PLAYER_NUM
 
 def handleSetStatus(decoded_data):	
 	global STATUS
@@ -82,13 +86,15 @@ def handleSetStatus(decoded_data):
 	# Do something here to OLED when afflicted with status
 
 def handleQuit(decoded_data):	
-	print "Quitting!"
+	if options.verbose:
+		print "Quitting!"
 	reactor.stop()
 
 def processResponse(data):
 	decoded_data = json.loads(data)			
 	request = decoded_data["request"]
-	print request
+	if options.verbose:
+		print "Request: %s" % request
 	response = {"NEWPLAYER" : handleSetPlayerNumber,
 		    "STATUS" : handleSetStatus,
 		    "FULL" : handleQuit
@@ -130,8 +136,10 @@ def main():
 	if options.verbose:
 		print "Starting client."
 
+	# Start logging
 	log.startLogging(sys.stdout)
 
+	# Run the client
 	reactor.connectTCP(HOST, PORT, ClientFactory())
 	reactor.run()
 

@@ -15,9 +15,12 @@ NOTES:
 	SEND:
 	{"request": "NEWPLAYER", "player_num": player_count}
 	{"request": "GAMESTART"}
+	{"request": "TURNSTART"}
+	{"request": "EVENT", "event": "event_num"}
 	RECEIVE:	
 	{"request": "UPDATE", "player_num": player_num, "location": location}
 	{"request": "ACTION", "player_num": player_num, "powerup": powerup}
+	{"request": "TURNEND", "player_num:" player_num}
 	{"request": "QUIT", "player_num": player_num}
 """
 class Player:
