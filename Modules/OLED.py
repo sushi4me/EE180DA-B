@@ -93,7 +93,7 @@ class OLED:
 			return
 		if len(self.SCREEN_BUFFER) > self.MAX_CURS_POS:
 			self.oled.setCursor(self.row(), self.col())
-			self.oled.write(string[CURSOR_POS : MAX_CURS_POS])
+			self.oled.write(string[self.CURSOR_POS : self.MAX_CURS_POS])
 			self.oled.refresh()	
 		else:
 			self.oled.setCursor(self.row(), self.col())
