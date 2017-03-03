@@ -16,7 +16,7 @@ from twisted.python		import log
 from position_estimation.position import position
 
 import json
-import mraa
+#import mraa
 import os
 import sys
 import time
@@ -29,22 +29,21 @@ STATUS = 0
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
 	def periodic(self):
-		global PLAYER_NUM	
+		global PLAYER_NUM
 		# Get player data and dump in this function
 		if PLAYER_NUM != 0:
 			location = position()
 			self.transport.write(json.dumps({"request": "UPDATE", 
 				"player_num": PLAYER_NUM, 
 				"location": location}))
-			if options.verbose:
+			if VERBOSE_FLAG:
 				print "Location sent: %d" % location	
 		else:
 			pass
 
 	def connectionMade(self):
 		#global BUZZER
-		if options.verbose:
-			print "Connected to server."
+		log.msg("Connected to server.")
 		lp = LoopingCall(self.periodic)
 		lp.start(1)
 		#BUZZER.connected()
@@ -52,8 +51,7 @@ class ClientProtocol(protocol.Protocol):
 
 	def dataReceived(self, data):
 		try:
-			if options.verbose:
-				print "Data recieved from server: %s" % data
+			log.msg("Data recieved from server: %s" % data)
 			processResponse(data)
 		except:
 			pass
@@ -62,22 +60,19 @@ class ClientProtocol(protocol.Protocol):
 		#global PLAYER_NUM, BUZZER
 		self.transport.write(json.dumps({"request": "QUIT", "player_num": PLAYER_NUM}))		
 		#BUZZER.disconnected()
-		if options.verbose:
-			print "Protocol::Connection lost."
+		log.msg("Protocol::Connection lost.")
 
 class ClientFactory(protocol.ClientFactory):
 	protocol = ClientProtocol	
 
 	def clientConnectionLost(self, connector, reason):
-		if options.verbose:
-			print "Factory::Connection lost."
+		log.msg("Factory::Connection lost.")
 
 # HELPER FUNCTIONS
 def handleSetPlayerNumber(decoded_data):
 	global PLAYER_NUM
 	PLAYER_NUM = decoded_data['player_num']
-	if options.verbose:
-		print "You are player %d" % PLAYER_NUM
+	log.msg("You are player %d" % PLAYER_NUM)
 
 def handleSetStatus(decoded_data):	
 	global STATUS
@@ -86,15 +81,13 @@ def handleSetStatus(decoded_data):
 	# Do something here to OLED when afflicted with status
 
 def handleQuit(decoded_data):	
-	if options.verbose:
-		print "Quitting!"
+	log.msg("Quitting!")
 	reactor.stop()
 
 def processResponse(data):
 	decoded_data = json.loads(data)			
 	request = decoded_data["request"]
-	if options.verbose:
-		print "Request: %s" % request
+	log.msg("Request: %s" % request)
 	response = {"NEWPLAYER" : handleSetPlayerNumber,
 		    "STATUS" : handleSetStatus,
 		    "FULL" : handleQuit
@@ -133,11 +126,8 @@ def main():
 		HOST = options.specific_host
 
 	# Start
-	if options.verbose:
-		print "Starting client."
-
-	# Start logging
 	log.startLogging(sys.stdout)
+	log.msg("Starting client.")
 
 	# Run the client
 	reactor.connectTCP(HOST, PORT, ClientFactory())

@@ -40,10 +40,10 @@ class ServerProtocol(protocol.Protocol):
 		global PLAYER_LIST, PLAYER_COUNT, PLAYER_IDS, GAME_START, MAX_PLAYERS_TO_START
 		# Decline connections if we are over the maximum
 		if PLAYER_COUNT == MAX_PLAYERS_TO_START:
-			print "DECLINED!"
+			log.msg("Declined a player because full!")
 			self.transport.write(json.dumps({"request": "FULL"}))
 		else:
-			print "Player has connected!"
+			log.msg("Player has connected!")
 			self.factory.clients.append(self)
 			response = json.dumps({"request": "NEWPLAYER", 
 				"player_num": PLAYER_IDS})
@@ -64,13 +64,13 @@ class ServerProtocol(protocol.Protocol):
 
 	def dataReceived(self, data):
 		global GAME_START
-		print "Data received!"
+		log.msg("Data received!")
 		if GAME_START:
 			processResponse(data)
 
 	def connectionLost(self, reason):
 		global PLAYER_COUNT, PLAYER_IDS
-		print "LOG - {}".format(reason)
+		log.msg("LOG - {}".format(reason))
 		PLAYER_IDS -= 1
 		PLAYER_COUNT -= 1
 
@@ -81,7 +81,7 @@ class ServerFactory(protocol.Factory):
 def processResponse(data):
 	decoded_data = json.loads(data)			
 	request = decoded_data["request"]
-	print request
+	log.msg("Request: %s" % request)
 	response = {"UPDATE" : handleUpdate,
 		    "ACTION" : handleAction,
 		    "QUIT" : handleQuit
@@ -93,7 +93,7 @@ def handleUpdate(decoded_data):
 	for players in PLAYER_LIST:
 		if player_num == players.m_player_num:	
 			players.m_location = decoded_data["location"]
-			print "I've updated his location to %d!" % players.m_location
+			log.msg("I've updated the location to %d!" % players.m_location)
 
 def handleAction(decoded_data):
 	global PLAYER_LIST
@@ -103,7 +103,7 @@ def handleQuit(decoded_data):
 	delete_player = decoded_data["player_num"]
 	for players in PLAYER_LIST:
 		if delete_player == players.m_player_num:
-			print "Player %d is quitting." % delete_player
+			log.msg("Player %d is quitting." % delete_player)
 			PLAYER_LIST.remove(players)
 
 # MAIN
@@ -135,13 +135,14 @@ def main():
 		HOST = options.specific_host
 
 	# Start
+	log.startLogging(sys.stdout)
 	m_factory = ServerFactory()
 	m_factory.clients = []
 
 	reactor.listenTCP(PORT, m_factory, interface=HOST)
-	print "Starting reactor."	
+	log.msg("Starting reactor.")	
 	reactor.run()
-	print "Closing server."
+	log.msg("Closing server.")
 
 if __name__ == "__main__":
 	main()
