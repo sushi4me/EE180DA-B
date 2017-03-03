@@ -36,8 +36,8 @@ class ClientProtocol(protocol.Protocol):
 			self.transport.write(json.dumps({"request": "UPDATE", 
 				"player_num": PLAYER_NUM, 
 				"location": location}))
-			if VERBOSE_FLAG:
-				print "Location sent: %d" % location	
+			
+			log.msg("Location sent: %d" % location)	
 		else:
 			pass
 
