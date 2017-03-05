@@ -46,7 +46,7 @@ imu.gyro_range("245DPS")    # leave blank for default of "245DPS"
 
 
 def recordData(x):
-    tstamp = strftime("_%Y-%m-%d%H:%M:%S", gmtime())
+    tstamp = strftime("_%Y-%m-%d_%H%M%S", gmtime())
     file = DIRECTORY + '/' + str(x) + tstamp + ".txt"
     fd = open(file, 'w')
 
