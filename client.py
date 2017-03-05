@@ -11,7 +11,7 @@ NOTES:
 from optparse			import OptionParser
 from random			import randint
 from twisted.internet		import reactor, protocol, defer
-from twisted.internet.task	import LoopingCall		#IMPORTANT!
+#from twisted.internet.task	import LoopingCall		#IMPORTANT!
 from twisted.python		import log
 from position_estimation.position import position
 
@@ -28,24 +28,9 @@ STATUS = 0
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
-	def periodic(self):
-		global PLAYER_NUM
-		# Get player data and dump in this function
-		if PLAYER_NUM != 0:
-			location = position()
-			self.transport.write(json.dumps({"request": "UPDATE", 
-				"player_num": PLAYER_NUM, 
-				"location": location}))
-			
-			log.msg("Location sent: %d" % location)	
-		else:
-			pass
-
 	def connectionMade(self):
 		#global BUZZER
 		log.msg("Connected to server.")
-		lp = LoopingCall(self.periodic)
-		lp.start(1)
 		#BUZZER.connected()
 		#self.transport.loseConnection()
 
@@ -73,6 +58,21 @@ def handleSetPlayerNumber(decoded_data):
 	global PLAYER_NUM
 	PLAYER_NUM = decoded_data['player_num']
 	log.msg("You are player %d" % PLAYER_NUM)
+	location = position()
+	self.transport.write(json.dumps({"request": "UPDATE",
+		"player_num": PLAYER_NUM,
+		"location": location}))
+	log.msg("Location sent: %d" % location)
+
+def handleGameStart(decoded_data):
+	global PLAYER_NUM
+	self.transport.write(json.dumps({"request": "TURNEND",
+		"player_num": PLAYER_NUM}))
+	log.msg("Ending turn.\n")
+
+def handleTurnEnd(decoded_data):
+	global PLAYER_NUM
+	#TO DO:
 
 def handleSetStatus(decoded_data):	
 	global STATUS
@@ -90,8 +90,12 @@ def processResponse(data):
 	log.msg("Request: %s" % request)
 	response = {"NEWPLAYER" : handleSetPlayerNumber,
 		    "STATUS" : handleSetStatus,
-		    "FULL" : handleQuit
-		   }[request](decoded_data)
+		    "TURNEND" : handleTurnEnd,
+		    "FULL" : handleQuit,
+		    "GAMESTART" : handleGameStart
+		    }[request](decoded_data)
+	return response
+
 # MAIN
 def main():
 	# Defaults

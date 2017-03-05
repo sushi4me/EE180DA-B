@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-#from Modules.Player	import Player
+from Modules.Player	import Player
 from optparse 		import OptionParser
 from twisted.internet 	import reactor, protocol
 from twisted.python	import log
@@ -23,16 +23,13 @@ NOTES:
 	{"request": "TURNEND", "player_num:" player_num}
 	{"request": "QUIT", "player_num": player_num}
 """
-class Player:
-    def __init__(self, id):
-        self.p_id = id
 
 # GLOBALS
 PLAYER_LIST = []
 PLAYER_COUNT = 0
 PLAYER_IDS = 1
 GAME_START = False
-MAX_PLAYERS_TO_START = 2
+MAX_PLAYERS_TO_START = 1
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
@@ -70,7 +67,7 @@ class ServerProtocol(protocol.Protocol):
 
 	def connectionLost(self, reason):
 		global PLAYER_COUNT, PLAYER_IDS
-		log.msg("LOG - {}".format(reason))
+		log.msg("{}".format(reason))
 		PLAYER_IDS -= 1
 		PLAYER_COUNT -= 1
 
@@ -81,29 +78,43 @@ class ServerFactory(protocol.Factory):
 def processResponse(data):
 	decoded_data = json.loads(data)			
 	request = decoded_data["request"]
-	log.msg("Request: %s" % request)
+	log.msg("REQUEST: %s" % request)
 	response = {"UPDATE" : handleUpdate,
 		    "ACTION" : handleAction,
+		    "TURNEND" : handleNextPlayer,
 		    "QUIT" : handleQuit
 		   }[request](decoded_data)
+	return response
 
 def handleUpdate(decoded_data):
 	global PLAYER_LIST
 	player_num = decoded_data["player_num"]
 	for players in PLAYER_LIST:
-		if player_num == players.m_player_num:	
+		if player_num == players.m_id:	
 			players.m_location = decoded_data["location"]
-			log.msg("I've updated the location to %d!" % players.m_location)
+			log.msg("UPDATE: %d LOCATION: %d" % (player_num, players.m_location))
 
 def handleAction(decoded_data):
 	global PLAYER_LIST
+
+def handleNextPlayer(decoded_data):
+	next_player = decoded_data["player_num"]
+	if next_player == MAX_PLAYERS_TO_START:
+		next_player = 1
+	else:
+		next_player = next_player + 1
+	log.msg("NEXT PLAYER: %d" % next_player)
+	# Get the specific next player and send them TURNSTART
+	send_to = self.factory.clients[next_player-1]
+	send_to.transport.write(json.dumps({"request": "TURNSTART"}))
+	#self.transport.write(json.dumps({"request": "TURNSTART"}))
 
 def handleQuit(decoded_data):	
 	global PLAYER_LIST
 	delete_player = decoded_data["player_num"]
 	for players in PLAYER_LIST:
-		if delete_player == players.m_player_num:
-			log.msg("Player %d is quitting." % delete_player)
+		if delete_player == players.m_id:
+			log.msg("QUIT %d" % delete_player)
 			PLAYER_LIST.remove(players)
 
 # MAIN
@@ -140,7 +151,7 @@ def main():
 	m_factory.clients = []
 
 	reactor.listenTCP(PORT, m_factory, interface=HOST)
-	log.msg("Starting reactor.")	
+	log.msg("Starting server.")	
 	reactor.run()
 	log.msg("Closing server.")
 
