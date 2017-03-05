@@ -11,7 +11,7 @@
 #----------------------------
 # Globals
 #----------------------------
-ENUM_SIZE = 0
+global ENUM_SIZE
 #----------------------------
 # Helper Functions
 #----------------------------
@@ -37,9 +37,9 @@ END_OBJECTS = ENUM_SIZE
 #----------------------------
 # Player States
 #----------------------------
-global isDEAD, isALIVE, END_STATES
-isDEAD = start()
-isALIVE = inc()
+global DEAD, ALIVE, END_STATES
+DEAD = start()
+ALIVE = inc()
 END_STATES = ENUM_SIZE
 
 #----------------------------

@@ -14,6 +14,7 @@ B#!/usr/bin/python
 #----------------------------
 # Modules
 #----------------------------
+from Globals import *
 import player
 import object_
 import map_
