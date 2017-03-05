@@ -15,9 +15,9 @@ B#!/usr/bin/python
 # Modules
 #----------------------------
 from Globals import *
-import player
-import object_
-import map_
+from Player import Player
+from Object import Object
+from Map import Map
 import sys
 #----------------------------
 # Globals
@@ -28,12 +28,13 @@ import sys
 # Game Class
 #----------------------------
 class Game:
-    def init(self, numPlayers, playersTeamNums):
+    def __init__(self, numPlayers):
+    	# Instantiate all the players
         players = []
-        for i, c in enumerate(numPlayers):
-            player[i] = Player.Player(c)
+        for i in range(1, numPlayers + 1):
+        	players.append(Player(i))
 
-#    def displayGame(self):
+	def displayGame(self):
 
 #    def move(self):
 
