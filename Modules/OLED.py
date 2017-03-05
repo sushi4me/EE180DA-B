@@ -202,10 +202,11 @@ class OLED:
 	#	when the user has pressed any of the buttons. Returns a
 	#	char that corresponds with the button that was pressed.
 	#---------------------------------- 
-	def getUserInput(self):
+	def waitForUserInput(self):
 		while(self.BUTTON_A.read() != 0 and self.BUTTON_B.read() != 0 and 
 			self.BUTTON_SELECT.read() != 0 and self.BUTTON_DOWN.read() != 0 and
-			self.BUTTON_LEFT.read() != 0 and self.BUTTON_RIGHT.read() != 0):
+			self.BUTTON_LEFT.read() != 0 and self.BUTTON_RIGHT.read() != 0 and 
+			self.BUTTON_UP.read() != 0):
 			pass
 		if (self.BUTTON_A.read() == 0):
 			return "A"
@@ -213,9 +214,12 @@ class OLED:
 			return "B"
 		if (self.BUTTON_SELECT.read() == 0):
 			return "S"
+		if (self.BUTTON_UP.read() == 0):
+			return "U"
 		if (self.BUTTON_DOWN.read() == 0):
 			return "D"
 		if (self.BUTTON_LEFT.read() == 0):
 			return "L"
 		if (self.BUTTON_RIGHT.read() == 0):
 			return "R"
+

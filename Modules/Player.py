@@ -1,3 +1,10 @@
+#**************************************
+# Module: Player
+# Description:
+# 
+#**************************************
+from Globals import *
+
 #------------------------
 #  Player Class
 #------------------------
@@ -7,12 +14,11 @@ class Player:
     #------------------------
     m_id = 0
     m_location = 0
-    m_hp = 0
+    m_hp = 100
     m_items = []
 
     def __init__(self, player_id):
         self.m_id = player_id
-        self.m_hp = 100
 
     def setHP(self, amt):
         self.m_hp += amt
