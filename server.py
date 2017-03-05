@@ -44,26 +44,25 @@ class ServerProtocol(protocol.Protocol):
 			self.factory.clients.append(self)
 			response = json.dumps({"request": "NEWPLAYER", 
 				"player_num": PLAYER_IDS})
+
 			p = Player(PLAYER_IDS)
 			# If the player is already in the list, then pass
 			if p in PLAYER_LIST:
 				pass
 			else:
-				PLAYER_LIST.append(p)			
+				PLAYER_LIST.append(p)	
 				PLAYER_COUNT += 1
+				# Start game if player cap met
+				if PLAYER_COUNT == MAX_PLAYERS_TO_START:
+					GAME_START = True
+					response = json.dumps({"request": "GAMESTART",
+						"player_num": PLAYER_IDS})
 				PLAYER_IDS   += 1
-				self.transport.write(response)
-			# Allow processing in dataReceived			
-			if PLAYER_COUNT == MAX_PLAYERS_TO_START:
-				GAME_START = True
-				response = json.dumps({"request": "GAMESTART"})
 				self.transport.write(response)
 
 	def dataReceived(self, data):
-		global GAME_START
-		log.msg("Data received!")
-		if GAME_START:
-			processResponse(data)
+		log.msg("Data recieved from client: %s" % data)
+		self.processResponse(data)
 
 	def connectionLost(self, reason):
 		global PLAYER_COUNT, PLAYER_IDS
@@ -71,51 +70,53 @@ class ServerProtocol(protocol.Protocol):
 		PLAYER_IDS -= 1
 		PLAYER_COUNT -= 1
 
+	# HELPER FUNCTIONS
+	def processResponse(self, data):
+		decoded_data = json.loads(data)			
+		request = decoded_data["request"]
+		log.msg("REQUEST: %s" % request)
+
+		response = {	"UPDATE": 	self.handleUpdate,
+		    		"ACTION": 	self.handleAction,
+		    		"TURNEND": 	self.handleNextPlayer,
+		    		"QUIT": 	self.handleQuit
+		   }[request](decoded_data)
+
+		return response
+
+	def handleUpdate(self, decoded_data):
+		global PLAYER_LIST
+		player_num = decoded_data["player_num"]
+		for players in PLAYER_LIST:
+			if player_num == players.m_id:	
+				players.m_location = decoded_data["location"]
+				log.msg("PLAYER: %d LOCATION: %d" % (player_num, players.m_location))
+
+	def handleAction(decoded_data):
+		global PLAYER_LIST
+
+	def handleNextPlayer(self, decoded_data):
+		next_player = decoded_data["player_num"]
+		if next_player == MAX_PLAYERS_TO_START:
+			next_player = 1
+		else:
+			next_player = next_player + 1
+		log.msg("NEXT PLAYER: %d" % next_player)
+		# Get the specific next player and send them TURNSTART
+		send_to = self.factory.clients[next_player-1]
+		send_to.transport.write(json.dumps({"request": "TURNSTART"}))
+
+	def handleQuit(decoded_data):	
+		global PLAYER_LIST
+		delete_player = decoded_data["player_num"]
+		for players in PLAYER_LIST:
+			if delete_player == players.m_id:
+				log.msg("QUIT %d" % delete_player)
+				PLAYER_LIST.remove(players)
+
+
 class ServerFactory(protocol.Factory):
 	protocol = ServerProtocol
-
-# HELPER FUNCTIONS
-def processResponse(data):
-	decoded_data = json.loads(data)			
-	request = decoded_data["request"]
-	log.msg("REQUEST: %s" % request)
-	response = {"UPDATE" : handleUpdate,
-		    "ACTION" : handleAction,
-		    "TURNEND" : handleNextPlayer,
-		    "QUIT" : handleQuit
-		   }[request](decoded_data)
-	return response
-
-def handleUpdate(decoded_data):
-	global PLAYER_LIST
-	player_num = decoded_data["player_num"]
-	for players in PLAYER_LIST:
-		if player_num == players.m_id:	
-			players.m_location = decoded_data["location"]
-			log.msg("UPDATE: %d LOCATION: %d" % (player_num, players.m_location))
-
-def handleAction(decoded_data):
-	global PLAYER_LIST
-
-def handleNextPlayer(decoded_data):
-	next_player = decoded_data["player_num"]
-	if next_player == MAX_PLAYERS_TO_START:
-		next_player = 1
-	else:
-		next_player = next_player + 1
-	log.msg("NEXT PLAYER: %d" % next_player)
-	# Get the specific next player and send them TURNSTART
-	send_to = self.factory.clients[next_player-1]
-	send_to.transport.write(json.dumps({"request": "TURNSTART"}))
-	#self.transport.write(json.dumps({"request": "TURNSTART"}))
-
-def handleQuit(decoded_data):	
-	global PLAYER_LIST
-	delete_player = decoded_data["player_num"]
-	for players in PLAYER_LIST:
-		if delete_player == players.m_id:
-			log.msg("QUIT %d" % delete_player)
-			PLAYER_LIST.remove(players)
 
 # MAIN
 def main():

@@ -35,11 +35,20 @@ class ClientProtocol(protocol.Protocol):
 		#self.transport.loseConnection()
 
 	def dataReceived(self, data):
+		global PLAYER_NUM
 		try:
 			log.msg("Data recieved from server: %s" % data)
-			processResponse(data)
+			decoded_data = json.loads(data)			
+			self.transport.getHandle().sendall(processResponse(decoded_data))
 		except:
 			pass
+
+		# Wait for 3 seconds and if the request was a GAMESTART then TURNEND
+		time.sleep(3)
+		request = decoded_data["request"]
+		if request == "GAMESTART":
+			self.transport.write(json.dumps({"request": "TURNEND",
+				"player_num": PLAYER_NUM}))
 
 	def connectionLost(self, reason):
 		#global PLAYER_NUM, BUZZER
@@ -54,15 +63,25 @@ class ClientFactory(protocol.ClientFactory):
 		log.msg("Factory::Connection lost.")
 
 # HELPER FUNCTIONS
+def processResponse(decoded_data):
+	request = decoded_data["request"]
+	log.msg("Request: %s" % request)
+	response = {"NEWPLAYER": 	handleSetPlayerNumber,
+		    "STATUS": 		handleSetStatus,
+		    "TURNEND": 		handleTurnEnd,
+		    "FULL": 		handleQuit,
+		    "GAMESTART": 	handleSetPlayerNumber
+		    }[request](decoded_data)
+	return response
+
 def handleSetPlayerNumber(decoded_data):
 	global PLAYER_NUM
 	PLAYER_NUM = decoded_data['player_num']
 	log.msg("You are player %d" % PLAYER_NUM)
-	location = position()
-	self.transport.write(json.dumps({"request": "UPDATE",
+	location = 4
+	return json.dumps({"request": "UPDATE",
 		"player_num": PLAYER_NUM,
-		"location": location}))
-	log.msg("Location sent: %d" % location)
+		"location": location})
 
 def handleGameStart(decoded_data):
 	global PLAYER_NUM
@@ -83,18 +102,6 @@ def handleSetStatus(decoded_data):
 def handleQuit(decoded_data):	
 	log.msg("Quitting!")
 	reactor.stop()
-
-def processResponse(data):
-	decoded_data = json.loads(data)			
-	request = decoded_data["request"]
-	log.msg("Request: %s" % request)
-	response = {"NEWPLAYER" : handleSetPlayerNumber,
-		    "STATUS" : handleSetStatus,
-		    "TURNEND" : handleTurnEnd,
-		    "FULL" : handleQuit,
-		    "GAMESTART" : handleGameStart
-		    }[request](decoded_data)
-	return response
 
 # MAIN
 def main():
