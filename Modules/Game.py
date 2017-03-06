@@ -1,4 +1,4 @@
-B#!/usr/bin/python
+#!/usr/bin/python
 #******************************************************************************
 # Module: Game.py
 #
@@ -17,7 +17,6 @@ B#!/usr/bin/python
 from Globals import *
 from Player import Player
 from Object import Object
-from Map import Map
 import sys
 #----------------------------
 # Globals
@@ -28,13 +27,22 @@ import sys
 # Game Class
 #----------------------------
 class Game:
-    def __init__(self, numPlayers):
-    	# Instantiate all the players
-        players = []
-        for i in range(1, numPlayers + 1):
-        	players.append(Player(i))
+    def __init__(self, maxPlayers):
+        self.players     = []
+        self.numPlayers  = 0
 
-	def displayGame(self):
+        self.MAX_PLAYERS = maxPlayers
+    
+    def addPlayer(self):
+        playerID = self.numPlayers
+        self.players.append(Player(playerID))
+
+        self.numPlayers += 1
+
+    def removePlayer(self, playerID):
+        del self.players[playerID]
+
+        self.numPlayers -= 1
 
 #    def move(self):
 
