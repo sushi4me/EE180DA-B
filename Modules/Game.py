@@ -28,12 +28,12 @@ import sys
 # Game Class
 #----------------------------
 class Game:
-    MAX_PLAYERS = 4
+    def __init__(self, maxPlayers):
+        self.players     = []
+        self.numPlayers  = 0
 
-    def __init__(self, numPlayers):
-        self.players    = []
-        self.numPlayers = 0
-
+        self.MAX_PLAYERS = maxPlayers
+    
     def addPlayer(self):
         playerID = self.numPlayers
         self.players.append(Player(playerID))
