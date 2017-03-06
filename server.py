@@ -35,17 +35,17 @@ class ServerProtocol(protocol.Protocol):
             self.game = Game(MAX_PLAYERS)
 
 	def connectionMade(self):
-	    if game.numPlayers < game.MAX_PLAYERS:
+	    if self.game.numPlayers < self.game.MAX_PLAYERS:
 		log.msg("Player has connected!")
 		self.factory.clients.append(self)
 		response = json.dumps({"request": "NEWPLAYER", "player_num": PLAYER_IDS})
 
-		game.addPlayer()
+		self.game.addPlayer()
 		
                 # Start game if we have max num players connected.
-                if game.numPlayers == game.MAX_PLAYERS:
+                if self.game.numPlayers == self.game.MAX_PLAYERS:
                     GAME_START = True
-                    response = json.dumps({"request": "GAMESTART", "player_num": game.numPlayers})
+                    response = json.dumps({"request": "GAMESTART", "player_num": self.game.numPlayers})
                         
 		self.transport.write(response)
 
@@ -59,7 +59,7 @@ class ServerProtocol(protocol.Protocol):
 
 	def connectionLost(self, reason):
 		log.msg("{}".format(reason))
-                game.removePlayer(game.numPlayers-1)
+                self.game.removePlayer(self.game.numPlayers-1)
 
 	# HELPER FUNCTIONS
 	def processResponse(self, data):
@@ -78,7 +78,7 @@ class ServerProtocol(protocol.Protocol):
 	def handleUpdate(self, decoded_data):
 		player_num = decoded_data["player_num"]
 		
-                for player in game.players:
+                for player in self.game.players:
 			if player_num == player.m_id:	
 				player.m_location = decoded_data["location"]
 				log.msg("PLAYER: %d LOCATION: %d" % (player_num, player.m_location))
@@ -88,7 +88,7 @@ class ServerProtocol(protocol.Protocol):
 
 	def handleNextPlayer(self, decoded_data):
 		next_player = decoded_data["player_num"]
-		if next_player == game.MAX_PLAYERS:
+		if next_player == self.game.MAX_PLAYERS:
 		    next_player = 1
 		else:
 		    next_player = next_player + 1
@@ -99,10 +99,10 @@ class ServerProtocol(protocol.Protocol):
 
 	def handleQuit(decoded_data):	
 		delete_player = decoded_data["player_num"]
-		for player in game.players:
+		for player in self.game.players:
 			if delete_player == player.m_id:
 				log.msg("QUIT %d" % delete_player)
-				game.removePlayer(delete_player)
+				self.game.removePlayer(delete_player)
 
 
 class ServerFactory(protocol.Factory):
