@@ -48,15 +48,15 @@ class actions(IntEnum):
     PICKUP_ITEM = inc()
     USE_ITEM    = inc()
 
-
 #----------------------------
 # OLED Buttons
 #----------------------------
 class buttons(IntEnum):
-    UP = start()
-    DOWN = inc()
-    LEFT = inc()
-    RIGHT = inc()
-    A = inc()
-    B = inc()
-    SELECT = inc()
+    UP		= start()
+    DOWN	= inc()
+    LEFT	= inc()
+    RIGHT	= inc()
+    A		= inc()
+    B		= inc()
+    SELECT	= inc()
+
