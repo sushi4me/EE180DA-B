@@ -13,10 +13,12 @@ class OLED:
 	CURSOR_ROW = [ 0, 9, 18, 27, 36, 45 ]  # values correspond to pixels
 	CURSOR_COL = [ 0, 6, 12, 18, 24, 30, 36, 42, 48, 54 ] # 
 	CURSOR_POS = 0 # Takes values from [ 0, 59 ] where e.g. 13 -> (9, 12)
-	MAX_CURS_POS = 59		# Used for writing
+	MAX_CURS_POS = 59		# Text Cursor Used for writing characters
 	CURRENT_PAGE = 0		# Used for scrolling
 	SCREEN_BUFFER = ""		# Used for remembering the sate of the buffer
 	TYPE_DELAY = 0.005		# Delay for writeScroll()
+	MAX_PIXELS_COL = 64
+	MAX_PIXELS_ROW = 48
 
 	#----------------------------------
 	# GPIO OLED Buttons
@@ -222,4 +224,17 @@ class OLED:
 			return "L"
 		if (self.BUTTON_RIGHT.read() == 0):
 			return "R"
+
+	#----------------------------------
+	# Module: drawMap(self, position)
+	# Description:
+	#
+	#----------------------------------
+	def drawMap(self, position):
+		self.clear()
+		# Draw outline
+		self.oled.drawRoundedRectangle(0, 0, MAX_PIXELS_COL, MAX_PIXELS_ROW, 4, 1)
+		# Draw map
+		grid = [[0]*MAX_PIXELS_COL, for i in range(MAX_PIXELS_ROW)]
+		
 

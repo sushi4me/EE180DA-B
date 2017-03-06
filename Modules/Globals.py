@@ -32,7 +32,7 @@ HEALTH = start()
 POISON = inc()
 SHIELD = inc()
 WEAPON = inc()
-END_OBJECTS = ENUM_SIZE
+END_OBJECTS = inc()
 
 #----------------------------
 # Player States
@@ -40,7 +40,7 @@ END_OBJECTS = ENUM_SIZE
 global DEAD, ALIVE, END_STATES
 DEAD = start()
 ALIVE = inc()
-END_STATES = ENUM_SIZE
+END_STATES = inc()
 
 #----------------------------
 # Player Actions
@@ -50,5 +50,17 @@ ATTACK = start()
 DEFEND = inc()
 PICKUP_ITEM = inc()
 USE_ITEM = inc()
-END_ACTIONS = ENUM_SIZE
+END_ACTIONS = inc()
 
+#----------------------------
+# OLED Buttons
+#----------------------------
+global UP, DOWN, LEFT, RIGHT, A, B, SELECT, END_BUTTONS
+UP = start()
+DOWN = inc()
+LEFT = inc()
+RIGHT = inc()
+A = inc()
+B = inc()
+SELECT = inc()
+END_BUTTONS = inc()
