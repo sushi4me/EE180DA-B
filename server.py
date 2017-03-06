@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from Modules.Game       import Game
 from Modules.Player	import Player
 from optparse 		import OptionParser
 from twisted.internet 	import reactor, protocol
@@ -25,50 +26,40 @@ NOTES:
 """
 
 # GLOBALS
-PLAYER_LIST = []
-PLAYER_COUNT = 0
-PLAYER_IDS = 1
 GAME_START = False
-MAX_PLAYERS_TO_START = 1
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
-	def connectionMade(self):
-		global PLAYER_LIST, PLAYER_COUNT, PLAYER_IDS, GAME_START, MAX_PLAYERS_TO_START
-		# Decline connections if we are over the maximum
-		if PLAYER_COUNT == MAX_PLAYERS_TO_START:
-			log.msg("Declined a player because full!")
-			self.transport.write(json.dumps({"request": "FULL"}))
-		else:
-			log.msg("Player has connected!")
-			self.factory.clients.append(self)
-			response = json.dumps({"request": "NEWPLAYER", 
-				"player_num": PLAYER_IDS})
+        def __init__(self):
+            MAX_PLAYERS = 4
+            self.game = Game(MAX_PLAYERS)
 
-			p = Player(PLAYER_IDS)
-			# If the player is already in the list, then pass
-			if p in PLAYER_LIST:
-				pass
-			else:
-				PLAYER_LIST.append(p)	
-				PLAYER_COUNT += 1
-				# Start game if player cap met
-				if PLAYER_COUNT == MAX_PLAYERS_TO_START:
-					GAME_START = True
-					response = json.dumps({"request": "GAMESTART",
-						"player_num": PLAYER_IDS})
-				PLAYER_IDS   += 1
-				self.transport.write(response)
+	def connectionMade(self):
+	    if game.numPlayers < game.MAX_PLAYERS:
+		log.msg("Player has connected!")
+		self.factory.clients.append(self)
+		response = json.dumps({"request": "NEWPLAYER", "player_num": PLAYER_IDS})
+
+		game.addPlayer()
+		
+                # Start game if we have max num players connected.
+                if game.numPlayers == game.MAX_PLAYERS:
+                    GAME_START = True
+                    response = json.dumps({"request": "GAMESTART", "player_num": game.numPlayers})
+                        
+		self.transport.write(response)
+
+            else: # Decline connections when at max capacity
+		log.msg("Declined a player because full!")
+	        self.transport.write(json.dumps({"request": "FULL"}))
 
 	def dataReceived(self, data):
 		log.msg("Data recieved from client: %s" % data)
 		self.processResponse(data)
 
 	def connectionLost(self, reason):
-		global PLAYER_COUNT, PLAYER_IDS
 		log.msg("{}".format(reason))
-		PLAYER_IDS -= 1
-		PLAYER_COUNT -= 1
+                game.removePlayer(game.numPlayers-1)
 
 	# HELPER FUNCTIONS
 	def processResponse(self, data):
@@ -85,34 +76,33 @@ class ServerProtocol(protocol.Protocol):
 		return response
 
 	def handleUpdate(self, decoded_data):
-		global PLAYER_LIST
 		player_num = decoded_data["player_num"]
-		for players in PLAYER_LIST:
-			if player_num == players.m_id:	
-				players.m_location = decoded_data["location"]
-				log.msg("PLAYER: %d LOCATION: %d" % (player_num, players.m_location))
+		
+                for player in game.players:
+			if player_num == player.m_id:	
+				player.m_location = decoded_data["location"]
+				log.msg("PLAYER: %d LOCATION: %d" % (player_num, player.m_location))
 
 	def handleAction(decoded_data):
-		global PLAYER_LIST
+            count = 0
 
 	def handleNextPlayer(self, decoded_data):
 		next_player = decoded_data["player_num"]
-		if next_player == MAX_PLAYERS_TO_START:
-			next_player = 1
+		if next_player == game.MAX_PLAYERS:
+		    next_player = 1
 		else:
-			next_player = next_player + 1
+		    next_player = next_player + 1
 		log.msg("NEXT PLAYER: %d" % next_player)
 		# Get the specific next player and send them TURNSTART
 		send_to = self.factory.clients[next_player-1]
 		send_to.transport.write(json.dumps({"request": "TURNSTART"}))
 
 	def handleQuit(decoded_data):	
-		global PLAYER_LIST
 		delete_player = decoded_data["player_num"]
-		for players in PLAYER_LIST:
-			if delete_player == players.m_id:
+		for player in game.players:
+			if delete_player == player.m_id:
 				log.msg("QUIT %d" % delete_player)
-				PLAYER_LIST.remove(players)
+				game.removePlayer(delete_player)
 
 
 class ServerFactory(protocol.Factory):
