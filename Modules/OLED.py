@@ -276,5 +276,5 @@ class OLED:
         
 	def updateMap(self, position):
 		# need to implement
-		self.oled.drawCircle(46, 61, 2, 1)
+		self.oled.drawCircle(61, 45, 2, 1)
 		self.oled.refresh()
