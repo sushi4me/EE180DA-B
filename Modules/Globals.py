@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#******************************************************************************
+#**************************************
 # Module: Globals.py
 #
 # Description: 
@@ -7,48 +7,44 @@
 # Version: 
 # 
 # Revisions:
-#******************************************************************************
+#**************************************
+#----------------------------
+# Modules
+#----------------------------
+from enum import IntEnum
+
 #----------------------------
 # Globals
 #----------------------------
-global ENUM_SIZE
+global INDEX
+
 #----------------------------
 # Helper Functions
 #----------------------------
 def start():
-	global ENUM_SIZE
-	ENUM_SIZE = 0
-	return ENUM_SIZE
+	global INDEX
+	INDEX = 1
+	return INDEX
 
 def inc():
-	global ENUM_SIZE
-	ENUM_SIZE += 1
-	return ENUM_SIZE
+	global INDEX
+	INDEX += 1
+	return INDEX
 #----------------------------
 # Object Types
 #----------------------------
-global 	HEALTH, POISON, SHIELD, WEAPON, END_OBJECTS
-HEALTH = start()
-POISON = inc()
-SHIELD = inc()
-WEAPON = inc()
-END_OBJECTS = ENUM_SIZE
-
-#----------------------------
-# Player States
-#----------------------------
-global DEAD, ALIVE, END_STATES
-DEAD = start()
-ALIVE = inc()
-END_STATES = ENUM_SIZE
-
+class items(IntEnum):
+    HEALTH = start()
+    POISON = inc() 
+    SHIELD = inc()
+    WEAPON = inc()
+    
 #----------------------------
 # Player Actions
 #----------------------------
-global ATTACK, DEFEND, PICKUP_ITEM, USE_ITEM, END_ACTIONS
-ATTACK = start()
-DEFEND = inc()
-PICKUP_ITEM = inc()
-USE_ITEM = inc()
-END_ACTIONS = ENUM_SIZE
+class actions(IntEnum):
+    ATTACK      = start()
+    DEFEND      = inc()
+    PICKUP_ITEM = inc()
+    USE_ITEM    = inc()
 
