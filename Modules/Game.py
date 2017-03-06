@@ -1,4 +1,4 @@
-B#!/usr/bin/python
+#!/usr/bin/python
 #******************************************************************************
 # Module: Game.py
 #
@@ -17,7 +17,6 @@ B#!/usr/bin/python
 from Globals import *
 from Player import Player
 from Object import Object
-from Map import Map
 import sys
 #----------------------------
 # Globals

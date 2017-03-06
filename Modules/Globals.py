@@ -48,3 +48,4 @@ class actions(IntEnum):
     PICKUP_ITEM = inc()
     USE_ITEM    = inc()
 
+
