@@ -59,67 +59,80 @@ class ClientProtocol(protocol.Protocol):
 		#BUZZER.disconnected()
 		log.msg("Protocol::Connection lost.")
 
+	# HELPER FUNCTIONS
+	def processResponse(self, decoded_data):
+		request = decoded_data["request"]
+		log.msg("Request: %s" % request)
+		response = {	"FULL": 	self.handleQuit,
+			    	"GAMESTART": 	self.handleSetPlayerNumber,
+				"NEWPLAYER": 	self.handleSetPlayerNumber,
+		    		"STATUS": 	self.handleSetStatus,
+		    		"TURNSTART":	self.handleTurnStart,
+		    		"TURNEND": 	self.handleTurnEnd
+			    }[request](decoded_data)
+		return response
+
+	def handleQuit(self, decoded_data):	
+		log.msg("Quitting!")
+		reactor.stop()
+
+	def handleSetPlayerNumber(self, decoded_data):
+		global PLAYER_NUM
+		PLAYER_NUM = decoded_data['player_num']
+		log.msg("You are player %d" % PLAYER_NUM)
+		CURRENT_LOCATION = position()
+		# time.sleep(5)
+		return json.dumps({"request": "UPDATE",
+			"player_num": PLAYER_NUM,
+			"location": CURRENT_LOCATION})
+
+	def handleSetStatus(self, decoded_data):	
+		global STATUS
+		STATUS = decoded_data['status']
+		print STATUS
+		# Do something here to OLED when afflicted with status
+
+	def handleTurnStart(self, decoded_data):
+		global CURRENT_LOCATION
+		# Roll a die
+		random.seed(time.time())
+		roll = random.randint(0, 6)
+		log.msg("Rolled: %d" % roll)
+
+		# On button press locate player and find out how many steps
+		o = OLED()
+		flag = True
+		while flag:
+			if o.waitUserInput() == "A":
+				previous_location = CURRENT_LOCATION
+				CURRENT_LOCATION = position()
+				diff = CURRENT_LOCATION - previous_location
+
+				if diff > roll:
+					log.msg("Go back!  You went too far!")
+					continue
+				elif diff < roll:
+					flag = False
+				elif diff == roll:
+					flag = False
+					
+		self.transport.getHandle().sendall(json.dumps({"request": "UPDATE",
+			"location": CURRENT_LOCATION}))
+
+		# Record gestures and deduct from remainder
+		
+
+		# On button press or remainder is zero - TURNEND
+
+	def handleTurnEnd(decoded_data):
+		global PLAYER_NUM
+		#TO DO:
+
 class ClientFactory(protocol.ClientFactory):
 	protocol = ClientProtocol	
 
 	def clientConnectionLost(self, connector, reason):
 		log.msg("Factory::Connection lost.")
-
-# HELPER FUNCTIONS
-def processResponse(decoded_data):
-	request = decoded_data["request"]
-	log.msg("Request: %s" % request)
-	response = {	"FULL": 	handleQuit,
-		    	"GAMESTART": 	handleSetPlayerNumber,
-			"NEWPLAYER": 	handleSetPlayerNumber,
-		    	"STATUS": 	handleSetStatus,
-		    	"TURNSTART":	handleTurnStart,
-		    	"TURNEND": 	handleTurnEnd
-		    }[request](decoded_data)
-	return response
-
-def handleQuit(decoded_data):	
-	log.msg("Quitting!")
-	reactor.stop()
-
-def handleSetPlayerNumber(decoded_data):
-	global PLAYER_NUM
-	PLAYER_NUM = decoded_data['player_num']
-	log.msg("You are player %d" % PLAYER_NUM)
-	CURRENT_LOCATION = position()
-	time.sleep(5)
-	return json.dumps({"request": "UPDATE",
-		"player_num": PLAYER_NUM,
-		"location": CURRENT_LOCATION})
-
-def handleSetStatus(decoded_data):	
-	global STATUS
-	STATUS = decoded_data['status']
-	print STATUS
-	# Do something here to OLED when afflicted with status
-
-def handleTurnStart(decoded_data):
-	# Roll a die
-	random.seed(time.time())
-	roll = random.randint(0, 6)
-	log.msg("Rolled: %d" % roll)
-
-	# On button press locate player and find out how many steps
-	o = OLED()
-	if o.waitUserInput() == "A":
-		previous_location = CURRENT_LOCATION
-		CURRENT_LOCATION = position()
-
-		if CURRENT_LOCATION - previous_location > roll:
-
-
-	# Record gestures and deduct from remainder
-
-	# On button press or remainder is zero, UPDATE, ACTION, TURNEND
-
-def handleTurnEnd(decoded_data):
-	global PLAYER_NUM
-	#TO DO:
 
 # MAIN
 def main():
