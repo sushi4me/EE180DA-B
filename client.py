@@ -9,7 +9,7 @@ NOTES:
 from datetime				import datetime
 #from Modules.Buzzer			import Buzzer
 #from Modules.DOF 			import DOFsensor
-from Modules.OLED			import OLED
+#from Modules.OLED			import OLED
 from optparse				import OptionParser
 from random				import randint
 from twisted.internet			import reactor, protocol, defer
@@ -43,7 +43,7 @@ class ClientProtocol(protocol.Protocol):
 		try:
 			log.msg("Data recieved from server: %s" % data)
 			decoded_data = json.loads(data)			
-			self.transport.getHandle().sendall(processResponse(decoded_data))
+			self.transport.getHandle().sendall(self.processResponse(decoded_data))
 		except:
 			pass
 
@@ -80,7 +80,12 @@ class ClientProtocol(protocol.Protocol):
 		global PLAYER_NUM
 		PLAYER_NUM = decoded_data['player_num']
 		log.msg("You are player %d" % PLAYER_NUM)
-		CURRENT_LOCATION = position()
+
+		if options.testing == True:
+			CURRENT_LOCATION = 1
+		else:
+			CURRENT_LOCATION = position()
+
 		# time.sleep(5)
 		return json.dumps({"request": "UPDATE",
 			"player_num": PLAYER_NUM,
@@ -100,27 +105,46 @@ class ClientProtocol(protocol.Protocol):
 		log.msg("Rolled: %d" % roll)
 
 		# On button press locate player and find out how many steps
-		o = OLED()
-		flag = True
-		while flag:
-			if o.waitUserInput() == "A":
-				previous_location = CURRENT_LOCATION
-				CURRENT_LOCATION = position()
-				diff = CURRENT_LOCATION - previous_location
+		if True:
+			player_step = 2
+			CURRENT_LOCATION = CURRENT_LOCATION + player_step
+			if player_step > roll:
+				log.msg("Go back! You went too far!")
+			elif player_step < roll:
+				pass
+			elif player_step == roll:
+				pass
+			self.transport.getHandle().sendall(json.dumps({"request": "UPDATE",
+				"location": CURRENT_LOCATION}))
+		"""
+		else:
+			o = OLED()
+			flag = True
+			while flag:
+				if o.waitUserInput() == "A":
+					previous_location = CURRENT_LOCATION
 
-				if diff > roll:
-					log.msg("Go back!  You went too far!")
-					continue
-				elif diff < roll:
-					flag = False
-				elif diff == roll:
-					flag = False
+					if options.testing == True:
+						CURRENT_LOCATION = 4
+					else:
+						CURRENT_LOCATION = position()
+
+					diff = CURRENT_LOCATION - previous_location
+
+					if diff > roll:
+						log.msg("Go back!  You went too far!")
+						continue
+					elif diff < roll:
+						flag = False
+					elif diff == roll:
+						flag = False
 					
-		self.transport.getHandle().sendall(json.dumps({"request": "UPDATE",
-			"location": CURRENT_LOCATION}))
+			self.transport.getHandle().sendall(json.dumps({"request": "UPDATE",
+				"location": CURRENT_LOCATION}))
+		"""
 
 		# Record gestures and deduct from remainder
-		
+
 
 		# On button press or remainder is zero - TURNEND
 
@@ -156,11 +180,11 @@ def main():
 		dest="verbose", 
 		default=False, 
 		help="Prints debugging statements on console.")
-	parser.add_option("-l", "--laptop",
+	parser.add_option("-t", "--testing",
 		action="store_true",
-		dest="ie_lib",
+		dest="testing",
 		default=False,
-		help="Does not import Intel Edison only files.")
+		help="Testing mode for Nathan laptop.")
 
 	options, args = parser.parse_args(sys.argv[1:])
 

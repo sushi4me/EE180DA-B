@@ -38,15 +38,14 @@ class ServerProtocol(protocol.Protocol):
 	    if self.game.numPlayers < self.game.MAX_PLAYERS:
 		log.msg("Player has connected!")
 		self.factory.clients.append(self)
-		response = json.dumps({"request": "NEWPLAYER", "player_num": PLAYER_IDS})
+		response = json.dumps({"request": "NEWPLAYER", "player_num": self.game.numPlayers})
 
 		self.game.addPlayer()
 		
                 # Start game if we have max num players connected.
                 if self.game.numPlayers == self.game.MAX_PLAYERS:
                     GAME_START = True
-                    response = json.dumps({"request": "GAMESTART", "player_num": self.game.numPlayers})
-                        
+                                            
 		self.transport.write(response)
 
             else: # Decline connections when at max capacity
