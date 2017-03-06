@@ -28,13 +28,22 @@ import sys
 # Game Class
 #----------------------------
 class Game:
-    def __init__(self, numPlayers):
-    	# Instantiate all the players
-        players = []
-        for i in range(1, numPlayers + 1):
-        	players.append(Player(i))
+    MAX_PLAYERS = 4
 
-	def displayGame(self):
+    def __init__(self, numPlayers):
+        self.players    = []
+        self.numPlayers = 0
+
+    def addPlayer(self):
+        playerID = self.numPlayers
+        self.players.append(Player(playerID))
+
+        self.numPlayers += 1
+
+    def removePlayer(self, playerID):
+        del self.players[playerID]
+
+        self.numPlayers -= 1
 
 #    def move(self):
 
