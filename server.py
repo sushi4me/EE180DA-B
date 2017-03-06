@@ -31,7 +31,7 @@ GAME_START = False
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
         def __init__(self):
-            MAX_PLAYERS = 4
+            MAX_PLAYERS = 1
             self.game = Game(MAX_PLAYERS)
 
 	def connectionMade(self):

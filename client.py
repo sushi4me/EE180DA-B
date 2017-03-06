@@ -28,6 +28,7 @@ import time
 CURRENT_LOCATION = 0
 PLAYER_NUM = 0
 STATUS = 0
+TESTING = False
 #BUZZER = Buzzer()
 
 # TWISTED NETWORKING
@@ -81,7 +82,7 @@ class ClientProtocol(protocol.Protocol):
 		PLAYER_NUM = decoded_data['player_num']
 		log.msg("You are player %d" % PLAYER_NUM)
 
-		if options.testing == True:
+		if TESTING:
 			CURRENT_LOCATION = 1
 		else:
 			CURRENT_LOCATION = position()
@@ -105,8 +106,9 @@ class ClientProtocol(protocol.Protocol):
 		log.msg("Rolled: %d" % roll)
 
 		# On button press locate player and find out how many steps
-		if True:
-			player_step = 2
+		if TESTING:
+			log.msg("Hi")
+			player_step = input('How many steps? ')
 			CURRENT_LOCATION = CURRENT_LOCATION + player_step
 			if player_step > roll:
 				log.msg("Go back! You went too far!")
@@ -160,6 +162,8 @@ class ClientFactory(protocol.ClientFactory):
 
 # MAIN
 def main():
+	global TESTING
+
 	# Defaults
 	HOST = 'localhost'
 	PORT = 8080
@@ -182,11 +186,13 @@ def main():
 		help="Prints debugging statements on console.")
 	parser.add_option("-t", "--testing",
 		action="store_true",
-		dest="testing",
 		default=False,
 		help="Testing mode for Nathan laptop.")
 
 	options, args = parser.parse_args(sys.argv[1:])
+
+	if options.testing is not None:
+		TESTING = options.testing
 
 	if options.specific_host is not None:
 		HOST = options.specific_host
