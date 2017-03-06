@@ -18,8 +18,8 @@ class OLED:
 	#----------------------------------
 	NUM_ROWS = 6			# 6 rows per column of the OLED display
 	NUM_COLS = 10			# 10 character per row of the OLED dispaly
-	CURSOR_ROW = [ 0, 9, 18, 27, 36, 45 ]  # values correspond to pixels
-	CURSOR_COL = [ 0, 6, 12, 18, 24, 30, 36, 42, 48, 54 ] # 
+	CURSOR_ROW = [ 2, 11, 20, 29, 38, 47 ]  # values correspond to pixels
+	CURSOR_COL = [ 2, 8, 14, 20, 26, 32, 38, 44, 50, 56 ] # 
 	CURSOR_POS = 0 # Takes values from [ 0, 59 ] where e.g. 13 -> (9, 12)
 	MAX_CURS_POS = 59		# Text Cursor Used for writing characters
 	CURRENT_PAGE = 0		# Used for scrolling
@@ -235,6 +235,16 @@ class OLED:
 			return "R"
 
 	#----------------------------------
+	# Module: drawBorder(self)
+	# Description:
+	#	Draws a rounded rectangular border
+	#	onto the edges of the screen
+	#----------------------------------
+	def drawBorder(self):
+		self.oled.drawRoundedRectangle(0, 0, self.MAX_PIXELS_COL, self.MAX_PIXELS_ROW, 4, 1)
+		self.oled.refresh()
+
+	#----------------------------------
 	# Module: drawMap(self, ArrayofStrings)
 	# Description:
 	# 	Each pixel that is drawn corresponds to a character
@@ -269,7 +279,7 @@ class OLED:
 	def drawEIVMap(self):
 		self.clear()
 		# Draw outline
-		self.oled.drawRoundedRectangle(0, 0, self.MAX_PIXELS_COL, self.MAX_PIXELS_ROW, 4, 1)
+		self.drawBorder()
 		self.oled.setCursor(3,3)
 		self.oled.write("EIV")
 		
@@ -337,7 +347,7 @@ class OLED:
 	# 	drawEIVMap(self) should be called before this module.
 	# 	This module updates the location of the player without
 	#	having to redraw the map.  The module takes a parameter
-	# 	named position that takes values in the range (0, 61)
+	# 	named position that takes values in the range [0, 60]
 	#----------------------------------
 	def updateMap(self, position):
 		# Erase Old Location
