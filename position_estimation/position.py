@@ -10,7 +10,8 @@ from posutils import file_as_dict, write_to_file
 def sample_current_location():
     # Run sample collection script.
     exe = "/home/root/EE180DA-B/position_estimation/sample.sh"
-    subprocess.call([exe])
+    numSamples = "3"
+    subprocess.call([exe, numSamples])
     
     # Need to parse the five files generated from script.
     sampledir = "/home/root/EE180DA-B/position_estimation/observed_rssi"
