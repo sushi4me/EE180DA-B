@@ -237,9 +237,9 @@ class OLED:
 		# Draw map
 		self.oled.drawLineHorizontal(5, 5, 51, 1)
 		self.oled.drawLineVertical(5, 5, 12, 1)
-		self.oled.drawLineHorizontal(5, 17, 15, 1)
-		self.oled.drawLineVertical(20, 17, 24, 1)
-		self.oled.drawLineHorizontal(20, 41, 26, 1)
+		self.oled.drawLineHorizontal(5, 17, 20, 1)
+		self.oled.drawLineVertical(25, 17, 24, 1)
+		self.oled.drawLineHorizontal(25, 41, 31, 1)
 		self.oled.drawLineVertical(56, 5, 36, 1)
 		self.oled.refresh()
 		grid = [[0 for x in range(self.MAX_PIXELS_COL)] for y in range(self.MAX_PIXELS_ROW)]
