@@ -5,23 +5,27 @@ NOTES:
 	Requires pyupm to run, intended for the Intel Edison.
 
 """
-#from Modules.Buzzer		import Buzzer
-#from Modules.DOF 		import DOFsensor
-#from Modules.OLED		import OLED
-from optparse			import OptionParser
-from random			import randint
-from twisted.internet		import reactor, protocol, defer
-#from twisted.internet.task	import LoopingCall		#IMPORTANT!
-from twisted.python		import log
-from position_estimation.position import position
+
+from datetime				import datetime
+#from Modules.Buzzer			import Buzzer
+#from Modules.DOF 			import DOFsensor
+from Modules.OLED			import OLED
+from optparse				import OptionParser
+from random				import randint
+from twisted.internet			import reactor, protocol, defer
+#from twisted.internet.task		import LoopingCall		#IMPORTANT!
+from twisted.python			import log
+from position_estimation.position 	import position
 
 import json
 #import mraa
 import os
+import random
 import sys
 import time
 
 # GLOBALS
+CURRENT_LOCATION = 0
 PLAYER_NUM = 0
 STATUS = 0
 #BUZZER = Buzzer()
@@ -43,8 +47,7 @@ class ClientProtocol(protocol.Protocol):
 		except:
 			pass
 
-		# Wait for 3 seconds and if the request was a GAMESTART then TURNEND
-		time.sleep(3)
+		# If GAMESTART then send TURNEND afterwards
 		request = decoded_data["request"]
 		if request == "GAMESTART":
 			self.transport.write(json.dumps({"request": "TURNEND",
@@ -66,32 +69,28 @@ class ClientFactory(protocol.ClientFactory):
 def processResponse(decoded_data):
 	request = decoded_data["request"]
 	log.msg("Request: %s" % request)
-	response = {"NEWPLAYER": 	handleSetPlayerNumber,
-		    "STATUS": 		handleSetStatus,
-		    "TURNEND": 		handleTurnEnd,
-		    "FULL": 		handleQuit,
-		    "GAMESTART": 	handleSetPlayerNumber
+	response = {	"FULL": 	handleQuit,
+		    	"GAMESTART": 	handleSetPlayerNumber,
+			"NEWPLAYER": 	handleSetPlayerNumber,
+		    	"STATUS": 	handleSetStatus,
+		    	"TURNSTART":	handleTurnStart,
+		    	"TURNEND": 	handleTurnEnd
 		    }[request](decoded_data)
 	return response
+
+def handleQuit(decoded_data):	
+	log.msg("Quitting!")
+	reactor.stop()
 
 def handleSetPlayerNumber(decoded_data):
 	global PLAYER_NUM
 	PLAYER_NUM = decoded_data['player_num']
 	log.msg("You are player %d" % PLAYER_NUM)
-	location = 4
+	CURRENT_LOCATION = position()
+	time.sleep(5)
 	return json.dumps({"request": "UPDATE",
 		"player_num": PLAYER_NUM,
-		"location": location})
-
-def handleGameStart(decoded_data):
-	global PLAYER_NUM
-	self.transport.write(json.dumps({"request": "TURNEND",
-		"player_num": PLAYER_NUM}))
-	log.msg("Ending turn.\n")
-
-def handleTurnEnd(decoded_data):
-	global PLAYER_NUM
-	#TO DO:
+		"location": CURRENT_LOCATION})
 
 def handleSetStatus(decoded_data):	
 	global STATUS
@@ -99,9 +98,28 @@ def handleSetStatus(decoded_data):
 	print STATUS
 	# Do something here to OLED when afflicted with status
 
-def handleQuit(decoded_data):	
-	log.msg("Quitting!")
-	reactor.stop()
+def handleTurnStart(decoded_data):
+	# Roll a die
+	random.seed(time.time())
+	roll = random.randint(0, 6)
+	log.msg("Rolled: %d" % roll)
+
+	# On button press locate player and find out how many steps
+	o = OLED()
+	if o.waitUserInput() == "A":
+		previous_location = CURRENT_LOCATION
+		CURRENT_LOCATION = position()
+
+		if CURRENT_LOCATION - previous_location > roll:
+
+
+	# Record gestures and deduct from remainder
+
+	# On button press or remainder is zero, UPDATE, ACTION, TURNEND
+
+def handleTurnEnd(decoded_data):
+	global PLAYER_NUM
+	#TO DO:
 
 # MAIN
 def main():

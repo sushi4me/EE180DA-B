@@ -76,9 +76,9 @@ class ServerProtocol(protocol.Protocol):
 		request = decoded_data["request"]
 		log.msg("REQUEST: %s" % request)
 
-		response = {	"UPDATE": 	self.handleUpdate,
-		    		"ACTION": 	self.handleAction,
+		response = {	"ACTION": 	self.handleAction,
 		    		"TURNEND": 	self.handleNextPlayer,
+		    		"UPDATE": 	self.handleUpdate,
 		    		"QUIT": 	self.handleQuit
 		   }[request](decoded_data)
 
