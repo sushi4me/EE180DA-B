@@ -226,33 +226,41 @@ class OLED:
 			return "R"
 
 	#----------------------------------
-	# Module: drawMap(self, position)
+	# Module: drawMap(self)
 	# Description:
 	#
 	#----------------------------------
-	def drawMap(self, position):
+	def drawMap(self):
 		self.clear()
 		# Draw outline
 		self.oled.drawRoundedRectangle(0, 0, self.MAX_PIXELS_COL, self.MAX_PIXELS_ROW, 4, 1)
+                self.oled.setCursor(3,3)
+                self.oled.write("EIV")
 		# Draw map
-		self.oled.drawLineHorizontal(5, 5, 51, 1)
-		self.oled.drawLineVertical(5, 5, 12, 1)
-		self.oled.drawLineHorizontal(5, 17, 20, 1)
-		self.oled.drawLineVertical(25, 17, 24, 1)
-		self.oled.drawLineHorizontal(25, 41, 31, 1)
-		self.oled.drawLineVertical(56, 5, 36, 1)
-		self.oled.refresh()
-		time.sleep(3)
 		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
-		grid[0] = "                                                                "
-		grid[5] = "                                 __________________________     "
-		grid[6] = "                                 |                        |     "
-		for i in range(7, 19):
-			grid[i] = grid[6]
+		grid[0] = "                           |                                    "
+		grid[1] = "                           |                                    "
+		grid[2] = "                           |                                    "
+		grid[3] = "                           |                                    "
+		grid[4] = "                           |                                    "
+		grid[5] = "                           |     __________________________     "
+		grid[6] = "                           |     |                        |     "
+		grid[7] = "                           |     |                        |     "
+		grid[8] = "                           |     |                        |     "
+		grid[9] = "                           |     |                        |     "
+		grid[10]= "                           |     |                        |     "
+		grid[11]= "                           |     |                        |     "
+		grid[12]= "                           |     |                        |     "
+		grid[13] ="----------------------------     |                        |     "
+		grid[14] ="                                 |                        |     "
+		grid[15] ="                                 |                        |     "
+		grid[16] ="                                 |                        |     "
+		grid[17] ="                                 |                        |     "
+		grid[18] ="                                 |                        |     "
 		grid[19] ="     ____________________________|                        |     "
 		grid[20] ="     |                                                    |     "
 		for i in range(21, 42):
-			grid[i] = grid[16]
+			grid[i] = grid[20]
 		grid[42] ="     |                                                    |     "
 		grid[43] ="     ------------------------------------------------------     "
 		x = 0
@@ -261,7 +269,12 @@ class OLED:
 			x = 0
 			for j in i:
 				if j != " ":
-					o.oled.drawPixel(x, y, 1)
-					o.oled.refresh()
+					self.oled.drawPixel(x, y, 1)
+					self.oled.refresh()
 				x += 1
 			y += 1
+        
+        def updateMap(self, position):
+                # need to implement
+                self.oled.drawCircle(46, 61, 2, 1)
+                self.oled.refresh()
