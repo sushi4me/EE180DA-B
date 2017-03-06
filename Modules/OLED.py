@@ -242,4 +242,26 @@ class OLED:
 		self.oled.drawLineHorizontal(25, 41, 31, 1)
 		self.oled.drawLineVertical(56, 5, 36, 1)
 		self.oled.refresh()
-		grid = [[0 for x in range(self.MAX_PIXELS_COL)] for y in range(self.MAX_PIXELS_ROW)]
+		time.sleep(3)
+		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
+		grid[0] = "                                                                "
+		grid[5] = "                                 __________________________     "
+		grid[6] = "                                 |                        |     "
+		for i in range(7, 19):
+			grid[i] = grid[6]
+		grid[19] ="     ____________________________|                        |     "
+		grid[20] ="     |                                                    |     "
+		for i in range(21, 42):
+			grid[i] = grid[16]
+		grid[42] ="     |                                                    |     "
+		grid[43] ="     ------------------------------------------------------     "
+		x = 0
+		y = 0
+		for i in grid:
+			x = 0
+			for j in i:
+				if j != " ":
+					o.oled.drawPixel(x, y, 1)
+					o.oled.refresh()
+				x += 1
+			y += 1
