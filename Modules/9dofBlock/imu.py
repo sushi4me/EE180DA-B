@@ -30,10 +30,11 @@ imu.gyro_range("245DPS")    # leave blank for default of "245DPS"
 while(1):
     imu.read_accel()
     imu.read_gyro()
+    imu.read_mag()
 
     # Print the results
-    print("Accel-X: %.8f\tY: %.8f\tZ: %.8f\t|  Gyro-X: %.8f\tY: %.8f\tZ: %.8f\
-            " % (imu.ax*10, imu.ay*10, imu.az*10, imu.gx, imu.gy, imu.gz))
+    print("AX: %.4f\tY: %.4f\tZ: %.4f\t| GX: %.4f\tY: %.4f\tZ: %.4f\t | MX: %.4f\tY: %.4f\tZ: %.4f\
+            " % (imu.ax*10, imu.ay*10, imu.az*10, imu.gx, imu.gy, imu.gz, imu.mx*10, imu.my*10, imu.mz*10))
 
     # Sleep for 1/20th of a second
     time.sleep(0.05)

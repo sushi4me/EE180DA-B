@@ -16,6 +16,8 @@ class OLED:
 	#----------------------------------
 	# SparkFun OLED Screen Variables
 	#----------------------------------
+	MAX_PIXELS_COL = 64
+	MAX_PIXELS_ROW = 48
 	NUM_ROWS = 6			# 6 rows per column of the OLED display
 	NUM_COLS = 10			# 10 character per row of the OLED dispaly
 	CURSOR_ROW = [ 2, 11, 20, 29, 38, 47 ]  # values correspond to pixels
@@ -23,11 +25,9 @@ class OLED:
 	CURSOR_POS = 0 # Takes values from [ 0, 59 ] where e.g. 13 -> (9, 12)
 	MAX_CURS_POS = 59		# Text Cursor Used for writing characters
 	CURRENT_PAGE = 0		# Used for scrolling
-	SCREEN_BUFFER = ""		# Used for remembering the sate of the buffer
+	TEXT_BUFFER = ""		# Used for remembering the text in the screen buffer
+	PIXEL_BUFFER = [ " " for i in range(MAX_PIXELS_ROW)] # Used to remember pixel screen state
 	TYPE_DELAY = 0.005		# Delay for writeScroll()
-	MAX_PIXELS_COL = 64
-	MAX_PIXELS_ROW = 48
-	
 
 	#----------------------------------
 	# GPIO OLED Block Buttons
@@ -99,10 +99,10 @@ class OLED:
 	#	number of characters that can fit on the display.
 	#----------------------------------	
 	def write(self, string):
-		self.SCREEN_BUFFER += string
+		self.TEXT_BUFFER += string
 		if self.CURSOR_POS >= self.MAX_CURS_POS:
 			return
-		if len(self.SCREEN_BUFFER) > self.MAX_CURS_POS:
+		if len(self.TEXT_BUFFER) > self.MAX_CURS_POS:
 			self.oled.setCursor(self.row(), self.col())
 			self.oled.write(string[self.CURSOR_POS : self.MAX_CURS_POS])
 			self.oled.refresh()	
@@ -120,7 +120,7 @@ class OLED:
 	#	message is being typed out each character at a time.
 	#----------------------------------
 	def writeScroll(self, string):
-		self.SCREEN_BUFFER += string
+		self.TEXT_BUFFER += string
 		for i in string:
 			if self.CURSOR_POS > self.MAX_CURS_POS:
 				return
@@ -135,16 +135,16 @@ class OLED:
 	# Description:
 	#	Clears the screen, resets the position of the cursor, and 
 	#	clears the OLED screen buffer (which is different from the 
-	#	SCREEN_BUFFER).  Additionally resets the SCREEN_BUFFER
+	#	TEXT_BUFFER).  Additionally resets the TEXT_BUFFER
 	#	and the CURRENT_PAGE (Used to determine what page of the 
-	#	SCREEN_BUFFER the user is looking at)
+	#	TEXT_BUFFER the user is looking at)
 	#----------------------------------
 	def clear(self):
 		self.CURSOR_POS = 0
 		self.oled.clear()
 		self.oled.clearScreenBuffer()
 		self.oled.setCursor(0,0)
-		self.SCREEN_BUFFER = ""
+		self.TEXT_BUFFER = ""
 		self.CURRENT_PAGE = 0
 
 	#----------------------------------
@@ -165,14 +165,14 @@ class OLED:
 	# Module: scrollDown(self)
 	# Description:
 	#	This module scrolls the display down according to the 
-	#	characters stored in SCREEN_BUFFER.  This module can
+	#	characters stored in TEXT_BUFFER.  This module can
 	#	be used in conjuction with the BUTTON_DOWN to allow the user
 	#	to scroll through large messages.  This module uses
 	#	CURRENT_PAGE to keep track of how much the user has 
 	#	scrolled down.  
 	#----------------------------------
 	def scrollDown(self):
-		buffer_size = len(self.SCREEN_BUFFER)
+		buffer_size = len(self.TEXT_BUFFER)
 		num_pages = -(-buffer_size//self.NUM_COLS) - 5
 		if buffer_size < self.MAX_CURS_POS:
 			return
@@ -183,14 +183,14 @@ class OLED:
 			self.oled.clear()
 			self.oled.clearScreenBuffer()
 			self.oled.home()
-			self.oled.write(self.SCREEN_BUFFER[self.CURRENT_PAGE*self.NUM_COLS:])
+			self.oled.write(self.TEXT_BUFFER[self.CURRENT_PAGE*self.NUM_COLS:])
 			self.oled.refresh()
 
 	#----------------------------------
 	# Module: scrollUp(self)
 	# Description:
 	#	This module scrolls the display up according to the 
-	#	characters stored in SCREEN_BUFFER.  This module can
+	#	characters stored in TEXT_BUFFER.  This module can
 	#	be used in conjuction with the BUTTON_UP to allow the user
 	#	to scroll through large messages.  This module uses
 	#	CURRENT_PAGE to keep track of how much the user has 
@@ -203,7 +203,7 @@ class OLED:
 		self.oled.clear()
 		self.oled.clearScreenBuffer()
 		self.oled.home()
-		self.oled.write(self.SCREEN_BUFFER[self.CURRENT_PAGE*self.NUM_COLS:])
+		self.oled.write(self.TEXT_BUFFER[self.CURRENT_PAGE*self.NUM_COLS:])
 		self.oled.refresh()
 
 	#----------------------------------
@@ -257,6 +257,7 @@ class OLED:
 	#	initialization takes place
 	#----------------------------------
 	def drawScreen(self, ArrayOfStrings, delay=0):
+		self.PIXEL_BUFFER = ArrayOfStrings
 		x = 0
 		y = 0
 		# For each string in the array
@@ -431,3 +432,73 @@ class OLED:
 		self.oled.write("47")
 		self.oled.refresh()
 
+	def rotateMapRight(self):
+		self.oled.clear()
+		self.oled.clearScreenBuffer()
+		self.drawBorder()
+		x = 0
+		y = 0
+		# For each string in the array
+		for i in reversed(self.PIXEL_BUFFER):
+			y = 0
+			index = 0
+			# For each character in the string
+			for j in i:
+				# Any character other than space 
+				# corresponds to a pixel drawn on the map
+				if j != " ":
+					self.oled.drawPixel(x, y, 1)
+					if x%4 == 1:
+						self.oled.drawPixel(x+1, y, 1)
+				if index%3 != 1:
+					y += 1
+				index += 1
+			if x%4 == 1:
+				x += 1
+			x += 1
+		self.oled.refresh()
+
+	def rotateMapLeft(self):
+		self.oled.clear()
+		self.oled.clearScreenBuffer()
+		self.drawBorder()
+		x = 0
+		y = 0
+		# For each string in the array
+		for i in self.PIXEL_BUFFER:
+			y = 0
+			index = 0
+			# For each character in the string
+			for j in reversed(i):
+				# Any character other than space 
+				# corresponds to a pixel drawn on the map
+				if j != " ":
+					self.oled.drawPixel(x, y, 1)
+					if x%4 == 1:
+						self.oled.drawPixel(x+1, y, 1)
+				if index%3 != 1:
+					y += 1
+				index += 1
+			if x%4 == 1:
+				x += 1
+			x += 1
+		self.oled.refresh()
+
+	def rotateMapTwice(self):
+		self.oled.clear()
+		self.oled.clearScreenBuffer()
+		self.drawBorder()
+		x = 0
+		y = 0
+		# For each string in the array
+		for i in reversed(self.PIXEL_BUFFER):
+			x = 0
+			# For each character in the string
+			for j in reversed(i):
+				# Any character other than space 
+				# corresponds to a pixel drawn on the map
+				if j != " ":
+					self.oled.drawPixel(x, y, 1)
+				x += 1
+			y += 1
+		self.oled.refresh()
