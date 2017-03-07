@@ -245,15 +245,18 @@ class OLED:
 		self.oled.refresh()
 
 	#----------------------------------
-	# Module: drawMap(self, ArrayofStrings)
+	# Module: drawScreen(self, ArrayofStrings, delay)
 	# Description:
 	# 	Each pixel that is drawn corresponds to a character
 	# 	other than the SPACE character.  The ArrayofStrings
 	#	can have maximum index of MAX_PIXELS_ROW and each
 	#	string in the array can have maximum length of
-	#	MAX_PIXELS_COL.  Each Pixel is drawn one at a time.
+	#	MAX_PIXELS_COL. Delay parameter is used to inidiate
+	#	the screen to be refreshed after drawing each pixel.
+	#	This option can be used as a delay while game
+	#	initialization takes place
 	#----------------------------------
-	def drawMap(self, ArrayOfStrings):
+	def drawScreen(self, ArrayOfStrings, delay=0):
 		x = 0
 		y = 0
 		# For each string in the array
@@ -265,9 +268,65 @@ class OLED:
 				# corresponds to a pixel drawn on the map
 				if j != " ":
 					self.oled.drawPixel(x, y, 1)
-					self.oled.refresh()
+					if delay == 1:
+						self.oled.refresh()
 				x += 1
 			y += 1
+		self.oled.refresh()
+
+	#----------------------------------
+	# Module: drawInitScreen(self)
+	# Description:
+	# 	Draws game initialization screen
+	#----------------------------------
+	def drawInitScreen(self):
+		self.drawBorder()
+		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
+		grid[self.MAX_PIXELS_ROW//2 - 9] = "                    ****          ******                        "
+		grid[self.MAX_PIXELS_ROW//2 - 8] = "                    * * **      **      **                      "
+		grid[self.MAX_PIXELS_ROW//2 - 7] = "                    * *   ******          **                    "
+		grid[self.MAX_PIXELS_ROW//2 - 6] = "                    * *                    *                    "
+		grid[self.MAX_PIXELS_ROW//2 - 5] = "                    * *                    *                    "
+		grid[self.MAX_PIXELS_ROW//2 - 4] = "                    * *                    *                    "
+		grid[self.MAX_PIXELS_ROW//2 - 3] = "                    * *                    *                    "
+		grid[self.MAX_PIXELS_ROW//2 - 2] = "                    * *                    *                    "
+		grid[self.MAX_PIXELS_ROW//2 - 1] = "                    * *                    *                    "
+		grid[self.MAX_PIXELS_ROW//2 - 0] = "                    * *                    *                    "
+		grid[self.MAX_PIXELS_ROW//2 + 1] = "                    * *                    *                    "
+		grid[self.MAX_PIXELS_ROW//2 + 2] = "                    * *                    *                    "
+		grid[self.MAX_PIXELS_ROW//2 + 3] = "                    * **          ******   *                    "
+		grid[self.MAX_PIXELS_ROW//2 + 4] = "                    * * **      **      ** *                    "
+		grid[self.MAX_PIXELS_ROW//2 + 5] = "                    * *   ******          **                    "
+		grid[self.MAX_PIXELS_ROW//2 + 6] = "                    * *                                         "
+		grid[self.MAX_PIXELS_ROW//2 + 7] = "                    * *                                         "
+		grid[self.MAX_PIXELS_ROW//2 + 8] = "                    * *                                         "
+		grid[self.MAX_PIXELS_ROW//2 + 9] = "                    ***                                         "
+		self.drawScreen(grid, 1)
+
+	#----------------------------------
+	# Module: drawStartScreen(self)
+	# Description:
+	#	Draws the game main menu, allowing the
+	#	user to indicate they are ready to start
+	#	or navigate the options.  This module
+	#	returns the value the user select
+	#----------------------------------
+	def drawStartScreen(self):
+		self.drawBorder()
+		self.setTextCursor(0, 0)
+		self.oled.write("Main Menu")
+		self.oled.drawLineHorizontal(0, 10, 64, 1)
+		self.setTextCursor(2, 0)
+		self.oled.write("(A) Start")
+		self.setTextCursor(3, 0)
+		self.oled.write("(B) Option")
+		self.oled.refresh()
+		input = self.waitForUserInput()
+		while (input != "A"):
+			if input == "B":
+				# Initialize options menu
+				pass
+			input = self.waitForUserInput()
 
 	#----------------------------------
 	# Module: drawEIVMap(self)
@@ -277,13 +336,15 @@ class OLED:
 	# 	with map position indices
 	#----------------------------------
 	def drawEIVMap(self):
-		self.clear()
+		# Clear Screen
+		self.oled.clearScreenBuffer()
+		self.oled.clear()
 		# Draw outline
 		self.drawBorder()
 		self.oled.setCursor(3,3)
 		self.oled.write("EIV")
 		
-		# Initialize MAP arrays of strings
+		# Initialize MAP array of strings
 		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
 		grid[0] = "                      |                                         "
 		for i in range(1,9):
@@ -305,7 +366,7 @@ class OLED:
 		grid[38] ="          --------------------------------------------          "
 
 		# Draw EIV Map
-		self.drawMap(grid)
+		self.drawScreen(grid)
 		
 		# Draw Map Position References
 		self.oled.setCursor(39, 56)

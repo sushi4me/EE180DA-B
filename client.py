@@ -9,7 +9,7 @@ NOTES:
 from datetime				import datetime
 #from Modules.Buzzer			import Buzzer
 #from Modules.DOF 			import DOFsensor
-#from Modules.OLED			import OLED
+from Modules.OLED			import OLED
 from optparse				import OptionParser
 from random				import randint
 from twisted.internet			import reactor, protocol, defer
@@ -29,15 +29,28 @@ CURRENT_LOCATION = 0
 PLAYER_NUM = 0
 STATUS = 0
 TESTING = False
-#BUZZER = Buzzer()
+#buzzer = Buzzer()
+oled = OLED()
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
 	def connectionMade(self):
-		#global BUZZER
+		global buzzer, oled
 		log.msg("Connected to server.")
 		#BUZZER.connected()
+		oled.drawInitScreen()
+		time.sleep(1)
+		oled.clear()
+		oled.drawStartScreen()
+		oled.clear()
+		oled.drawEIVMap()
+		i = 0
+		while (i < 62):
+			oled.updateMap(i)
+			oled.waitForUserInput()
+			i += 1
 		#self.transport.loseConnection()
+
 
 	def dataReceived(self, data):
 		global PLAYER_NUM
