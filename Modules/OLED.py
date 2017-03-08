@@ -6,6 +6,7 @@
 import time
 import mraa
 import pyupm_i2clcd as oledObj
+from Globals import buttons
 
 #--------------------------------------
 # OLED Class (Sparkfun OLED Block)
@@ -432,7 +433,7 @@ class OLED:
 		self.oled.write("47")
 		self.oled.refresh()
 
-	def rotateMapRight(self):
+	def rotateScreenRight(self):
 		self.oled.clear()
 		self.oled.clearScreenBuffer()
 		self.drawBorder()
@@ -458,7 +459,7 @@ class OLED:
 			x += 1
 		self.oled.refresh()
 
-	def rotateMapLeft(self):
+	def rotateScreenLeft(self):
 		self.oled.clear()
 		self.oled.clearScreenBuffer()
 		self.drawBorder()
@@ -484,7 +485,7 @@ class OLED:
 			x += 1
 		self.oled.refresh()
 
-	def rotateMapTwice(self):
+	def rotateScreenTwice(self):
 		self.oled.clear()
 		self.oled.clearScreenBuffer()
 		self.drawBorder()
@@ -502,3 +503,19 @@ class OLED:
 				x += 1
 			y += 1
 		self.oled.refresh()
+
+
+	def drawMainMenu(self, optionsList):
+		self.clear()
+		self.drawBorder()
+		self.oled.drawLineHorizontal(0, 10, 64, 1)
+		self.oled.setCursor(2, 2)
+		self.oled.write("Main Menu")
+		rowIndex = 1
+		for option in optionsList:
+			if rowIndex < self.NUM_ROWS:
+				self.oled.setCursor(self.CURSOR_ROW[rowIndex], 2)
+				self.oled.write(button[rowIndex - 1].name + option)
+			rowIndex += 1
+		self.oled.refresh()
+
