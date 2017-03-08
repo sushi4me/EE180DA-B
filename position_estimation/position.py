@@ -8,9 +8,9 @@ from os.path  import isfile, join, basename
 from posutils import file_as_dict, write_to_file
 
 def sample_current_location():
+    numSamples = 3
     # Run sample collection script.
     exe = "/home/root/EE180DA-B/position_estimation/sample.sh"
-    numSamples = "3"
     subprocess.call([exe, numSamples])
     
     # Need to parse the five files generated from script.

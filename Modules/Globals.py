@@ -52,11 +52,11 @@ class actions(IntEnum):
 # OLED Buttons
 #----------------------------
 class buttons(IntEnum):
-    A		= start()
-    B		= inc()
-    SELECT	= inc()
-    UP		= inc()
-    DOWN	= inc()
-    LEFT	= inc()
-    RIGHT	= inc()
+    A	= start()
+    B	= inc()
+    S	= inc()
+    U	= inc()
+    D	= inc()
+    L	= inc()
+    R	= inc()
 

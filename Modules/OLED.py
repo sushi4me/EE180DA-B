@@ -215,25 +215,37 @@ class OLED:
 	#	char that corresponds with the button that was pressed.
 	#---------------------------------- 
 	def waitForUserInput(self):
+		# Wait for button press
 		while(self.BUTTON_A.read() != 0 and self.BUTTON_B.read() != 0 and 
 			self.BUTTON_SELECT.read() != 0 and self.BUTTON_DOWN.read() != 0 and
 			self.BUTTON_LEFT.read() != 0 and self.BUTTON_RIGHT.read() != 0 and 
 			self.BUTTON_UP.read() != 0):
 			pass
+		
+		# get input
+		input = " "
 		if (self.BUTTON_A.read() == 0):
-			return "A"
-		if (self.BUTTON_B.read() == 0):
-			return "B"
-		if (self.BUTTON_SELECT.read() == 0):
-			return "S"
-		if (self.BUTTON_UP.read() == 0):
-			return "U"
-		if (self.BUTTON_DOWN.read() == 0):
-			return "D"
-		if (self.BUTTON_LEFT.read() == 0):
-			return "L"
-		if (self.BUTTON_RIGHT.read() == 0):
-			return "R"
+			input = buttons.A
+		elif (self.BUTTON_B.read() == 0):
+			input = buttons.B
+		elif (self.BUTTON_SELECT.read() == 0):
+			input = buttons.S
+		elif (self.BUTTON_UP.read() == 0):
+			input = buttons.U
+		elif (self.BUTTON_DOWN.read() == 0):
+			input = buttons.D
+		elif (self.BUTTON_LEFT.read() == 0):
+			input = buttons.L
+		elif (self.BUTTON_RIGHT.read() == 0):
+			input = buttons.R
+
+		# Wait for press release		
+		while(self.BUTTON_A.read() == 0 or self.BUTTON_B.read() == 0 or 
+			self.BUTTON_SELECT.read() == 0 or self.BUTTON_DOWN.read() == 0 or
+			self.BUTTON_LEFT.read() == 0 or self.BUTTON_RIGHT.read() == 0 or 
+			self.BUTTON_UP.read() == 0):
+			pass
+		return input
 
 	#----------------------------------
 	# Module: drawBorder(self)
@@ -512,10 +524,11 @@ class OLED:
 		self.oled.setCursor(2, 2)
 		self.oled.write("Main Menu")
 		rowIndex = 1
+		b = list(buttons)
 		for option in optionsList:
 			if rowIndex < self.NUM_ROWS:
 				self.oled.setCursor(self.CURSOR_ROW[rowIndex], 2)
-				self.oled.write(button[rowIndex - 1].name + option)
+				self.oled.write(b[rowIndex - 1].name + ":" + option)
 			rowIndex += 1
 		self.oled.refresh()
 
