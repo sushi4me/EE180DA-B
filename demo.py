@@ -3,6 +3,7 @@
 # Description:
 #
 #------------------------------------------------
+import position_estimation.position
 from time				import sleep
 from pythonwifi.iwlibs 	import Wireless
 from Modules.OLED		import OLED
@@ -74,7 +75,7 @@ def showIP():
 	oled.drawBorder()
 	IP = getIP('wlan0')
 	oled.write(IP)
-	oled.setTextCursor(2, 0)
+	oled.setTextCursor(3, 0)
 	oled.oled.write("A: BACK   B: EXIT   ")
 	oled.oled.refresh()
 	incorrectInput = True
