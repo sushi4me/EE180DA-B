@@ -1,10 +1,12 @@
 #!/usr/bin/python
 
-from Modules.Game       import Game
-from Modules.Player	import Player
-from optparse 		import OptionParser
-from twisted.internet 	import reactor, protocol
-from twisted.python	import log
+from Modules.Game		import Game
+from Modules.Player		import Player
+from optparse 			import OptionParser
+from threading			import Thread
+from twisted.internet 		import reactor, protocol
+from twisted.internet.task	import LoopingCall
+from twisted.python		import log
 
 import json
 import os			
@@ -12,21 +14,50 @@ import sys
 import time
 
 """
-NOTES:
-	SEND:
+SEND:
 	{"request": "NEWPLAYER", "player_num": player_count}
 	{"request": "GAMESTART"}
 	{"request": "TURNSTART"}
 	{"request": "EVENT", "event": "event_num"}
-	RECEIVE:	
+RECEIVE:	
 	{"request": "UPDATE", "player_num": player_num, "location": location}
 	{"request": "ACTION", "player_num": player_num, "powerup": powerup}
 	{"request": "TURNEND", "player_num:" player_num}
 	{"request": "QUIT", "player_num": player_num}
+
+TO DO: 
+	* Allow the Game class to receive information from the reactor thread.
+		1. Start Game's "checking" function in LoopingCall.
+		2. If we detect something in LoopingCall, send back to reactor.
+
+	* Upon data receive send decoded JSON to Game class.
 """
 
 # GLOBALS
 GAME_START = False
+
+class Game():
+	global VERBOSE
+
+	def __init__(self, host="localhost", port=8080):
+		self.m_factory = ServerFactory()
+		self.m_factory.clients = []
+		self.m_host = host
+		self.m_port = port
+
+	def run(self):
+		twisted_thread = Thread(target=self.runTwisted)
+		twisted_thread.start()
+		
+		twisted_thread.join()
+		if VERBOSE:
+			log.msg("End of game.")
+
+	def runTwisted(self):
+		reactor.listenTCP(self.m_port, self.m_factory, interface=self.m_host)
+		if VERBOSE:
+			log.msg("Running reactor.")
+		reactor.run()
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
@@ -104,12 +135,13 @@ class ServerProtocol(protocol.Protocol):
 				log.msg("QUIT %d" % delete_player)
 				self.game.removePlayer(delete_player)
 
-
 class ServerFactory(protocol.Factory):
 	protocol = ServerProtocol
 
 # MAIN
 def main():
+	global VERBOSE
+
 	# Defaults
 	HOST = 'localhost'
 	PORT = 8080
@@ -136,15 +168,20 @@ def main():
 	if options.specific_host is not None:
 		HOST = options.specific_host
 
-	# Start
-	log.startLogging(sys.stdout)
+	if options.verbose is not None:
+		VERBOSE = options.verbose
+
+	if VERBOSE:
+		log.startLogging(sys.stdout)
+
+	# Start reactor
 	m_factory = ServerFactory()
 	m_factory.clients = []
 
 	reactor.listenTCP(PORT, m_factory, interface=HOST)
-	log.msg("Starting server.")	
+	if VERBOSE:
+		log.msg("Running reactor.")
 	reactor.run()
-	log.msg("Closing server.")
 
 if __name__ == "__main__":
 	main()
