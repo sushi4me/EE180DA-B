@@ -13,7 +13,7 @@ def getIP('wlan0'):
         return socket.inet_ntoa(fcntl.ioctl(
             s.fileno(),
             0x8915,  # SIOCGIFADDR
-            struct.pack('256s', ifname[:15])
+            struct.pack('256s', wlan0[:15])
         )[20:24])
 
 
