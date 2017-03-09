@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
 from collections	import deque
-from Modules.Game       import Game
-from Modules.Player	import Player
-from optparse 		import OptionParser
+#from Modules.Game	import Game
+#from Modules.Player	import Player
+from optparse		import OptionParser
 from threading		import Thread
-from twisted.internet 	import reactor, protocol, task
+from twisted.internet	import reactor, protocol, task
 from twisted.python	import log
 
 import json
@@ -16,28 +16,59 @@ import time
 """
 NOTES:
 	SEND:
-	{"request": "NEWPLAYER", "player_num": player_count}
 	{"request": "GAMESTART"}
-	{"request": "TURNSTART"}
 	{"request": "EVENT", "event": "event_num"}
-	RECEIVE:	
-	{"request": "UPDATE", "player_num": player_num, "location": location}
+	{"request": "NEWPLAYER", "player_num": player_num}
+	{"request": "TURNSTART"}
+
+	RECEIVE:
 	{"request": "ACTION", "player_num": player_num, "powerup": powerup}
+	{"request": "DISCONNECTED", "player_num": player_num}
+	("request": "NEWPLAYER")
 	{"request": "TURNEND", "player_num:" player_num}
-	{"request": "QUIT", "player_num": player_num}
+	{"request": "UPDATE", "player_num": player_num, "location": location}
+
 """
 
 # GLOBALS
-JSON_REQUESTS = deque()
 
 # FUNCTION
 class Game():
-	def detect(self):
-		global JSON_REQUESTS, m_factory
-		if len(JSON_REQUESTS) > 0:
-			decoded = JSON_REQUESTS.popleft()
-			print "%s" % decoded
-			writeToClient(0, decoded)
+	# CALLED BY SERVER CODE TO PROCESS JSON
+	def processJSON(self, client, decoded):
+		global m_factory
+
+		log.msg("%s" % decoded)
+		request = decoded["request"]
+
+		# Use the request field to execute corresponding function.
+		# If the player can perform a new action, add it here:
+		response = {	"ACTION":	self.handleAction,
+				"DISCONNECTED": self.handleDisconnect,
+				"NEWPLAYER": 	self.handleNewPlayer,
+				"TURNSTART":	self.handleTurnStart,
+				"TURNEND": 	self.handleTurnEnd
+			   }[request](decoded)
+
+	# HANDLER FUNCTIONS
+	def handleAction(self, decoded):
+		# TO DO
+
+	def handleDisconnect(self, decoded):
+		# TO DO
+
+	def handleNewPlayer(self, decoded):
+		# TO DO
+
+	def handleTurnStart(self, decoded):
+		# TO DO
+
+	def handleTurnEnd(self, decoded):
+		# TO DO
+
+	# HELPER FUNCTIONS
+	def rollDice(self, max=6):
+		# TO DO
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
@@ -50,23 +81,26 @@ class ServerProtocol(protocol.Protocol):
 	    	self.factory.clients.append(self)
 
 	def dataReceived(self, data):
-		global JSON_REQUESTS, LOOPING
+		global LOOPING
+
 		log.msg("You got data!")
+
 		decoded = json.loads(data)
-		JSON_REQUESTS.append(decoded)
-		detect_thread = Thread(target=self.gameObj.detect)
+		detect_thread = Thread(target=self.gameObj.processJSON, 
+			args=(client, decoded, ))
 		detect_thread.start()
 
 	def connectionLost(self, reason):
 		log.msg("Connection lost.")
 
-def writeToClient(client, msg):
-	global m_factory
-	m_factory.clients[client].transport.write(json.dumps(msg))
-	log.msg("Wrote to a client.")
-
 class ServerFactory(protocol.Factory):
 	protocol = ServerProtocol
+
+def writeToClient(client, msg):
+	global m_factory
+
+	m_factory.clients[client].transport.write(json.dumps(msg))
+	log.msg("Wrote to a client.")
 
 # MAIN
 def main():
