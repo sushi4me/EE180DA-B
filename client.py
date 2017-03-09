@@ -10,8 +10,6 @@ NOTES:
 	{"request": "UPDATE", "player_num": player_num, "location": location}
 
 	RECEIVE:
-	{"request": "GAMESTART"}
-	{"request": "EVENT", "event": "event_num"}
 	{"request": "NEWPLAYER", "player_num": player_num}
 	{"request": "TURNSTART"}
 """
@@ -25,7 +23,7 @@ from random			import randint
 from twisted.internet		import reactor, protocol, defer
 #from twisted.internet.task	import LoopingCall
 from twisted.python		import log
-#from location.location 	import location
+from location.location 		import location
 
 import json
 #import mraa
@@ -35,10 +33,13 @@ import sys
 import time
 
 # GLOBALS
+global PLAYER
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
 	def connectionMade(self):
+		global PLAYER
+
                 log.msg("Connected to server.")
                 
                 log.msg("Determining start location...")
@@ -53,6 +54,30 @@ class ClientProtocol(protocol.Protocol):
 
 class ClientFactory(protocol.ClientFactory):
 	protocol = ClientProtocol	
+
+def processJSON(decoded):
+		log.msg("%s" % decoded)
+		request = decoded["request"]
+
+		# Use the request field to execute corresponding function.
+		# If the player can perform a new action, add it here:
+		response = {	"NEWPLAYER": 	self.handleNewPlayer,
+				"TURNSTART": 	self.handleTurnEnd,
+			   }[request](decoded)
+
+		return
+
+def handleNewPlayer(decoded):
+	global PLAYER
+
+
+
+	return
+
+def handleTurnStart(decoded):
+	log.msg("Turn started!")
+
+	return
 
 # MAIN
 def main():
