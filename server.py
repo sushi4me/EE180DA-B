@@ -25,7 +25,7 @@ NOTES:
 	RECEIVE:
 	{"request": "ACTION", "player_num": player_num, "powerup": powerup}
 	{"request": "DISCONNECTED", "player_num": player_num}
-	("request": "NEWPLAYER")
+	("request": "NEWPLAYER", "location": location)
 	{"request": "TURNEND", "player_num:" player_num}
 	{"request": "UPDATE", "player_num": player_num, "location": location}
 
@@ -35,10 +35,10 @@ NOTES:
 
 # FUNCTION
 class Game():
-	global NUMBER_OF_PLAYERS
-	global PLAYERS
-
+	NUMBER_OF_PLAYERS = 0
+	MAX_PLAYERS = 4
 	PLAYERS = []
+	FULL_FLAG
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
 	def processJSON(self, decoded):
@@ -67,7 +67,13 @@ class Game():
 
 	def handleNewPlayer(self, decoded):
 		log.msg("A new player has connected!")
-		
+		if not FULL_FLAG:
+			NUMBER_OF_PLAYERS = NUMBER_OF_PLAYERS + 1
+			location = decoded["location"]
+			PLAYERS.append(Player(NUMBER_OF_PLAYERS, location))
+
+		if NUMBER_OF_PLAYERS == MAX_PLAYERS:
+			FULL_FLAG = True
 
 		return
 
@@ -105,7 +111,8 @@ class ServerProtocol(protocol.Protocol):
 		detect_thread.start()
 
 	def connectionLost(self, reason):
-		log.msg("Connection lost.")
+		log.msg("Connection lost. Stopping game.")
+		reactor.stop()
 
 class ServerFactory(protocol.Factory):
 	protocol = ServerProtocol
