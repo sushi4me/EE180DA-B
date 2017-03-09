@@ -7,6 +7,7 @@ import time
 import mraa
 import pyupm_i2clcd as oledObj
 from Globals import buttons
+from Globals import orientation
 
 #--------------------------------------
 # OLED Class (Sparkfun OLED Block)
@@ -29,6 +30,7 @@ class OLED:
 	TEXT_BUFFER = ""		# Used for remembering the text in the screen buffer
 	PIXEL_BUFFER = [ " " for i in range(MAX_PIXELS_ROW)] # Used to remember pixel screen state
 	TYPE_DELAY = 0.005		# Delay for writeScroll()
+	ORIENTATION = orientation.NORTH
 
 	#----------------------------------
 	# GPIO OLED Block Buttons
@@ -59,7 +61,7 @@ class OLED:
 	#----------------------------------
 	# Method: int row(self)
 	# Description:
-	#	The setCursor() method in the pyupm_i2dlcd module 
+	#	The setCursor() method in the pyupm_i2dlcd method 
 	#	indexes the rows each by pixel location in the range [0, 48]
 	#	The row method returns the pixel value of the Current
 	#	position of the cursor.  Each character row begins in the following
@@ -72,7 +74,7 @@ class OLED:
 	#----------------------------------
 	# Method: int col(self)
 	# Description:
-	#	The setCursor() method in the pyupm_i2dlcd module 
+	#	The setCursor() method in the pyupm_i2dlcd method 
 	#	indexes the columns each by pixel location in the range [0, 64]
 	#	The col method returns the pixel value of the Current
 	#	position of the cursor.  Each character column begins in the following
@@ -132,7 +134,7 @@ class OLED:
 			self.CURSOR_POS += 1
 
 	#----------------------------------
-	# Module: clear(self)
+	# Method: clear(self)
 	# Description:
 	#	Clears the screen, resets the position of the cursor, and 
 	#	clears the OLED screen buffer (which is different from the 
@@ -149,11 +151,11 @@ class OLED:
 		self.CURRENT_PAGE = 0
 
 	#----------------------------------
-	# Module: setTextCursor
+	# Method: setTextCursor
 	# Description:
 	#	The OLED display fits 6 rows of characters by 10 columns of 
 	#	characters.  The pyupm setCursor() enables to set the cursor 
-	#	at any given pixel in contrast with this module that enables
+	#	at any given pixel in contrast with this method that enables
 	#	the user to set the cursor at a specific (row,col) that are
 	#	index based on the set size of all characters.
 	#----------------------------------
@@ -163,12 +165,12 @@ class OLED:
 		self.oled.setCursor(self.CURSOR_ROW[r], self.CURSOR_COL[c])
 
 	#----------------------------------
-	# Module: scrollDown(self)
+	# Method: scrollDown(self)
 	# Description:
-	#	This module scrolls the display down according to the 
-	#	characters stored in TEXT_BUFFER.  This module can
+	#	This method scrolls the display down according to the 
+	#	characters stored in TEXT_BUFFER.  This method can
 	#	be used in conjuction with the BUTTON_DOWN to allow the user
-	#	to scroll through large messages.  This module uses
+	#	to scroll through large messages.  This method uses
 	#	CURRENT_PAGE to keep track of how much the user has 
 	#	scrolled down.  
 	#----------------------------------
@@ -190,12 +192,12 @@ class OLED:
 			self.oled.refresh()
 
 	#----------------------------------
-	# Module: scrollUp(self)
+	# Method: scrollUp(self)
 	# Description:
-	#	This module scrolls the display up according to the 
-	#	characters stored in TEXT_BUFFER.  This module can
+	#	This method scrolls the display up according to the 
+	#	characters stored in TEXT_BUFFER.  This method can
 	#	be used in conjuction with the BUTTON_UP to allow the user
-	#	to scroll through large messages.  This module uses
+	#	to scroll through large messages.  This method uses
 	#	CURRENT_PAGE to keep track of how much the user has 
 	#	scrolled up.
 	#----------------------------------
@@ -212,7 +214,7 @@ class OLED:
 		self.oled.refresh()
 
 	#----------------------------------
-	# Module: getUserInput(self)
+	# Method: getUserInput(self)
 	# Description:
 	#	waits and listens for user input.  Immediately returns
 	#	when the user has pressed any of the buttons. Returns a
@@ -252,7 +254,7 @@ class OLED:
 		return input
 
 	#----------------------------------
-	# Module: drawBorder(self)
+	# Method: drawBorder(self)
 	# Description:
 	#	Draws a rounded rectangular border
 	#	onto the edges of the screen
@@ -262,7 +264,7 @@ class OLED:
 		self.oled.refresh()
 
 	#----------------------------------
-	# Module: drawScreen(self, ArrayofStrings, delay)
+	# Method: drawScreen(self, ArrayofStrings, delay)
 	# Description:
 	# 	Each pixel that is drawn corresponds to a character
 	# 	other than the SPACE character.  The ArrayofStrings
@@ -293,7 +295,7 @@ class OLED:
 		self.oled.refresh()
 
 	#----------------------------------
-	# Module: drawInitScreen(self)
+	# Method: drawInitScreen(self)
 	# Description:
 	# 	Draws game initialization screen
 	#----------------------------------
@@ -322,11 +324,11 @@ class OLED:
 		self.drawScreen(grid, 1)
 
 	#----------------------------------
-	# Module: drawStartScreen(self)
+	# Method: drawStartScreen(self)
 	# Description:
 	#	Draws the game main menu, allowing the
 	#	user to indicate they are ready to start
-	#	or navigate the options.  This module
+	#	or navigate the options.  This method
 	#	returns the value the user select
 	#----------------------------------
 	def drawStartScreen(self):
@@ -347,7 +349,7 @@ class OLED:
 			input = self.waitForUserInput()
 
 	#----------------------------------
-	# Module: drawEIVMap(self)
+	# Method: drawEIVMap(self)
 	# Description:
 	#	Clears the screen before drawing the map
 	#	Draws a map of UCLA EIV 4th Floor
@@ -421,11 +423,11 @@ class OLED:
 	PLAYER_POS = 0
 
 	#----------------------------------
-	# Module: updateMap(self, position)
+	# Method: updateMap(self, position)
 	# Description:
-	# 	drawEIVMap(self) should be called before this module.
-	# 	This module updates the location of the player without
-	#	having to redraw the map.  The module takes a parameter
+	# 	drawEIVMap(self) should be called before this method.
+	# 	This method updates the location of the player without
+	#	having to redraw the map.  The method takes a parameter
 	# 	named position that takes values in the range [0, 60]
 	#----------------------------------
 	def updateMap(self, position):
@@ -434,21 +436,88 @@ class OLED:
 		# Draw New Location
 		self.PLAYER_POS = position
 		self.oled.drawCircleFilled(self.POS[self.PLAYER_POS]['COL'], self.POS[self.PLAYER_POS]['ROW'], 2, 1)
-		# ReDraw Map Position References
-		self.oled.setCursor(39, 56)
-		self.oled.write("0")
-		self.oled.setCursor(39, 2)
-		self.oled.write("17")
-		self.oled.setCursor(16, 2)
-		self.oled.write("25")
-		self.oled.setCursor(16, 22)
-		self.oled.write("35")
-		self.oled.setCursor(2, 24)
-		self.oled.write("42")
-		self.oled.setCursor(2, 48)
-		self.oled.write("47")
-		self.oled.refresh()
+		# ReDraw Map Position References based on orientation of screen
+		#------------------------------
+		# IMU Facing NORTH
+		#------------------------------
+		if self.ORIENTATION == orientation.NORTH:
+			self.oled.setCursor(39, 56)
+			self.oled.write("0")
+			self.oled.setCursor(39, 2)
+			self.oled.write("17")
+			self.oled.setCursor(16, 2)
+			self.oled.write("25")
+			self.oled.setCursor(16, 22)
+			self.oled.write("35")
+			self.oled.setCursor(2, 24)
+			self.oled.write("42")
+			self.oled.setCursor(2, 48)
+			self.oled.write("47")
+			self.oled.refresh()
+		#------------------------------
+		# IMU Facing WEST
+		#------------------------------
+		elif self.ORIENTATION == orientation.WEST:
+			self.setTextCursor(0, 7)
+			self.oled.write("EIV")
+			self.oled.setCursor(38, 4)
+			self.oled.write("0")
+			self.oled.setCursor(2, 2)
+			self.oled.write("17")
+			self.oled.setCursor(2, 31)
+			self.oled.write("25")
+			self.oled.setCursor(13, 31)
+			self.oled.write("35")
+			self.oled.setCursor(16, 50)
+			self.oled.write("42")
+			self.oled.setCursor(38, 50)
+			self.oled.write("47")
+			self.oled.refresh()
+		#------------------------------
+		# IMU Facing EAST
+		#------------------------------
+		elif self.ORIENTATION == orientation.EAST:
+			self.setTextCursor(0, 7)
+			self.oled.write("EIV")
+			self.oled.setCursor(38, 4)
+			self.oled.write("0")
+			self.oled.setCursor(2, 2)
+			self.oled.write("17")
+			self.oled.setCursor(2, 31)
+			self.oled.write("25")
+			self.oled.setCursor(13, 31)
+			self.oled.write("35")
+			self.oled.setCursor(16, 50)
+			self.oled.write("42")
+			self.oled.setCursor(38, 50)
+			self.oled.write("47")
+			self.oled.refresh()
+		#------------------------------
+		# IMU FACING SOUTH
+		#------------------------------
+		elif self.ORIENTATION == orientation.SOUTH:
+			self.setTextCursor(0, 7)
+			self.oled.write("EIV")
+			self.oled.setCursor(38, 4)
+			self.oled.write("0")
+			self.oled.setCursor(2, 2)
+			self.oled.write("17")
+			self.oled.setCursor(2, 31)
+			self.oled.write("25")
+			self.oled.setCursor(13, 31)
+			self.oled.write("35")
+			self.oled.setCursor(16, 50)
+			self.oled.write("42")
+			self.oled.setCursor(38, 50)
+			self.oled.write("47")
+			self.oled.refresh()
 
+	#----------------------------------
+	# Method: rotateScreenRight(self)
+	# Description:
+	# 	Rotates screen to the right based on PIXEL_BUFFER
+	#	which is stored whenever drawScreen() is called.
+	#----------------------------------
 	def rotateScreenRight(self):
 		self.oled.clear()
 		self.oled.clearScreenBuffer()
@@ -474,7 +543,14 @@ class OLED:
 				x += 1
 			x += 1
 		self.oled.refresh()
+		self.ORIENTATION = orientation.WEST
 
+	#----------------------------------
+	# Method: rotateScreenLeft(self)
+	# Description:
+	# 	Rotates screen to the left based on PIXEL_BUFFER
+	#	which is stored whenever drawScreen() is called.
+	#----------------------------------
 	def rotateScreenLeft(self):
 		self.oled.clear()
 		self.oled.clearScreenBuffer()
@@ -500,7 +576,14 @@ class OLED:
 				x += 1
 			x += 1
 		self.oled.refresh()
+		self.ORIENTATION = orientation.EAST
 
+	#----------------------------------
+	# Method: rotateScreenTwice(self)
+	# Description:
+	# 	Rotates screen 180 degrees based on PIXEL_BUFFER
+	#	which is stored whenever drawScreen() is called.
+	#----------------------------------
 	def rotateScreenTwice(self):
 		self.oled.clear()
 		self.oled.clearScreenBuffer()
@@ -519,14 +602,24 @@ class OLED:
 				x += 1
 			y += 1
 		self.oled.refresh()
+		self.ORIENTATION = orientation.SOUTH
 
-
-	def drawMainMenu(self, optionsList):
+	#----------------------------------
+	# Method: drawMenu(self, menuName, optionsList)
+	# Description:
+	# 	Draws a menu screen that takes a string called
+	#	menuName as the title of the screen and a list
+	#	of strings called optionsList as the options to
+	#	display to the UI.  The length of the menuName
+	#	can be max 10 characters and optionsList takes
+	#	max 4 options
+	#----------------------------------
+	def drawMenu(self, menuName, optionsList):
 		self.clear()
 		self.drawBorder()
 		self.oled.drawLineHorizontal(0, 10, 64, 1)
 		self.oled.setCursor(2, 2)
-		self.oled.write("Main Menu")
+		self.oled.write(menuName)
 		rowIndex = 1
 		b = list(buttons)
 		for option in optionsList:
