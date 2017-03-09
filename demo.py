@@ -2,32 +2,38 @@
 #------------------------------------------------
 # Module: Demo.py
 # Description:
+#	This program will be saved under /etc/init.d/ and configured to
+#	run on startup when the wearable device is turned on.  The player
+#	will then be taken to a Main Menu where prompted with the options
+#	to start the game or use development options (collect data/check IP)
 #
 #------------------------------------------------
 import position_estimation.position
 from time				import sleep
-from pythonwifi.iwlibs 	import Wireless
 from Modules.OLED		import OLED
-from Modules.DOF		import DOFsensor
 from Modules.Globals	import buttons
 from Modules.GetIP		import getIP
 from Miscellaneous.detect import sample_location_number
 #----------------------------
-# Globals
+# Initialization
+# Description:
+#	Initializes the OLED Block Display and displays 
+#	the initialization Screen. Waits 1 second for 
+#	smooth transition between screens
 #----------------------------
 oled = OLED()
-dof = DOFsensor()
-wifi = Wireless('wlan0')
-
-#----------------------------
-# Initialization
-#----------------------------
 oled.clear()
 oled.drawInitScreen()
 sleep(1)
 
 #----------------------------
-# runScan
+# Function: runScan
+# Description:
+#	This is used when in developer mode.  Developer
+#	options allows for access point data collection.
+#	This function will save a file with the location
+#	data and additionally display the results on the
+#	OLED display.
 #----------------------------
 def runScan(position):
 	oled.clear()
@@ -47,81 +53,98 @@ def runScan(position):
 			break;
 
 #----------------------------
-# runDemo
+# Function: runGame
+# Description:
+#	This function is run when the user is ready to 
+#	begin playing the game.  This function imports
+#	the client function and begins running the client
+#	code for the game.
 #----------------------------
-def runDemo():
+def runGame():
 	oled.clear()
-	oled.write("STARTING  DEMO...")
+	oled.drawBorder()
+	oled.write("STARTING  GAME...")
 	sleep(3)
-	mainMenu()	
+	import Miscellaneous.client_test as client
+	client.main()
 
 #----------------------------
-# runCalib()
+# Function: runDeveloper
+# Description:
+#	This is the UI for collecting wireless access
+#	point data.  
+# 
 #----------------------------
-def runCalib(position):
+def runDeveloper(position):
 	oled.clear()
 	oled.drawBorder()
 	oled.write("POS:" + str(position))
 	oled.setTextCursor(1,0)
-	oled.oled.write("S: SCAN   A: NEXT   B: PREV   R:MAIN MENU")
+	oled.oled.write("S: SCAN   A: NEXT   B: PREV   L: BACK")
 	oled.oled.refresh()
 	input = oled.waitForUserInput()
 	if input == buttons.S:
 		runScan(position)
 	elif input == buttons.A:
-		position += 1
-	elif input == buttons.B:
-		if position > 0:
-			position -= 1
-		else:
+		if position == 60:
 			position = 0
-	elif input == buttons.R:
-		mainMenu()
-	runCalib(position)
+		else:
+			position += 1
+		runDeveloper(position)
+	elif input == buttons.B:
+		if position == 0:
+			position = 60
+		else:
+			position -= 1
+		runDeveloper(position)
+	elif input != buttons.L:
+		runDeveloper(position)
+		
 
 #----------------------------
-# showIP()
+# Function: showIP()
+# Description:
+#	This a developer option to obtain IP for
+#	ssh access.
 #----------------------------
 def showIP():
 	oled.clear()
 	oled.drawBorder()
 	IP = getIP('wlan0')
-	oled.write(IP)
-	oled.setTextCursor(3, 0)
-	oled.oled.write("A: BACK   B: EXIT   ")
+	oled.write("IP: " + IP)
+	oled.setTextCursor(4, 0)
+	oled.oled.write("B: BACK")
 	oled.oled.refresh()
-	incorrectInput = True
-	while (incorrectInput):
+	while True:
 		input = oled.waitForUserInput()
-		incorrectInput = False
-		if input == buttons.A:
-			mainMenu()
-		elif input == buttons.B:
-			quit()
-		else:
-			incorrectInput = True
+		if input == buttons.B:
+			break;
 
 
 #----------------------------
-# Main Menu
+# Function: mainMenu
+# Description:
+#	Run at startup.  Presents the user with a 
+#	series of options including, START game,
+#	DEVELOP options, ShowIP, and EXIT
 #----------------------------
 def mainMenu():
-	options = [" Demo", " Collect", " ShowIP", " EXIT"]
-	oled.drawMainMenu(options)
-	input = oled.waitForUserInput()
-	incorrectInput = True
-	while (incorrectInput):
-		incorrectInput = False
+	options = [" START", " DEVELOP", " ShowIP", " EXIT"]
+	refreshScreen = True
+	while True:
+		if refreshScreen == True:
+			oled.drawMainMenu(options)
+		input = oled.waitForUserInput()
 		if input == buttons.A:
-			runDemo()
+			runGame()
 		elif input == buttons.B:
-			runCalib(0)
+			runDeveloper(0)
 		elif input == buttons.S:
 			showIP()
-		elif input == buttons.D:
-			quit()
+		elif input == buttons.U:
+			break;
 		else:
-			incorrectInput = True
+			refreshScreen = False
 
 #----------------------------
 # main

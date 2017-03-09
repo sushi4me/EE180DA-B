@@ -9,7 +9,7 @@ def sample_location_number(location):
     subprocess.call([exe, str(location)])
 
     locationdata = ""
-    with open("demo_calib_data/CURRENTSAMPLE.txt", 'r') as fin:
+    with open("/home/root/EE180DA-B/demo_calib_data/CURRENTSAMPLE.txt", 'r') as fin:
     	locationdata = fin.read()
     fin.close()
 
