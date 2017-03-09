@@ -74,6 +74,7 @@ class Game():
 		if NUMBER_OF_PLAYERS == MAX_PLAYERS:
 			FULL_FLAG = True
 			log.msg("Start game!")
+			writeToClient(0, {"request": "TURNSTART"})
 
 		return
 
