@@ -9,7 +9,7 @@
 # Revisions:
 #**************************************
 #----------------------------
-# Modules
+# Module Imports
 #----------------------------
 from enum import IntEnum
 
@@ -60,3 +60,11 @@ class buttons(IntEnum):
     L	= inc()
     R	= inc()
 
+#----------------------------
+# OLED Orientation
+#----------------------------
+class orientation(IntEnum):
+    NORTH   = start()
+    SOUTH   = inc()
+    EAST    = inc()
+    WEST    = inc()
