@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #------------------------------------------------
 # Module: Demo.py
 # Description:
@@ -35,7 +36,6 @@ def runScan(position):
 	oled.write("SCANNING..")
 	locationdata = sample_location_number(position)
 	oled.clear()
-	print(locationdata)
 	oled.write(str(locationdata))
 	while True:
 		input = oled.waitForUserInput()
