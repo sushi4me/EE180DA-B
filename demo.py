@@ -39,7 +39,7 @@ def runScan(position):
 	oled.clear()
 	oled.drawBorder()
 	oled.write("Position " + str(position))
-	oled.write("SCANNING..")
+	oled.write(" SCANNING..")
 	locationdata = sample_location_number(position)
 	oled.clear()
 	oled.write(str(locationdata))
@@ -90,14 +90,12 @@ def runDeveloper(position):
 			position = 0
 		else:
 			position += 1
-		runDeveloper(position)
 	elif input == buttons.B:
 		if position == 0:
 			position = 60
 		else:
 			position -= 1
-		runDeveloper(position)
-	elif input != buttons.L:
+	if input != buttons.L:
 		runDeveloper(position)
 		
 
