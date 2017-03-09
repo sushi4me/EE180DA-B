@@ -10,6 +10,6 @@ Justine Figuerres
 
 Nathan Kong
 
-## Feb. 12, 2017
-* Replaced json_client & json_socket with Twisted Python implementation
-* The two new modules can communicate, set-up, update a location using pseudo-random generator.
+## March 8, 2017
+* client.py & server.py needs revising
+* Miscellaneous/client_test.py & server_test.py has new implementation.
