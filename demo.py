@@ -65,7 +65,8 @@ def runGame():
 	oled.drawBorder()
 	oled.write("STARTING  GAME...")
 	sleep(3)
-	import client 
+	import Miscellaneous.client_test as client
+	client.main()
 
 #----------------------------
 # Function: runDeveloper
