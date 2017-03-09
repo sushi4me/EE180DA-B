@@ -1,12 +1,13 @@
 #!/usr/bin/python
 
-from Modules.Game		import Game
-from Modules.Player		import Player
-from optparse 			import OptionParser
-from threading			import Thread
-from twisted.internet 		import reactor, protocol
-from twisted.internet.task	import LoopingCall
-from twisted.python		import log
+from collections	import deque
+#from Modules.Game	import Game
+from Modules.Player	import Player
+from optparse		import OptionParser
+from random		import randint
+from threading		import Thread
+from twisted.internet	import reactor, protocol, task
+from twisted.python	import log
 
 import json
 import os			
@@ -14,174 +15,161 @@ import sys
 import time
 
 """
-SEND:
-	{"request": "NEWPLAYER", "player_num": player_count}
+NOTES:
+	SEND:
 	{"request": "GAMESTART"}
-	{"request": "TURNSTART"}
 	{"request": "EVENT", "event": "event_num"}
-RECEIVE:	
-	{"request": "UPDATE", "player_num": player_num, "location": location}
+	{"request": "NEWPLAYER", "player_num": player_num}
+	{"request": "TURNSTART"}
+
+	RECEIVE:
 	{"request": "ACTION", "player_num": player_num, "powerup": powerup}
+	{"request": "DISCONNECTED", "player_num": player_num}
+	("request": "NEWPLAYER", "location": location)
 	{"request": "TURNEND", "player_num:" player_num}
-	{"request": "QUIT", "player_num": player_num}
+	{"request": "UPDATE", "player_num": player_num, "location": location}
 
-TO DO: 
-	* Allow the Game class to receive information from the reactor thread.
-		1. Start Game's "checking" function in LoopingCall.
-		2. If we detect something in LoopingCall, send back to reactor.
-
-	* Upon data receive send decoded JSON to Game class.
 """
 
 # GLOBALS
-GAME_START = False
 
+# FUNCTION
 class Game():
-	global VERBOSE
+	NUMBER_OF_PLAYERS = 0
+	MAX_PLAYERS = 4
+	PLAYERS = []
+	FULL_FLAG
 
-	def __init__(self, host="localhost", port=8080):
-		self.m_factory = ServerFactory()
-		self.m_factory.clients = []
-		self.m_host = host
-		self.m_port = port
+	# CALLED BY SERVER CODE TO PROCESS JSON
+	def processJSON(self, decoded):
+		global m_factory
 
-	def run(self):
-		twisted_thread = Thread(target=self.runTwisted)
-		twisted_thread.start()
-		
-		twisted_thread.join()
-		if VERBOSE:
-			log.msg("End of game.")
+		log.msg("%s" % decoded)
+		request = decoded["request"]
 
-	def runTwisted(self):
-		reactor.listenTCP(self.m_port, self.m_factory, interface=self.m_host)
-		if VERBOSE:
-			log.msg("Running reactor.")
-		reactor.run()
+		# Use the request field to execute corresponding function.
+		# If the player can perform a new action, add it here:
+		response = {	"ACTION":	self.handleAction,
+				"DISCONNECTED": self.handleDisconnect,
+				"NEWPLAYER": 	self.handleNewPlayer,
+				"TURNEND": 	self.handleTurnEnd,
+				"UPDATE":	self.handleUpdate
+			   }[request](decoded)
+
+	# HANDLER FUNCTIONS
+	def handleAction(self, decoded):
+		# TO DO
+		pass
+
+	def handleDisconnect(self, decoded):
+		# TO DO
+		pass
+
+	def handleNewPlayer(self, decoded):
+		log.msg("A new player has connected!")
+		if not FULL_FLAG:
+			NUMBER_OF_PLAYERS = NUMBER_OF_PLAYERS + 1
+			location = decoded["location"]
+			PLAYERS.append(Player(NUMBER_OF_PLAYERS, location))
+
+		if NUMBER_OF_PLAYERS == MAX_PLAYERS:
+			FULL_FLAG = True
+
+		return
+
+	def handleTurnEnd(self, decoded):
+		# TO DO
+		pass
+
+	def handleUpdate(self, decoded):
+		# TO DO
+		pass
+
+	# HELPER FUNCTIONS
+	def rollDice(self, max=6):
+		random.seed(time.time())
+		return random.randint(0, max)
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
         def __init__(self):
-            MAX_PLAYERS = 1
-            self.game = Game(MAX_PLAYERS)
+        	self.gameObj = Game()
+            	log.msg("ServerProtocol constructor called.")
 
 	def connectionMade(self):
-	    if self.game.numPlayers < self.game.MAX_PLAYERS:
-		log.msg("Player has connected!")
-		self.factory.clients.append(self)
-		response = json.dumps({"request": "NEWPLAYER", "player_num": self.game.numPlayers})
-
-		self.game.addPlayer()
-		
-                # Start game if we have max num players connected.
-                if self.game.numPlayers == self.game.MAX_PLAYERS:
-                    GAME_START = True
-                    response = json.dumps({"request": "GAMESTART", "player_num": self.game.numPlayers})
-                        
-		self.transport.write(response)
-
-            else: # Decline connections when at max capacity
-		log.msg("Declined a player because full!")
-	        self.transport.write(json.dumps({"request": "FULL"}))
+	    	log.msg("Connection made.")
+	    	self.factory.clients.append(self)
 
 	def dataReceived(self, data):
-		log.msg("Data recieved from client: %s" % data)
-		self.processResponse(data)
+		global LOOPING
+
+		log.msg("You got data!")
+
+		decoded = json.loads(data)
+		detect_thread = Thread(target=self.gameObj.processJSON, 
+			args=(decoded, ))
+		detect_thread.start()
 
 	def connectionLost(self, reason):
-		log.msg("{}".format(reason))
-                self.game.removePlayer(self.game.numPlayers-1)
-
-	# HELPER FUNCTIONS
-	def processResponse(self, data):
-		decoded_data = json.loads(data)			
-		request = decoded_data["request"]
-		log.msg("REQUEST: %s" % request)
-
-		response = {	"ACTION": 	self.handleAction,
-		    		"TURNEND": 	self.handleNextPlayer,
-		    		"UPDATE": 	self.handleUpdate,
-		    		"QUIT": 	self.handleQuit
-		   }[request](decoded_data)
-
-		return response
-
-	def handleUpdate(self, decoded_data):
-		player_num = decoded_data["player_num"]
-		
-                for player in self.game.players:
-			if player_num == player.m_id:	
-				player.m_location = decoded_data["location"]
-				log.msg("PLAYER: %d LOCATION: %d" % (player_num, player.m_location))
-
-	def handleAction(decoded_data):
-            count = 0
-
-	def handleNextPlayer(self, decoded_data):
-		next_player = decoded_data["player_num"]
-		if next_player == self.game.MAX_PLAYERS:
-		    next_player = 1
-		else:
-		    next_player = next_player + 1
-		log.msg("NEXT PLAYER: %d" % next_player)
-		# Get the specific next player and send them TURNSTART
-		send_to = self.factory.clients[next_player-1]
-		send_to.transport.write(json.dumps({"request": "TURNSTART"}))
-
-	def handleQuit(decoded_data):	
-		delete_player = decoded_data["player_num"]
-		for player in self.game.players:
-			if delete_player == player.m_id:
-				log.msg("QUIT %d" % delete_player)
-				self.game.removePlayer(delete_player)
+		log.msg("Connection lost. Stopping game.")
+		reactor.stop()
 
 class ServerFactory(protocol.Factory):
 	protocol = ServerProtocol
 
+def writeToClient(client, msg):
+	global m_factory
+
+	m_factory.clients[client].transport.write(json.dumps(msg))
+	log.msg("Wrote to a client.")
+
 # MAIN
 def main():
-	global VERBOSE
+	global LOOPING, m_factory
 
 	# Defaults
 	HOST = 'localhost'
 	PORT = 8080
 
 	# Option parser
-	version_msg = "server.py--1.12.17"
+	version_msg = "server.py--3.8.17"
 	usage_msg = """%prog [OPTIONS] ...
 	Hosts server on HOST & waits for clients to connect."""
-	
-	# Option parser
+
 	parser = OptionParser(version=version_msg, usage=usage_msg)
-	parser.add_option("-s", "--specific", 
-		action="store",
-		dest="specific_host", 
-		help="Hosts onto specific HOST.")
-	parser.add_option("-v", "--verbose", 
+	parser.add_option("-l", "--looping", 
 		action="store_true",
-		dest="verbose", 
+		dest="looping", 
 		default=False, 
-		help="Prints debugging statements on console.")
+		help="Uses LoopingCall.")
+	parser.add_option("-s", "--specificHost",
+		dest="specific_host",
+		default=None,
+		help="Connect to a specific hostname other than localhost.")
 
 	options, args = parser.parse_args(sys.argv[1:])
+
+	if options.looping is not None:
+		LOOPING = options.looping
 
 	if options.specific_host is not None:
 		HOST = options.specific_host
 
-	if options.verbose is not None:
-		VERBOSE = options.verbose
+	# Logging
+	log.startLogging(sys.stdout)
 
-	if VERBOSE:
-		log.startLogging(sys.stdout)
-
-	# Start reactor
+	# Start
 	m_factory = ServerFactory()
 	m_factory.clients = []
 
+	# LoopingCall version
+	if LOOPING:
+		check = task.LoopingCall(gameObj.detect)
+		check.start(0)
+
 	reactor.listenTCP(PORT, m_factory, interface=HOST)
-	if VERBOSE:
-		log.msg("Running reactor.")
 	reactor.run()
+	# End
 
 if __name__ == "__main__":
 	main()

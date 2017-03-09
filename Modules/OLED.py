@@ -28,7 +28,7 @@ class OLED:
 	MAX_CURS_POS = 59		# Text Cursor Used for writing characters
 	CURRENT_PAGE = 0		# Used for scrolling
 	TEXT_BUFFER = ""		# Used for remembering the text in the screen buffer
-	PIXEL_BUFFER = [ " " for i in range(MAX_PIXELS_ROW)] # Used to remember pixel screen state
+	PIXEL_BUFFER = [ [" " for x in range(MAX_PIXELS_COL)] for y in range(MAX_PIXELS_ROW)] # Used to remember pixel screen state
 	TYPE_DELAY = 0.005		# Delay for writeScroll()
 	ORIENTATION = orientation.NORTH
 
@@ -266,14 +266,14 @@ class OLED:
 	#----------------------------------
 	# Method: drawScreen(self, ArrayofStrings, delay)
 	# Description:
-	# 	Each pixel that is drawn corresponds to a character
-	# 	other than the SPACE character.  The ArrayofStrings
-	#	can have maximum index of MAX_PIXELS_ROW and each
-	#	string in the array can have maximum length of
+	# 	Each character in the ArrayofStrings (other than SPACE) 
+	# 	corresponds to a pixel drawn on the screen.  The '@' symbol 
+	#	corresponds to the player's location on the map,   The 
+	#	ArrayofStrings must have index of MAX_PIXELS_ROW and each
+	#	string in the array must have length of
 	#	MAX_PIXELS_COL. Delay parameter is used to inidiate
 	#	the screen to be refreshed after drawing each pixel.
-	#	This option can be used as a delay while game
-	#	initialization takes place
+	#	This option adds a loading effect
 	#----------------------------------
 	def drawScreen(self, ArrayOfStrings, delay=0):
 		self.PIXEL_BUFFER = ArrayOfStrings
@@ -284,6 +284,9 @@ class OLED:
 			x = 0
 			# For each character in the string
 			for j in i:
+				# If it is '@' draw player
+				if j == '@':
+					self.oled.drawCircleFilled(x, y, 2, 1)
 				# Any character other than space 
 				# corresponds to a pixel drawn on the map
 				if j != " ":
@@ -361,11 +364,15 @@ class OLED:
 		self.oled.clear()
 		# Draw outline
 		self.drawBorder()
+		# Draw Map Reference Points
 		self.oled.setCursor(3,3)
 		self.oled.write("EIV")
+		self.oled.setCursor(39, 56)
+		self.oled.write("0")
+
 		
 		# Initialize MAP array of strings
-		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
+		grid = [[" " for x in range(self.MAX_PIXELS_COL)] for y in range(self.MAX_PIXELS_ROW)]
 		grid[0] = "                      |                                         "
 		for i in range(1,9):
 			grid[i] = grid[0]
@@ -388,20 +395,6 @@ class OLED:
 		# Draw EIV Map
 		self.drawScreen(grid)
 		
-		# Draw Map Position References
-		self.oled.setCursor(39, 56)
-		self.oled.write("0")
-		self.oled.setCursor(39, 2)
-		self.oled.write("17")
-		self.oled.setCursor(16, 2)
-		self.oled.write("25")
-		self.oled.setCursor(16, 22)
-		self.oled.write("35")
-		self.oled.setCursor(2, 24)
-		self.oled.write("42")
-		self.oled.setCursor(2, 48)
-		self.oled.write("47")
-		self.oled.refresh()
 
 	#----------------------------------
 	# Position to pixel (row and column) mapping
@@ -420,7 +413,7 @@ class OLED:
 	{'ROW': 23, 'COL': 58}, {'ROW': 26, 'COL': 58}, {'ROW': 29, 'COL': 58}, {'ROW': 31, 'COL': 58}, {'ROW': 34, 'COL': 58},
 	{'ROW': 37, 'COL': 58}, {'ROW': 40, 'COL': 58}]
 	# Current Player Position in the map
-	PLAYER_POS = 0
+	PLAYER_POS = -1
 
 	#----------------------------------
 	# Method: updateMap(self, position)
@@ -432,85 +425,98 @@ class OLED:
 	#----------------------------------
 	def updateMap(self, position):
 		# Erase Old Location
-		self.oled.drawCircleFilled(self.POS[self.PLAYER_POS]['COL'], self.POS[self.PLAYER_POS]['ROW'], 2, 0)
+		if self.PLAYER_POS != -1:
+			x = self.POS[self.PLAYER_POS]['COL']
+			y = self.POS[self.PLAYER_POS]['ROW']
+			self.PIXEL_BUFFER[y][x] = " "
+			if self.ORIENTATION == orientation.NORTH:
+				self.oled.drawCircleFilled(x, y, 2, 0)
 		# Draw New Location
 		self.PLAYER_POS = position
-		self.oled.drawCircleFilled(self.POS[self.PLAYER_POS]['COL'], self.POS[self.PLAYER_POS]['ROW'], 2, 1)
+		if self.PLAYER_POS != -1:
+			x = self.POS[self.PLAYER_POS]['COL']
+			y = self.POS[self.PLAYER_POS]['ROW']
+			self.PIXEL_BUFFER[y][x] = "@"
+			if self.ORIENTATION == orientation.NORTH:
+				self.oled.drawCircleFilled(x, y, 2, 1)
+		
 		# ReDraw Map Position References based on orientation of screen
 		#------------------------------
 		# IMU Facing NORTH
 		#------------------------------
 		if self.ORIENTATION == orientation.NORTH:
+			self.setTextCursor(0, 0)
+			self.oled.write("EIV")
 			self.oled.setCursor(39, 56)
 			self.oled.write("0")
-			self.oled.setCursor(39, 2)
-			self.oled.write("17")
-			self.oled.setCursor(16, 2)
-			self.oled.write("25")
-			self.oled.setCursor(16, 22)
-			self.oled.write("35")
-			self.oled.setCursor(2, 24)
-			self.oled.write("42")
-			self.oled.setCursor(2, 48)
-			self.oled.write("47")
-			self.oled.refresh()
+			# self.oled.setCursor(39, 2)
+			# self.oled.write("17")
+			# self.oled.setCursor(16, 2)
+			# self.oled.write("25")
+			# self.oled.setCursor(16, 22)
+			# self.oled.write("35")
+			# self.oled.setCursor(2, 24)
+			# self.oled.write("42")
+			# self.oled.setCursor(2, 48)
+			# self.oled.write("47")
+
 		#------------------------------
 		# IMU Facing WEST
 		#------------------------------
 		elif self.ORIENTATION == orientation.WEST:
 			self.setTextCursor(0, 7)
 			self.oled.write("EIV")
-			self.oled.setCursor(38, 4)
+			self.oled.setCursor(56, 4)
 			self.oled.write("0")
-			self.oled.setCursor(2, 2)
-			self.oled.write("17")
-			self.oled.setCursor(2, 31)
-			self.oled.write("25")
-			self.oled.setCursor(13, 31)
-			self.oled.write("35")
-			self.oled.setCursor(16, 50)
-			self.oled.write("42")
-			self.oled.setCursor(38, 50)
-			self.oled.write("47")
-			self.oled.refresh()
+			# self.oled.setCursor(2, 2)
+			# self.oled.write("17")
+			# self.oled.setCursor(2, 31)
+			# self.oled.write("25")
+			# self.oled.setCursor(13, 31)
+			# self.oled.write("35")
+			# self.oled.setCursor(16, 50)
+			# self.oled.write("42")
+			# self.oled.setCursor(38, 50)
+			# self.oled.write("47")
+
 		#------------------------------
 		# IMU Facing EAST
 		#------------------------------
 		elif self.ORIENTATION == orientation.EAST:
-			self.setTextCursor(0, 7)
+			self.oled.setCursor(34, 2)
 			self.oled.write("EIV")
-			self.oled.setCursor(38, 4)
-			self.oled.write("0")
 			self.oled.setCursor(2, 2)
-			self.oled.write("17")
-			self.oled.setCursor(2, 31)
-			self.oled.write("25")
-			self.oled.setCursor(13, 31)
-			self.oled.write("35")
-			self.oled.setCursor(16, 50)
-			self.oled.write("42")
-			self.oled.setCursor(38, 50)
-			self.oled.write("47")
-			self.oled.refresh()
+			self.oled.write("0")
+			# self.oled.setCursor(2, 48)
+			# self.oled.write("17")
+			# self.oled.setCursor(38, 48)
+			# self.oled.write("25")
+			# self.oled.setCursor(38, 22)
+			# self.oled.write("35")
+			# self.oled.setCursor(16, 22)
+			# self.oled.write("42")
+			# self.oled.setCursor(16, 2)
+			# self.oled.write("47")
+
 		#------------------------------
 		# IMU FACING SOUTH
 		#------------------------------
 		elif self.ORIENTATION == orientation.SOUTH:
-			self.setTextCursor(0, 7)
+			self.setTextCursor(4, 7)
 			self.oled.write("EIV")
-			self.oled.setCursor(38, 4)
-			self.oled.write("0")
 			self.oled.setCursor(2, 2)
-			self.oled.write("17")
-			self.oled.setCursor(2, 31)
-			self.oled.write("25")
-			self.oled.setCursor(13, 31)
-			self.oled.write("35")
-			self.oled.setCursor(16, 50)
-			self.oled.write("42")
-			self.oled.setCursor(38, 50)
-			self.oled.write("47")
-			self.oled.refresh()
+			self.oled.write("0")
+			# self.oled.setCursor(2, 2)
+			# self.oled.write("17")
+			# self.oled.setCursor(2, 31)
+			# self.oled.write("25")
+			# self.oled.setCursor(13, 31)
+			# self.oled.write("35")
+			# self.oled.setCursor(16, 50)
+			# self.oled.write("42")
+			# self.oled.setCursor(38, 50)
+			# self.oled.write("47")
+		self.oled.refresh()
 
 	#----------------------------------
 	# Method: rotateScreenRight(self)
@@ -530,6 +536,9 @@ class OLED:
 			index = 0
 			# For each character in the string
 			for j in i:
+				# If it is '@' draw player
+				if j == '@':
+					self.oled.drawCircleFilled(x, y, 2, 1)
 				# Any character other than space 
 				# corresponds to a pixel drawn on the map
 				if j != " ":
@@ -542,8 +551,10 @@ class OLED:
 			if x%4 == 1:
 				x += 1
 			x += 1
-		self.oled.refresh()
 		self.ORIENTATION = orientation.WEST
+		self.updateMap(self.PLAYER_POS)
+		self.oled.refresh()
+
 
 	#----------------------------------
 	# Method: rotateScreenLeft(self)
@@ -563,6 +574,9 @@ class OLED:
 			index = 0
 			# For each character in the string
 			for j in reversed(i):
+				# If it is '@' draw player
+				if j == '@':
+					self.oled.drawCircleFilled(x, y, 2, 1)
 				# Any character other than space 
 				# corresponds to a pixel drawn on the map
 				if j != " ":
@@ -575,8 +589,9 @@ class OLED:
 			if x%4 == 1:
 				x += 1
 			x += 1
-		self.oled.refresh()
 		self.ORIENTATION = orientation.EAST
+		self.updateMap(self.PLAYER_POS)
+		self.oled.refresh()
 
 	#----------------------------------
 	# Method: rotateScreenTwice(self)
@@ -595,14 +610,18 @@ class OLED:
 			x = 0
 			# For each character in the string
 			for j in reversed(i):
+				# If it is '@' draw player
+				if j == '@':
+					self.oled.drawCircleFilled(x, y, 2, 1)
 				# Any character other than space 
 				# corresponds to a pixel drawn on the map
 				if j != " ":
 					self.oled.drawPixel(x, y, 1)
 				x += 1
 			y += 1
-		self.oled.refresh()
 		self.ORIENTATION = orientation.SOUTH
+		self.updateMap(self.PLAYER_POS)
+		self.oled.refresh()
 
 	#----------------------------------
 	# Method: drawMenu(self, menuName, optionsList)
