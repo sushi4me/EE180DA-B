@@ -16,16 +16,16 @@ NOTES:
 	{"request": "TURNSTART"}
 """
 
-from datetime				import datetime
-#from Modules.Buzzer			import Buzzer
-#from Modules.DOF 			import DOFsensor
-#from Modules.OLED			import OLED
-from optparse				import OptionParser
-from random				import randint
-from twisted.internet			import reactor, protocol, defer
-#from twisted.internet.task		import LoopingCall
-from twisted.python			import log
-#from position_estimation.position 	import position
+from datetime			import datetime
+#from Modules.Buzzer		import Buzzer
+#from Modules.DOF 		import DOFsensor
+#from Modules.OLED		import OLED
+from optparse			import OptionParser
+from random			import randint
+from twisted.internet		import reactor, protocol, defer
+#from twisted.internet.task	import LoopingCall
+from twisted.python		import log
+#from location.location 	import location
 
 import json
 #import mraa
@@ -39,7 +39,13 @@ import time
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
 	def connectionMade(self):
-		self.transport.write(json.dumps({"request": "NEWPLAYER"}))
+                log.msg("Connected to server.")
+                
+                log.msg("Determining start location...")
+                startLocation = location()
+                log.msg("Done!")
+
+                self.transport.write(json.dumps({"request": "NEWPLAYER", "location": startLocation}))
 
 	def dataReceived(self, data):
 		decoded = json.loads(data)

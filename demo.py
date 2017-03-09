@@ -8,7 +8,7 @@
 #	to start the game or use development options (collect data/check IP)
 #
 #------------------------------------------------
-import position_estimation.position
+import location.location 
 from time				import sleep
 from Modules.OLED		import OLED
 from Modules.Globals	import buttons
@@ -52,7 +52,7 @@ def runScan(position):
 		else:
 			break;
 
-#----------------------------
+#---------------------------
 # Function: runGame
 # Description:
 #	This function is run when the user is ready to 
