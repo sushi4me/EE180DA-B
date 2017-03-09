@@ -10,7 +10,7 @@ from Modules.OLED		import OLED
 from Modules.DOF		import DOFsensor
 from Modules.Globals	import buttons
 from Modules.GetIP		import getIP
-from position_estimation.position import sample_current_location
+from Miscellaneous.detect import sample_location_number
 #----------------------------
 # Globals
 #----------------------------
@@ -30,9 +30,21 @@ sleep(1)
 #----------------------------
 def runScan(position):
 	oled.clear()
+	oled.drawBorder()
 	oled.write("Position " + str(position))
 	oled.write("SCANNING..")
-	sample_current_location()
+	locationdata = sample_location_number(position)
+	oled.clear()
+	print(locationdata)
+	oled.write(str(locationdata))
+	while True:
+		input = oled.waitForUserInput()
+		if input == buttons.U:
+			oled.scrollUp()
+		elif input == buttons.D:
+			oled.scrollDown()
+		else:
+			break;
 
 #----------------------------
 # runDemo
@@ -94,7 +106,7 @@ def showIP():
 # Main Menu
 #----------------------------
 def mainMenu():
-	options = [" Demo", " Calib", " ShowIP", " EXIT"]
+	options = [" Demo", " Collect", " ShowIP", " EXIT"]
 	oled.drawMainMenu(options)
 	input = oled.waitForUserInput()
 	incorrectInput = True

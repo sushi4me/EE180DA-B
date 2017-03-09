@@ -184,7 +184,9 @@ class OLED:
 			self.oled.clear()
 			self.oled.clearScreenBuffer()
 			self.oled.home()
-			self.oled.write(self.TEXT_BUFFER[self.CURRENT_PAGE*self.NUM_COLS:])
+			START = self.CURRENT_PAGE*self.NUM_COLS
+			END = min(len(self.TEXT_BUFFER), self.CURRENT_PAGE*self.NUM_COLS + 60)
+			self.oled.write(self.TEXT_BUFFER[START:END])
 			self.oled.refresh()
 
 	#----------------------------------
@@ -204,7 +206,9 @@ class OLED:
 		self.oled.clear()
 		self.oled.clearScreenBuffer()
 		self.oled.home()
-		self.oled.write(self.TEXT_BUFFER[self.CURRENT_PAGE*self.NUM_COLS:])
+		START = self.CURRENT_PAGE*self.NUM_COLS
+		END = min(len(self.TEXT_BUFFER), self.CURRENT_PAGE*self.NUM_COLS + 60)
+		self.oled.write(self.TEXT_BUFFER[START:END])
 		self.oled.refresh()
 
 	#----------------------------------
