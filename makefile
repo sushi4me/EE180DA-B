@@ -1,4 +1,4 @@
-SUB_DIRS=Modules Modules/9dofBlock Modules/9dofBlock/gesture_data locations_data position_estimation reference_database 
+SUB_DIRS=Modules Modules/9dofBlock Modules/9dofBlock/gesture_data locations_data position_estimation reference_database Miscellaneous
 
 Default:
 	@echo Nothing to make
