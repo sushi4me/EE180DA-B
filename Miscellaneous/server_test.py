@@ -38,10 +38,11 @@ class Game():
 	def processJSON(self, client, decoded):
 		global m_factory
 
-		print "%s" % decoded
+		log.msg("%s" % decoded)
 		request = decoded["request"]
 
-		# Use the request field to execute corresponding function
+		# Use the request field to execute corresponding function.
+		# If the player can perform a new action, add it here:
 		response = {	"ACTION":	self.handleAction,
 				"DISCONNECTED": self.handleDisconnect,
 				"NEWPLAYER": 	self.handleNewPlayer,
@@ -66,7 +67,7 @@ class Game():
 		# TO DO
 
 	# HELPER FUNCTIONS
-	def rollDice(self, max):
+	def rollDice(self, max=6):
 		# TO DO
 
 # TWISTED NETWORKING
