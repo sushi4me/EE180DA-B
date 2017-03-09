@@ -133,7 +133,7 @@ def mainMenu():
 	refreshScreen = True
 	while True:
 		if refreshScreen == True:
-			oled.drawMainMenu(options)
+			oled.drawMenu("Main Menu", options)
 		input = oled.waitForUserInput()
 		if input == buttons.A:
 			runGame()
