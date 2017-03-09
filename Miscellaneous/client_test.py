@@ -39,7 +39,7 @@ import time
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
 	def connectionMade(self):
-		self.transport.write(json.dumps({"request": "GREETINGS"}))
+		self.transport.write(json.dumps({"request": "NEWPLAYER"}))
 
 	def dataReceived(self, data):
 		decoded = json.loads(data)

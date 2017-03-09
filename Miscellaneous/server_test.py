@@ -35,7 +35,7 @@ NOTES:
 # FUNCTION
 class Game():
 	# CALLED BY SERVER CODE TO PROCESS JSON
-	def processJSON(self, client, decoded):
+	def processJSON(self, decoded):
 		global m_factory
 
 		log.msg("%s" % decoded)
@@ -53,22 +53,29 @@ class Game():
 	# HANDLER FUNCTIONS
 	def handleAction(self, decoded):
 		# TO DO
+		pass
 
 	def handleDisconnect(self, decoded):
 		# TO DO
+		pass
 
 	def handleNewPlayer(self, decoded):
 		# TO DO
+		log.msg("A new player has connected!")
+		pass
 
 	def handleTurnStart(self, decoded):
 		# TO DO
+		pass
 
 	def handleTurnEnd(self, decoded):
 		# TO DO
+		pass
 
 	# HELPER FUNCTIONS
 	def rollDice(self, max=6):
 		# TO DO
+		pass
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
@@ -87,7 +94,7 @@ class ServerProtocol(protocol.Protocol):
 
 		decoded = json.loads(data)
 		detect_thread = Thread(target=self.gameObj.processJSON, 
-			args=(client, decoded, ))
+			args=(decoded, ))
 		detect_thread.start()
 
 	def connectionLost(self, reason):
