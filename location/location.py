@@ -10,11 +10,11 @@ from locationUtils import file_as_dict, write_to_file
 def sample_current_location():
     numSamples = "3"
     # Run sample collection script.
-    exe = "/home/root/EE180DA-B/position_estimation/sample.sh"
+    exe = "/home/root/EE180DA-B/location/sample.sh"
     subprocess.call([exe, numSamples])
     
     # Need to parse the five files generated from script.
-    sampledir = "/home/root/EE180DA-B/position_estimation/observed_rssi"
+    sampledir = "/home/root/EE180DA-B/location/observed_rssi"
     samplefiles = [join(sampledir, f) for f in listdir(sampledir) if isfile(join(sampledir, f))]
 
     rssiObserved = [file_as_dict(f) for f in samplefiles]
