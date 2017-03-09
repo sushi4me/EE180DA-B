@@ -51,26 +51,39 @@ def run():
 	
     # Gesture  Constants
     #--------------------
-    gesturedetected = 0  #1 = freeze; 2 = cloak
+    gesturedetected = 0  #1 = freeze; 2 = cloak; 3 = grenade
     gestureoccured = 9
+    
     downcount1 = 0
     downcount1z = 0
     downcount2 = 0
     downcount2y = 0
+    downcount3 = 0
+    downcount3x = 0
+    
     prereq1 = 0
     prereq2 = 0
+    prereq3 = 0
+    
     occurence1 = 0
     occurence2 = 0
+    occurence3 = 0
 
     # Position Threshold to start recording gesture
     threshold1_az = 0.85
     threshold1low_az = 0.20
+    
     threshold2_ax = -.85  
     threshold2_ay = -.85
+
+    threshold3_ax = -.7
+    threshold3_az = -1.2
+
     # Loop and read accel, and gyro
     while(1):
         imu.read_accel()
     	imu.read_gyro()
+        print imu.ax
         
         # Gesture 1 Detection
     	if imu.az > threshold1_az:
@@ -101,7 +114,7 @@ def run():
             occurence1 = 0
             prereq1 = 0
 
-        #Gesture 2 Detection
+        # Gesture 2 Detection
         if imu.ax <= threshold2_ax:
             if imu.az < 2 and imu.az > -2:
                 occurence2 += prereq2
@@ -129,6 +142,13 @@ def run():
         if downcount2y > 11:
             occurence2 = 0
             prereq2 = 0
+
+        # Gesture 3 Detection
+        if imu.ax <= threshold3_ax:
+            if imu.ay < -1 and imu.ay > threshold3_ax:
+                occurence3 += prereq3
+                downcount3 = 0
+
     	
         # Sleep for SLEEP_TIME seconds
     	time.sleep(SLEEP_TIME)
