@@ -56,7 +56,6 @@ class OLED:
 	#----------------------------------
 	def __init__(self):
 		self.oled.setTextWrap(1)
-		self.oled.clear()
 
 	#----------------------------------
 	# Method: int row(self)
@@ -657,7 +656,8 @@ class OLED:
 	def drawWelcomeScreen(self, playerID):
 		self.clear()
 		self.drawBorder()
-		self.oled.write("Welcome player " + playerID)
+		self.oled.write("\n  Welcome\n  Player\n    " + playerID)
+		self.oled.refresh()
 		time.sleep(3)
 
 
