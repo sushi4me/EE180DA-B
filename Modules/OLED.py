@@ -295,8 +295,6 @@ class OLED:
 						self.oled.refresh()
 				else:
 					self.oled.drawPixel(x, y, 0)
-					if delay == 1:
-						self.oled.refresh()
 				x += 1
 			y += 1
 		if delay == 1:
@@ -308,7 +306,6 @@ class OLED:
 	# 	Draws game initialization screen
 	#----------------------------------
 	def drawInitScreen(self):
-		self.drawBorder()
 		grid = [[" " for x in range(self.MAX_PIXELS_COL)] for y in range(self.MAX_PIXELS_ROW)]
 		grid[self.MAX_PIXELS_ROW//2 - 9] = "                    ****          ******                        "
 		grid[self.MAX_PIXELS_ROW//2 - 8] = "                    * * **      **      **                      "
@@ -330,6 +327,7 @@ class OLED:
 		grid[self.MAX_PIXELS_ROW//2 + 8] = "                    * *                                         "
 		grid[self.MAX_PIXELS_ROW//2 + 9] = "                    ***                                         "
 		self.drawScreen(grid, 1)
+		self.drawBorder()
 		self.oled.refresh()
 
 	#----------------------------------
@@ -352,7 +350,7 @@ class OLED:
 		for option in optionsList:
 			if rowIndex < self.NUM_ROWS:
 				self.oled.setCursor(self.CURSOR_ROW[rowIndex], 2)
-				self.oled.write(buttonList[rowIndex - 1].name + ":" + option)
+				self.oled.write(buttonList[rowIndex - 1] + ":" + option)
 			rowIndex += 1
 		self.oled.refresh()
 
