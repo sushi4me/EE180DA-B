@@ -1,6 +1,6 @@
 SUB_DIRS=Modules \
-	Modules/9dofBlock \
-	Modules/9dofBlock/gesture_data \
+	Modules/IMU \
+	Modules/IMU/gesture_data \
 	location \
 	locations_data \
 	position_estimation \

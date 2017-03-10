@@ -83,7 +83,6 @@ def run():
     while(1):
         imu.read_accel()
     	imu.read_gyro()
-        print imu.ax
         
         # Gesture 1 Detection
     	if imu.az > threshold1_az:

@@ -15,7 +15,7 @@ NOTES:
 """
 
 from datetime			import datetime
-#from Modules.Buzzer		import Buzzer
+from Modules.Buzzer		import Buzzer
 #from Modules.DOF 		import DOFsensor
 from Modules.OLED		import OLED
 from Modules.Globals 		import buttons
@@ -25,6 +25,7 @@ from twisted.internet		import reactor, protocol, defer
 #from twisted.internet.task	import LoopingCall
 from twisted.python		import log
 from location.location 		import location
+from Modules.IMU.gesture 	import run as detectGesture
 
 import json
 import mraa
@@ -37,10 +38,14 @@ import time
 global DISPLAY
 DISPLAY = OLED()
 global PLAYER_ID
+global Buzzer
+AUDIO = Buzzer()
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
 	def connectionMade(self):
+                global DISPLAY
+                DISPLAY.connecting()
                 log.msg("Connected to server.")
 		self.factory.server = self
                 
@@ -49,6 +54,8 @@ class ClientProtocol(protocol.Protocol):
                 log.msg("Done!")
 
                 self.transport.write(json.dumps({"request": "NEWPLAYER", "location": startLocation}))
+                DISPLAY.connected()
+                time.sleep(1)
 
 	def dataReceived(self, data):
 		decoded = json.loads(data)
@@ -85,17 +92,23 @@ def handleNewPlayer(decoded):
 	PLAYER_ID = decoded["player_num"]
 	log.msg("My player ID is %d" % PLAYER_ID)
 	DISPLAY.drawWelcomeScreen(str(decoded["player_num"]))
+	AUDIO.connected()
+	time.sleep(2)
 
 	return
 
 def handleTurnStart(decoded):
-	global PLAYER_ID, DISPLAY
+	global PLAYER_ID, DISPLAY, AUDIO
 	
 	log.msg("Turn started!")
-
+	DISPLAY.promptDiceRoll()
+	gesture = detectGesture()
 	roll = rollDice()
+	DISPLAY.displayDiceRoll()
 
 	# Wait for player to arrive at destination and press A
+	DISPLAY.clear()
+	DISPLAY.write("You rolled    a\n    " + str(roll) + "\nPress (A) to continue")
 	while DISPLAY.waitForUserInput() != buttons.A:
 		pass
 

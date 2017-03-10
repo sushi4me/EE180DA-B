@@ -84,6 +84,15 @@ class OLED:
 		return self.CURSOR_COL[c]
 
 	#----------------------------------
+	# Method: drawBorder(self)
+	# Description:
+	#	Draws a rounded rectangular border
+	#	onto the edges of the screen
+	#----------------------------------
+	def drawBorder(self):
+		self.oled.drawRoundedRectangle(0, 0, self.MAX_PIXELS_COL, self.MAX_PIXELS_ROW, 4, 1)
+
+	#----------------------------------
 	# Method: write(self, string)
 	# Description:
 	#	Differs from the pyupm write function as it refreshes the OLED
@@ -101,6 +110,7 @@ class OLED:
 	#	number of characters that can fit on the display.
 	#----------------------------------	
 	def write(self, string):
+		self.drawBorder()
 		self.TEXT_BUFFER += string
 		if self.CURSOR_POS >= self.MAX_CURS_POS:
 			return
@@ -122,6 +132,7 @@ class OLED:
 	#	message is being typed out each character at a time.
 	#----------------------------------
 	def writeScroll(self, string):
+		self.drawBorder()
 		self.TEXT_BUFFER += string
 		for i in string:
 			if self.CURSOR_POS > self.MAX_CURS_POS:
@@ -253,16 +264,6 @@ class OLED:
 		return input
 
 	#----------------------------------
-	# Method: drawBorder(self)
-	# Description:
-	#	Draws a rounded rectangular border
-	#	onto the edges of the screen
-	#----------------------------------
-	def drawBorder(self):
-		self.oled.drawRoundedRectangle(0, 0, self.MAX_PIXELS_COL, self.MAX_PIXELS_ROW, 4, 1)
-		self.oled.refresh()
-
-	#----------------------------------
 	# Method: drawScreen(self, ArrayofStrings, delay)
 	# Description:
 	# 	Each character in the ArrayofStrings (other than SPACE) 
@@ -292,9 +293,14 @@ class OLED:
 					self.oled.drawPixel(x, y, 1)
 					if delay == 1:
 						self.oled.refresh()
+				else:
+					self.oled.drawPixel(x, y, 0)
+					if delay == 1:
+						self.oled.refresh()
 				x += 1
 			y += 1
-		self.oled.refresh()
+		if delay == 1:
+			self.oled.refresh()
 
 	#----------------------------------
 	# Method: drawInitScreen(self)
@@ -303,7 +309,7 @@ class OLED:
 	#----------------------------------
 	def drawInitScreen(self):
 		self.drawBorder()
-		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
+		grid = [[" " for x in range(self.MAX_PIXELS_COL)] for y in range(self.MAX_PIXELS_ROW)]
 		grid[self.MAX_PIXELS_ROW//2 - 9] = "                    ****          ******                        "
 		grid[self.MAX_PIXELS_ROW//2 - 8] = "                    * * **      **      **                      "
 		grid[self.MAX_PIXELS_ROW//2 - 7] = "                    * *   ******          **                    "
@@ -324,6 +330,31 @@ class OLED:
 		grid[self.MAX_PIXELS_ROW//2 + 8] = "                    * *                                         "
 		grid[self.MAX_PIXELS_ROW//2 + 9] = "                    ***                                         "
 		self.drawScreen(grid, 1)
+		self.oled.refresh()
+
+	#----------------------------------
+	# Method: drawMenu(self, menuName, optionsList)
+	# Description:
+	# 	Draws a menu screen that takes a string called
+	#	menuName as the title of the screen and a list
+	#	of strings called optionsList as the options to
+	#	display to the UI.  The length of the menuName
+	#	can be max 10 characters and optionsList takes
+	#	max 4 options
+	#----------------------------------
+	def drawMenu(self, menuName, buttonList, optionsList):
+		self.clear()
+		self.drawBorder()
+		self.oled.drawLineHorizontal(0, 10, 64, 1)
+		self.oled.setCursor(2, 2)
+		self.oled.write(menuName)
+		rowIndex = 1
+		for option in optionsList:
+			if rowIndex < self.NUM_ROWS:
+				self.oled.setCursor(self.CURSOR_ROW[rowIndex], 2)
+				self.oled.write(buttonList[rowIndex - 1].name + ":" + option)
+			rowIndex += 1
+		self.oled.refresh()
 
 	#----------------------------------
 	# Method: drawStartScreen(self)
@@ -334,21 +365,26 @@ class OLED:
 	#	returns the value the user select
 	#----------------------------------
 	def drawStartScreen(self):
-		self.drawBorder()
-		self.setTextCursor(0, 0)
-		self.oled.write("Main Menu")
-		self.oled.drawLineHorizontal(0, 10, 64, 1)
-		self.setTextCursor(2, 0)
-		self.oled.write("(A) Start")
-		self.setTextCursor(3, 0)
-		self.oled.write("(B) Option")
-		self.oled.refresh()
+		menuName = "Main Menu"
+		buttonList = ["A", "B"]
+		optionsList = ["Play", "Options"]
+		self.drawMenu("Main Menu", buttonList, optionsList)
 		input = self.waitForUserInput()
 		while (input != "A"):
 			if input == "B":
 				# Initialize options menu
 				pass
 			input = self.waitForUserInput()
+
+	#----------------------------------
+	# Method: drawWelcomeScreen(self, playerID)
+	# Description:
+	#	Draws a welcome screen displaying the 
+	#	player's ID.
+	#----------------------------------
+	def drawWelcomeScreen(self, playerID):
+		self.clear()
+		self.write("\n  Welcome\n  Player\n    " + playerID)
 
 	#----------------------------------
 	# Method: drawEIVMap(self)
@@ -399,6 +435,7 @@ class OLED:
 
 		# Draw EIV Map
 		self.drawScreen(grid)
+		self.oled.refresh()
 		
 
 	#----------------------------------
@@ -452,8 +489,8 @@ class OLED:
 		if self.ORIENTATION == orientation.NORTH:
 			self.setTextCursor(0, 0)
 			self.oled.write("EIV")
-			self.oled.setCursor(39, 56)
-			self.oled.write("S")
+			# self.oled.setCursor(39, 56)
+			# self.oled.write("S")
 			# self.oled.setCursor(39, 2)
 			# self.oled.write("17")
 			# self.oled.setCursor(16, 2)
@@ -471,8 +508,8 @@ class OLED:
 		elif self.ORIENTATION == orientation.WEST:
 			self.setTextCursor(0, 7)
 			self.oled.write("EIV")
-			self.oled.setCursor(56, 4)
-			self.oled.write("S")
+			# self.oled.setCursor(56, 4)
+			# self.oled.write("S")
 			# self.oled.setCursor(2, 2)
 			# self.oled.write("17")
 			# self.oled.setCursor(2, 31)
@@ -490,8 +527,8 @@ class OLED:
 		elif self.ORIENTATION == orientation.EAST:
 			self.oled.setCursor(34, 2)
 			self.oled.write("EIV")
-			self.oled.setCursor(2, 2)
-			self.oled.write("S")
+			# self.oled.setCursor(2, 2)
+			# self.oled.write("S")
 			# self.oled.setCursor(2, 48)
 			# self.oled.write("17")
 			# self.oled.setCursor(38, 48)
@@ -509,8 +546,8 @@ class OLED:
 		elif self.ORIENTATION == orientation.SOUTH:
 			self.setTextCursor(4, 7)
 			self.oled.write("EIV")
-			self.oled.setCursor(2, 2)
-			self.oled.write("S")
+			# self.oled.setCursor(2, 2)
+			# self.oled.write("S")
 			# self.oled.setCursor(2, 2)
 			# self.oled.write("17")
 			# self.oled.setCursor(2, 31)
@@ -628,36 +665,64 @@ class OLED:
 		self.updateMap(self.PLAYER_POS)
 		self.oled.refresh()
 
-	#----------------------------------
-	# Method: drawMenu(self, menuName, optionsList)
-	# Description:
-	# 	Draws a menu screen that takes a string called
-	#	menuName as the title of the screen and a list
-	#	of strings called optionsList as the options to
-	#	display to the UI.  The length of the menuName
-	#	can be max 10 characters and optionsList takes
-	#	max 4 options
-	#----------------------------------
-	def drawMenu(self, menuName, optionsList):
+	def displayDiceRoll(self):
 		self.clear()
 		self.drawBorder()
-		self.oled.drawLineHorizontal(0, 10, 64, 1)
-		self.oled.setCursor(2, 2)
-		self.oled.write(menuName)
-		rowIndex = 1
-		b = list(buttons)
-		for option in optionsList:
-			if rowIndex < self.NUM_ROWS:
-				self.oled.setCursor(self.CURSOR_ROW[rowIndex], 2)
-				self.oled.write(b[rowIndex - 1].name + ":" + option)
-			rowIndex += 1
-		self.oled.refresh()
+		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
+		MID_SCREEN = self.MAX_PIXELS_ROW//2
+		grid[MID_SCREEN - 14]= "                                *                               "
+		grid[MID_SCREEN - 13]= "                              * * *                             "
+		grid[MID_SCREEN - 12]= "                            *   *   *                           "
+		grid[MID_SCREEN - 11]= "                          *     *     *                         "
+		grid[MID_SCREEN - 10]= "                        *       *       *                       "
+		grid[MID_SCREEN - 9] = "                      *         *     *   *                     "
+		grid[MID_SCREEN - 8] = "                    *           *    ***    *                   "
+		grid[MID_SCREEN - 7] = "                  *           *   *   *       *                 "
+		grid[MID_SCREEN - 6] = "                *   *       *       *           *               "
+		grid[MID_SCREEN - 5] = "              *    ***    *           *        *  *             "
+		grid[MID_SCREEN - 4] = "            *       *   *               *     ***   *           "
+		grid[MID_SCREEN - 3] = "          *           *                   *    *      *         "
+		grid[MID_SCREEN - 2] = "          *         *         *             *         *         "
+		grid[MID_SCREEN - 1] = "          *       *          ***              *       *         "
+		grid[MID_SCREEN + 0] = "          *     *             *                 *     *         "
+		grid[MID_SCREEN + 1] = "          *   *                                   *   *         "
+		grid[MID_SCREEN + 2] = "          * *        *                  *           * *         "
+		grid[MID_SCREEN + 3] = "          *         ***                ***            *         "
+		grid[MID_SCREEN + 4] = "            *        *                  *           *           "
+		grid[MID_SCREEN + 5] = "              *                                   *             "
+		grid[MID_SCREEN + 6] = "                *                               *               "
+		grid[MID_SCREEN + 7] = "                  *            *              *                 "
+		grid[MID_SCREEN + 8] = "                    *         ***           *                   "
+		grid[MID_SCREEN + 9] = "                      *        *          *                     "
+		grid[MID_SCREEN + 10]= "                        *               *                       "
+		grid[MID_SCREEN + 11]= "                          *           *                         "
+		grid[MID_SCREEN + 12]= "                            *       *                           "
+		grid[MID_SCREEN + 13]= "                              *   *                             "
+		grid[MID_SCREEN + 14]= "                                *                               "
+		TOP_DICE = MID_SCREEN - 14
+		BOT_DICE = MID_SCREEN + 14
+		for i in range(20):
+			self.drawScreen(grid)
+			self.drawBorder()
+			self.oled.refresh()
+			for y in range(14):
+				temp = grid[TOP_DICE + y]
+				grid[TOP_DICE + y] = grid[BOT_DICE - y]
+				grid[BOT_DICE - y] = temp
+			time.sleep(0.1)
 
-	def drawWelcomeScreen(self, playerID):
+	def connecting(self):
 		self.clear()
 		self.drawBorder()
-		self.oled.write("\n  Welcome\n  Player\n    " + playerID)
-		self.oled.refresh()
-		time.sleep(3)
+		self.write("\nConnecting to server  ...")
 
+	def connected(self):
+		self.clear()
+		self.drawBorder()
+		self.write("\nConnectionSuccessful")
+
+	def promptDiceRoll(self):
+		self.clear()
+		self.drawBorder()
+		self.write("\n   Roll\n   Dice!")
 
