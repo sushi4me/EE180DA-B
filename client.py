@@ -84,7 +84,7 @@ def handleNewPlayer(decoded):
 	
 	PLAYER_ID = decoded["player_num"]
 	log.msg("My player ID is %d" % PLAYER_ID)
-	DISPLAY.drawWelcomeScreen(decoded["player_num"])
+	DISPLAY.drawWelcomeScreen(str(decoded["player_num"]))
 
 	return
 
