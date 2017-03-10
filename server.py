@@ -70,6 +70,7 @@ class Game():
 			location = decoded["location"]
 			self.PLAYERS.append(Player(self.NUMBER_OF_PLAYERS, location))
 			log.msg("New player %d at %d" % (self.NUMBER_OF_PLAYERS, location))
+			writeToClient(self.NUMBER_OF_PLAYERS - 1, {"request": "NEWPLAYER", "player_num": self.NUMBER_OF_PLAYERS})
 
 		if self.NUMBER_OF_PLAYERS == self.MAX_PLAYERS:
 			FULL_FLAG = True
