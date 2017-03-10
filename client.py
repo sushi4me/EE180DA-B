@@ -95,7 +95,7 @@ def handleTurnStart(decoded):
 	global oled
 	log.msg("Turn started!")
 	newLocation = location()
-	oled.updateMap(newLocation)
+	oled.drawEIVMap(newLocation)
 	log.msg("Turn start!")
 
 	roll = rollDice()
