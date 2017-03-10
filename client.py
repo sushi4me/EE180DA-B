@@ -33,13 +33,9 @@ import sys
 import time
 
 # GLOBALS
-<<<<<<< HEAD
-global PLAYER
 global oled 
 oled = OLED()
-=======
 global PLAYER_ID
->>>>>>> 77342112958db75a265dac5a7c93a798864543c2
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
@@ -69,14 +65,11 @@ def writeToServer(msg):
 	m_factory.server.transport.write(json.dumps(msg))
 	log.msg("Wrote to server!")
 
-
-<<<<<<< HEAD
 def handleNewPlayer(decoded):
-	global PLAYER
 	global oled
 	oled.drawWelcomeScreen(decoded["player_num"])
 	oled.drawEIVMap(decoded["location"])
-=======
+
 def processJSON(decoded):
 	log.msg("%s" % decoded)
 	request = decoded["request"]
@@ -94,23 +87,20 @@ def handleNewPlayer(decoded):
 	
 	PLAYER_ID = decoded["player_num"]
 	log.msg("My player ID is %d" % PLAYER_ID)
->>>>>>> 77342112958db75a265dac5a7c93a798864543c2
+
 
 	return
 
 def handleTurnStart(decoded):
-<<<<<<< HEAD
 	global oled
 	log.msg("Turn started!")
 	newLocation = location()
 	oled.updateMap(newLocation)
-=======
 	log.msg("Turn start!")
 
 	roll = rollDice()
 	writeToServer({"request": "HELLO"})
 
->>>>>>> 77342112958db75a265dac5a7c93a798864543c2
 	return
 
 # HELPER FUNCTIONS
