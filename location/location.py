@@ -3,18 +3,18 @@
 import sys
 import subprocess
 
-from os       import listdir
-from os.path  import isfile, join, basename
-from posutils import file_as_dict, write_to_file
+from os            import listdir
+from os.path       import isfile, join, basename
+from locationUtils import file_as_dict, write_to_file
 
 def sample_current_location():
     numSamples = "3"
     # Run sample collection script.
-    exe = "/home/root/EE180DA-B/position_estimation/sample.sh"
+    exe = "/home/root/EE180DA-B/location/sample.sh"
     subprocess.call([exe, numSamples])
     
     # Need to parse the five files generated from script.
-    sampledir = "/home/root/EE180DA-B/position_estimation/observed_rssi"
+    sampledir = "/home/root/EE180DA-B/location/observed_rssi"
     samplefiles = [join(sampledir, f) for f in listdir(sampledir) if isfile(join(sampledir, f))]
 
     rssiObserved = [file_as_dict(f) for f in samplefiles]
@@ -40,26 +40,26 @@ def compute_distance_scores(rssiObserved, rssiReferences):
     
     return scores
 
-def position_estimate(rssiObserved, rssiReferences):
+def location_estimate(rssiObserved, rssiReferences):
     indicesOfMinScores = [] # Collect indices of minimum scores.
    
     # For each observed sample, make a 
-    # guess at the probable position.
+    # guess at the probable location.
     for sample in rssiObserved:
         scores = compute_distance_scores(sample, rssiReferences)
         indicesOfMinScores.append(scores.index(min(scores)))
 
     # Our guess will be the mode of the set.
-    position = max(set(indicesOfMinScores), key=indicesOfMinScores.count)
+    location = max(set(indicesOfMinScores), key=indicesOfMinScores.count)
 
-    return position
+    return location
 
-def extract_position(filename):
+def extract_location(filename):
     base = basename(filename)
 
     return int(filter(str.isdigit, base))
 
-def position():
+def location():
     # Collect files from reference db.
     db = "/home/root/EE180DA-B/reference_database"
     files = [join(db, f) for f in listdir(db) if isfile(join(db, f))]
@@ -68,7 +68,7 @@ def position():
     rssiObserved = sample_current_location()
     rssiReferences = [file_as_dict(f) for f in files]
 
-    pos = position_estimate(rssiObserved, rssiReferences)
+    loc = location_estimate(rssiObserved, rssiReferences)
     
-    return extract_position(files[pos])
+    return extract_location(files[loc])
 

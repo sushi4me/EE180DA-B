@@ -1,4 +1,13 @@
-SUB_DIRS=Modules Modules/9dofBlock Modules/9dofBlock/gesture_data locations_data position_estimation reference_database Miscellaneous
+SUB_DIRS=Modules \
+	Modules/IMU \
+	Modules/IMU/gesture_data \
+	location \
+	locations_data \
+	position_estimation \
+	reference_database \
+	Miscellaneous \
+
+.SILENT:
 
 Default:
 	@echo Nothing to make

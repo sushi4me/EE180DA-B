@@ -8,12 +8,13 @@
 #	to start the game or use development options (collect data/check IP)
 #
 #------------------------------------------------
-import position_estimation.position
-from time				import sleep
-from Modules.OLED		import OLED
-from Modules.Globals	import buttons
-from Modules.GetIP		import getIP
-from Miscellaneous.detect import sample_location_number
+import location.location 
+import mraa
+from time		    import sleep
+from Modules.OLED	    import OLED
+from Modules.Globals	    import buttons
+from Modules.GetIP	    import getIP
+from Miscellaneous.detect   import sample_location_number
 #----------------------------
 # Initialization
 # Description:
@@ -22,6 +23,11 @@ from Miscellaneous.detect import sample_location_number
 #	smooth transition between screens
 #----------------------------
 oled = OLED()
+# PIN_20 used to bring button pins HIGH after release
+# when using OLED Block w/ GPIO Block
+PIN_20 = mraa.Gpio(20)
+PIN_20.dir(mraa.DIR_OUT)
+PIN_20.write(1)
 oled.clear()
 oled.drawInitScreen()
 sleep(1)
@@ -39,7 +45,7 @@ def runScan(position):
 	oled.clear()
 	oled.drawBorder()
 	oled.write("Position " + str(position))
-	oled.write("SCANNING..")
+	oled.write(" SCANNING...")
 	locationdata = sample_location_number(position)
 	oled.clear()
 	oled.write(str(locationdata))
@@ -52,7 +58,7 @@ def runScan(position):
 		else:
 			break;
 
-#----------------------------
+#---------------------------
 # Function: runGame
 # Description:
 #	This function is run when the user is ready to 
@@ -63,11 +69,10 @@ def runScan(position):
 def runGame():
 	oled.clear()
 	oled.drawBorder()
-	oled.write("STARTING  GAME...")
-	sleep(3)
-	import Miscellaneous.client_test as client
+	oled.write("\n STARTING\n  GAME...")
+	import client
 	client.main()
-
+	
 #----------------------------
 # Function: runDeveloper
 # Description:
@@ -90,14 +95,12 @@ def runDeveloper(position):
 			position = 0
 		else:
 			position += 1
-		runDeveloper(position)
 	elif input == buttons.B:
 		if position == 0:
 			position = 60
 		else:
 			position -= 1
-		runDeveloper(position)
-	elif input != buttons.L:
+	if input != buttons.L:
 		runDeveloper(position)
 		
 
@@ -129,11 +132,12 @@ def showIP():
 #	DEVELOP options, ShowIP, and EXIT
 #----------------------------
 def mainMenu():
-	options = [" START", " DEVELOP", " ShowIP", " EXIT"]
+	optionsList = [" START", " DEVELOP", " ShowIP", " EXIT"]
+	buttonsList = ["A", "B", "S", "U"]
 	refreshScreen = True
 	while True:
 		if refreshScreen == True:
-			oled.drawMenu("Main Menu", options)
+			oled.drawMenu("Main Menu", buttonsList, optionsList)
 		input = oled.waitForUserInput()
 		if input == buttons.A:
 			runGame()

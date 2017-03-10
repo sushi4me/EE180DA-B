@@ -83,7 +83,11 @@ def run():
     while(1):
         imu.read_accel()
     	imu.read_gyro()
+<<<<<<< HEAD:Modules/9dofBlock/gesture.py
 
+=======
+        
+>>>>>>> 4035bfb9180f9f5ad9a63fe55ea81ea5ecc1f5a7:Modules/IMU/gesture.py
         # Gesture 1 Detection
     	if imu.az > threshold1_az:
             if imu.ax < 0 and imu.ax > -.4:

@@ -36,9 +36,9 @@ NOTES:
 # FUNCTION
 class Game():
 	NUMBER_OF_PLAYERS = 0
-	MAX_PLAYERS = 4
+	MAX_PLAYERS = 1
 	PLAYERS = []
-	FULL_FLAG
+	FULL_FLAG = False
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
 	def processJSON(self, decoded):
@@ -50,7 +50,7 @@ class Game():
 		# Use the request field to execute corresponding function.
 		# If the player can perform a new action, add it here:
 		response = {	"ACTION":	self.handleAction,
-				"DISCONNECTED": self.handleDisconnect,
+				"DISCONNECTED": self.handleDisconnect, # not used?
 				"NEWPLAYER": 	self.handleNewPlayer,
 				"TURNEND": 	self.handleTurnEnd,
 				"UPDATE":	self.handleUpdate
@@ -62,33 +62,30 @@ class Game():
 		pass
 
 	def handleDisconnect(self, decoded):
-		# TO DO
-		pass
+		log.msg("Player disconnected.")
 
 	def handleNewPlayer(self, decoded):
-		log.msg("A new player has connected!")
-		if not FULL_FLAG:
-			NUMBER_OF_PLAYERS = NUMBER_OF_PLAYERS + 1
+		if not self.FULL_FLAG:
+			self.NUMBER_OF_PLAYERS = self.NUMBER_OF_PLAYERS + 1
 			location = decoded["location"]
-			PLAYERS.append(Player(NUMBER_OF_PLAYERS, location))
+			self.PLAYERS.append(Player(self.NUMBER_OF_PLAYERS, location))
+			log.msg("New player %d at %d" % (self.NUMBER_OF_PLAYERS, location))
+			writeToClient(self.NUMBER_OF_PLAYERS - 1, {"request": "NEWPLAYER", "player_num": self.NUMBER_OF_PLAYERS})
 
-		if NUMBER_OF_PLAYERS == MAX_PLAYERS:
+		if self.NUMBER_OF_PLAYERS == self.MAX_PLAYERS:
 			FULL_FLAG = True
+			log.msg("Start game!")
+			writeToClient(0, {"request": "TURNSTART"})
 
 		return
 
 	def handleTurnEnd(self, decoded):
-		# TO DO
-		pass
+		player_num = decoded["player_num"] + 1
+		writeToClient(player_num % MAX_PLAYERS, {"request": "TURNSTART"})
 
 	def handleUpdate(self, decoded):
 		# TO DO
 		pass
-
-	# HELPER FUNCTIONS
-	def rollDice(self, max=6):
-		random.seed(time.time())
-		return random.randint(0, max)
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):

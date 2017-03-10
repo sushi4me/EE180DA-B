@@ -9,7 +9,11 @@ NUMSAMPLES=$1
 
 COUNTER=0
 
-DIR="/home/root/EE180DA-B/position_estimation/observed_rssi/"
+DIR="/home/root/EE180DA-B/location/observed_rssi/"
+
+if [ ! -d $DIR ]; then
+	mkdir $DIR
+fi	
 
 while [ $COUNTER -lt $NUMSAMPLES ]; do 
 	FILENAME="${DIR}sample${COUNTER}.txt"
