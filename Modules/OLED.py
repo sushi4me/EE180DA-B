@@ -658,6 +658,6 @@ class OLED:
 		self.clear()
 		self.drawBorder()
 		self.oled.write("Welcome player " + playerID)
-		self.time.sleep(3)
+		time.sleep(3)
 
 
