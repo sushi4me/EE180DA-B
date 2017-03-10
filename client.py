@@ -96,6 +96,7 @@ def handleTurnStart(decoded):
 	log.msg("Turn started!")
 	newLocation = location()
 	oled.drawEIVMap(newLocation)
+	writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
 	log.msg("Turn start!")
 
 	roll = rollDice()
