@@ -17,7 +17,7 @@ NOTES:
 from datetime			import datetime
 #from Modules.Buzzer		import Buzzer
 #from Modules.DOF 		import DOFsensor
-#from Modules.OLED		import OLED
+from Modules.OLED		import OLED
 from optparse			import OptionParser
 from random			import randint
 from twisted.internet		import reactor, protocol, defer
@@ -26,7 +26,7 @@ from twisted.python		import log
 from location.location 		import location
 
 import json
-#import mraa
+import mraa
 import os
 import random
 import sys
@@ -34,6 +34,8 @@ import time
 
 # GLOBALS
 global PLAYER
+global oled 
+oled = OLED()
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
@@ -52,6 +54,7 @@ class ClientProtocol(protocol.Protocol):
 		decoded = json.loads(data)
 		log.msg("%s" % data)
 
+
 class ClientFactory(protocol.ClientFactory):
 	protocol = ClientProtocol	
 
@@ -69,14 +72,17 @@ def processJSON(decoded):
 
 def handleNewPlayer(decoded):
 	global PLAYER
-
-
+	global oled
+	oled.drawWelcomeScreen(decoded["player_num"])
+	oled.drawEIVMap(decoded["location"])
 
 	return
 
 def handleTurnStart(decoded):
+	global oled
 	log.msg("Turn started!")
-
+	newLocation = location()
+	oled.updateMap(newLocation)
 	return
 
 # MAIN

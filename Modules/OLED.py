@@ -356,9 +356,9 @@ class OLED:
 	# Description:
 	#	Clears the screen before drawing the map
 	#	Draws a map of UCLA EIV 4th Floor
-	# 	with map position indices
+	# 	with map reference points
 	#----------------------------------
-	def drawEIVMap(self):
+	def drawEIVMap(self, position):
 		# Clear Screen
 		self.oled.clearScreenBuffer()
 		self.oled.clear()
@@ -369,6 +369,12 @@ class OLED:
 		self.oled.write("EIV")
 		self.oled.setCursor(39, 56)
 		self.oled.write("0")
+		# Determine Player Position
+		self.PLAYER_POS = position
+		x = self.POS[self.PLAYER_POS]['COL']
+		y = self.POS[self.PLAYER_POS]['ROW']
+		self.PIXEL_BUFFER[y][x] = "@"
+		self.oled.drawCircleFilled(x, y, 2, 1)
 
 		
 		# Initialize MAP array of strings
@@ -647,4 +653,11 @@ class OLED:
 				self.oled.write(b[rowIndex - 1].name + ":" + option)
 			rowIndex += 1
 		self.oled.refresh()
+
+	def drawWelcomeScreen(self, playerID):
+		self.clear()
+		self.drawBorder()
+		self.oled.write("Welcome player " + playerID)
+		self.time.sleep(3)
+
 
