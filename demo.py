@@ -39,7 +39,7 @@ def runScan(position):
 	oled.clear()
 	oled.drawBorder()
 	oled.write("Position " + str(position))
-	oled.write(" SCANNING..")
+	oled.write(" SCANNING...")
 	locationdata = sample_location_number(position)
 	oled.clear()
 	oled.write(str(locationdata))
@@ -63,11 +63,10 @@ def runScan(position):
 def runGame():
 	oled.clear()
 	oled.drawBorder()
-	oled.write("STARTING  GAME...")
-	sleep(3)
-	import Miscellaneous.client_test as client
+	oled.write("\n STARTING\n  GAME...")
+	import client
 	client.main()
-
+	
 #----------------------------
 # Function: runDeveloper
 # Description:
