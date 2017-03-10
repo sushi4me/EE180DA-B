@@ -36,7 +36,7 @@ NOTES:
 # FUNCTION
 class Game():
 	NUMBER_OF_PLAYERS = 0
-	MAX_PLAYERS = 4
+	MAX_PLAYERS = 1
 	PLAYERS = []
 	FULL_FLAG = False
 
@@ -85,11 +85,6 @@ class Game():
 	def handleUpdate(self, decoded):
 		# TO DO
 		pass
-
-	# HELPER FUNCTIONS
-	def rollDice(self, max=6):
-		random.seed(time.time())
-		return random.randint(0, max)
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):

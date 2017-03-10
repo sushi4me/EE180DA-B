@@ -33,16 +33,19 @@ import sys
 import time
 
 # GLOBALS
+<<<<<<< HEAD
 global PLAYER
 global oled 
 oled = OLED()
+=======
+global PLAYER_ID
+>>>>>>> 77342112958db75a265dac5a7c93a798864543c2
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
 	def connectionMade(self):
-		global PLAYER
-
                 log.msg("Connected to server.")
+		self.factory.server = self
                 
                 log.msg("Determining start location...")
                 startLocation = location()
@@ -53,40 +56,72 @@ class ClientProtocol(protocol.Protocol):
 	def dataReceived(self, data):
 		decoded = json.loads(data)
 		log.msg("%s" % data)
+		
+		processJSON(decoded)
 
 
 class ClientFactory(protocol.ClientFactory):
 	protocol = ClientProtocol	
 
-def processJSON(decoded):
-		log.msg("%s" % decoded)
-		request = decoded["request"]
+def writeToServer(msg):
+	global m_factory
 
-		# Use the request field to execute corresponding function.
-		# If the player can perform a new action, add it here:
-		response = {	"NEWPLAYER": 	self.handleNewPlayer,
-				"TURNSTART": 	self.handleTurnEnd,
-			   }[request](decoded)
+	m_factory.server.transport.write(json.dumps(msg))
+	log.msg("Wrote to server!")
 
-		return
 
+<<<<<<< HEAD
 def handleNewPlayer(decoded):
 	global PLAYER
 	global oled
 	oled.drawWelcomeScreen(decoded["player_num"])
 	oled.drawEIVMap(decoded["location"])
+=======
+def processJSON(decoded):
+	log.msg("%s" % decoded)
+	request = decoded["request"]
+
+	# Use the request field to execute corresponding function.
+	# If the player can perform a new action, add it here:
+	response = {	"NEWPLAYER": 	handleNewPlayer,
+			"TURNSTART": 	handleTurnStart,
+		   }[request](decoded)
+
+	return
+
+def handleNewPlayer(decoded):
+	global PLAYER_ID 
+	
+	PLAYER_ID = decoded["player_num"]
+	log.msg("My player ID is %d" % PLAYER_ID)
+>>>>>>> 77342112958db75a265dac5a7c93a798864543c2
 
 	return
 
 def handleTurnStart(decoded):
+<<<<<<< HEAD
 	global oled
 	log.msg("Turn started!")
 	newLocation = location()
 	oled.updateMap(newLocation)
+=======
+	log.msg("Turn start!")
+
+	roll = rollDice()
+	writeToServer({"request": "HELLO"})
+
+>>>>>>> 77342112958db75a265dac5a7c93a798864543c2
 	return
+
+# HELPER FUNCTIONS
+def rollDice(max=6):
+	random.seed(time.time())
+	return random.randint(0, max)
 
 # MAIN
 def main():
+	global m_factory
+
 	# Defaults
 	HOST = 'localhost'
 	PORT = 8080
@@ -110,7 +145,10 @@ def main():
 	# Start
 	log.startLogging(sys.stdout)
 
-	reactor.connectTCP(HOST, PORT, ClientFactory())
+	m_factory = ClientFactory()
+	m_factory.server = None	
+
+	reactor.connectTCP(HOST, PORT, m_factory)
 	reactor.run()
 	# End
 
