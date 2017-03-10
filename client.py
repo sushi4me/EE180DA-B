@@ -39,6 +39,7 @@ global PLAYER_ID
 class ClientProtocol(protocol.Protocol):	
 	def connectionMade(self):
                 log.msg("Connected to server.")
+		self.factory.server = self
                 
                 log.msg("Determining start location...")
                 startLocation = location()
@@ -49,6 +50,8 @@ class ClientProtocol(protocol.Protocol):
 	def dataReceived(self, data):
 		decoded = json.loads(data)
 		log.msg("%s" % data)
+		
+		processJSON(decoded)
 
 class ClientFactory(protocol.ClientFactory):
 	protocol = ClientProtocol	
@@ -56,7 +59,7 @@ class ClientFactory(protocol.ClientFactory):
 def writeToServer(msg):
 	global m_factory
 
-	m_factory.transport.write(json.dumps(msg))
+	m_factory.server.transport.write(json.dumps(msg))
 	log.msg("Wrote to server!")
 
 
@@ -66,8 +69,8 @@ def processJSON(decoded):
 
 	# Use the request field to execute corresponding function.
 	# If the player can perform a new action, add it here:
-	response = {	"NEWPLAYER": 	self.handleNewPlayer,
-			"TURNSTART": 	self.handleTurnEnd,
+	response = {	"NEWPLAYER": 	handleNewPlayer,
+			"TURNSTART": 	handleTurnStart,
 		   }[request](decoded)
 
 	return
@@ -89,7 +92,7 @@ def handleTurnStart(decoded):
 	return
 
 # HELPER FUNCTIONS
-def rollDice(self, max=6):
+def rollDice(max=6):
 	random.seed(time.time())
 	return random.randint(0, max)
 
@@ -121,6 +124,7 @@ def main():
 	log.startLogging(sys.stdout)
 
 	m_factory = ClientFactory()
+	m_factory.server = None	
 
 	reactor.connectTCP(HOST, PORT, m_factory)
 	reactor.run()
