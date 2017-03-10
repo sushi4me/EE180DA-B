@@ -66,11 +66,6 @@ def writeToServer(msg):
 	m_factory.server.transport.write(json.dumps(msg))
 	log.msg("Wrote to server!")
 
-def handleNewPlayer(decoded):
-	global PLAYER_ID, DISPLAY
-
-	PLAYER_ID = decoded["player_num"]
-	DISPLAY.drawWelcomeScreen(decoded["player_num"])
 
 def processJSON(decoded):
 	log.msg("%s" % decoded)
@@ -85,10 +80,11 @@ def processJSON(decoded):
 	return
 
 def handleNewPlayer(decoded):
-	global PLAYER_ID 
+	global PLAYER_ID, DISPLAY
 	
 	PLAYER_ID = decoded["player_num"]
 	log.msg("My player ID is %d" % PLAYER_ID)
+	DISPLAY.drawWelcomeScreen(decoded["player_num"])
 
 	return
 
