@@ -33,8 +33,8 @@ import sys
 import time
 
 # GLOBALS
-global oled 
-oled = OLED()
+global DISPLAY
+DISPLAY = OLED()
 global PLAYER_ID
 
 # TWISTED NETWORKING
@@ -66,7 +66,7 @@ def writeToServer(msg):
 	log.msg("Wrote to server!")
 
 def handleNewPlayer(decoded):
-	global oled
+	global DISPLAY
 	oled.drawWelcomeScreen(decoded["player_num"])
 	oled.drawEIVMap(decoded["location"])
 
@@ -88,11 +88,10 @@ def handleNewPlayer(decoded):
 	PLAYER_ID = decoded["player_num"]
 	log.msg("My player ID is %d" % PLAYER_ID)
 
-
 	return
 
 def handleTurnStart(decoded):
-	global oled
+	global PLAYER_ID, DISPLAY
 	log.msg("Turn started!")
 	newLocation = location()
 	oled.drawEIVMap(newLocation)
