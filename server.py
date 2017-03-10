@@ -65,7 +65,7 @@ class Game():
 		log.msg("Player disconnected.")
 
 	def handleNewPlayer(self, decoded):
-		if not FULL_FLAG:
+		if not self.FULL_FLAG:
 			NUMBER_OF_PLAYERS = NUMBER_OF_PLAYERS + 1
 			location = decoded["location"]
 			PLAYERS.append(Player(NUMBER_OF_PLAYERS, location))
