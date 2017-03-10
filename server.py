@@ -66,12 +66,12 @@ class Game():
 
 	def handleNewPlayer(self, decoded):
 		if not self.FULL_FLAG:
-			NUMBER_OF_PLAYERS = NUMBER_OF_PLAYERS + 1
+			self.NUMBER_OF_PLAYERS = self.NUMBER_OF_PLAYERS + 1
 			location = decoded["location"]
-			PLAYERS.append(Player(NUMBER_OF_PLAYERS, location))
-			log.msg("New player %d at %d" % (NUMBER_OF_PLAYERS, location))
+			self.PLAYERS.append(Player(self.NUMBER_OF_PLAYERS, location))
+			log.msg("New player %d at %d" % (self.NUMBER_OF_PLAYERS, location))
 
-		if NUMBER_OF_PLAYERS == MAX_PLAYERS:
+		if self.NUMBER_OF_PLAYERS == self.MAX_PLAYERS:
 			FULL_FLAG = True
 			log.msg("Start game!")
 			writeToClient(0, {"request": "TURNSTART"})
