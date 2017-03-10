@@ -67,9 +67,10 @@ def writeToServer(msg):
 	log.msg("Wrote to server!")
 
 def handleNewPlayer(decoded):
-	global DISPLAY
+	global PLAYER_ID, DISPLAY
+
+	PLAYER_ID = decoded["player_num"]
 	DISPLAY.drawWelcomeScreen(decoded["player_num"])
-	DISPLAY.drawEIVMap(decoded["location"])
 
 def processJSON(decoded):
 	log.msg("%s" % decoded)
