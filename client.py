@@ -33,13 +33,11 @@ import sys
 import time
 
 # GLOBALS
-global PLAYER
+global PLAYER_ID
 
 # TWISTED NETWORKING
 class ClientProtocol(protocol.Protocol):	
 	def connectionMade(self):
-		global PLAYER
-
                 log.msg("Connected to server.")
                 
                 log.msg("Determining start location...")
@@ -55,32 +53,50 @@ class ClientProtocol(protocol.Protocol):
 class ClientFactory(protocol.ClientFactory):
 	protocol = ClientProtocol	
 
+def writeToServer(msg):
+	global m_factory
+
+	m_factory.transport.write(json.dumps(msg))
+	log.msg("Wrote to server!")
+
+
 def processJSON(decoded):
-		log.msg("%s" % decoded)
-		request = decoded["request"]
+	log.msg("%s" % decoded)
+	request = decoded["request"]
 
-		# Use the request field to execute corresponding function.
-		# If the player can perform a new action, add it here:
-		response = {	"NEWPLAYER": 	self.handleNewPlayer,
-				"TURNSTART": 	self.handleTurnEnd,
-			   }[request](decoded)
+	# Use the request field to execute corresponding function.
+	# If the player can perform a new action, add it here:
+	response = {	"NEWPLAYER": 	self.handleNewPlayer,
+			"TURNSTART": 	self.handleTurnEnd,
+		   }[request](decoded)
 
-		return
+	return
 
 def handleNewPlayer(decoded):
-	global PLAYER
-
-
+	global PLAYER_ID 
+	
+	PLAYER_ID = decoded["player_num"]
+	log.msg("My player ID is %d" % PLAYER_ID)
 
 	return
 
 def handleTurnStart(decoded):
-	log.msg("Turn started!")
+	log.msg("Turn start!")
+
+	roll = rollDice()
+	writeToServer({"request": "HELLO"})
 
 	return
 
+# HELPER FUNCTIONS
+def rollDice(self, max=6):
+	random.seed(time.time())
+	return random.randint(0, max)
+
 # MAIN
 def main():
+	global m_factory
+
 	# Defaults
 	HOST = 'localhost'
 	PORT = 8080
@@ -104,7 +120,9 @@ def main():
 	# Start
 	log.startLogging(sys.stdout)
 
-	reactor.connectTCP(HOST, PORT, ClientFactory())
+	m_factory = ClientFactory()
+
+	reactor.connectTCP(HOST, PORT, m_factory)
 	reactor.run()
 	# End
 

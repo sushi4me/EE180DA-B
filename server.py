@@ -86,11 +86,6 @@ class Game():
 		# TO DO
 		pass
 
-	# HELPER FUNCTIONS
-	def rollDice(self, max=6):
-		random.seed(time.time())
-		return random.randint(0, max)
-
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
         def __init__(self):
