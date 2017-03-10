@@ -36,7 +36,7 @@ NOTES:
 # FUNCTION
 class Game():
 	NUMBER_OF_PLAYERS = 0
-	MAX_PLAYERS = 4
+	MAX_PLAYERS = 1
 	PLAYERS = []
 	FULL_FLAG = False
 
