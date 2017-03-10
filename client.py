@@ -18,6 +18,7 @@ from datetime			import datetime
 #from Modules.Buzzer		import Buzzer
 #from Modules.DOF 		import DOFsensor
 from Modules.OLED		import OLED
+from Modules.Globals 		import buttons
 from optparse			import OptionParser
 from random			import randint
 from twisted.internet		import reactor, protocol, defer
@@ -67,8 +68,8 @@ def writeToServer(msg):
 
 def handleNewPlayer(decoded):
 	global DISPLAY
-	oled.drawWelcomeScreen(decoded["player_num"])
-	oled.drawEIVMap(decoded["location"])
+	DISPLAY.drawWelcomeScreen(decoded["player_num"])
+	DISPLAY.drawEIVMap(decoded["location"])
 
 def processJSON(decoded):
 	log.msg("%s" % decoded)
@@ -92,13 +93,20 @@ def handleNewPlayer(decoded):
 
 def handleTurnStart(decoded):
 	global PLAYER_ID, DISPLAY
+	
 	log.msg("Turn started!")
-	newLocation = location()
-	oled.drawEIVMap(newLocation)
-	writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
-	log.msg("Turn start!")
 
 	roll = rollDice()
+
+	# Wait for player to arrive at destination and press A
+	while DISPLAY.waitForUserInput() != buttons.A:
+		pass
+
+	newLocation = location()
+	DISPLAY.drawEIVMap(newLocation)
+	writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
+
+
 	writeToServer({"request": "HELLO"})
 
 	return
