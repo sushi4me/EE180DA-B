@@ -15,11 +15,17 @@
 # Modules
 #----------------------------
 from Globals import *
-from Player import Player
-from Object import Object
+from Player  import Player
+from Object  import Object
+from enum    import IntEnum
 
 import sys
 import random
+
+class GameEvent(IntEnum):
+    LOSEHEALTH = 1
+    GAINHEALTH = 2
+    MONSTRFGHT = 3
 
 #----------------------------
 # Game Class
@@ -54,7 +60,32 @@ class Game:
 
         return newLocation
 
-    def randomEvent(self, location):
-        return random.choice(['Lose health', 'Gain health', 'Fight!'])
-    
-#    def cleanUp(self):
+    def battle(self, playerID):
+        playerDmg = random.randint(0, 1) * -5
+
+        self.players[playerID].changeHP(playerDmg)
+            
+    def randomEvent(self):
+        return random.choice([GameEvent.LOSEHEALTH, GameEvent.GAINHEALTH, GameEvent.MONSTRFGHT])
+
+    def runTurn(self, playerID, numSpaces):
+        newLocation = move(playerID, numSpaces)
+
+        event = randomEvent()
+
+        if event == GameEvent.LOSEHEALTH:
+            self.players[playerID].changeHP(-10)
+
+            playerMsg = "You lost 10 HP!"
+        elif event == GameEvent.GAINHEALTH:
+            self.players[playerID].changeHP(10)
+
+            playerMsg = "You gained 10 HP!"
+        elif event == GameEvent.MONSTRFGHT:
+            battle(playerID)
+
+            playerMsg = "You slayed! ;)"
+        else:
+            playerMsg = "Your turn was a little boring..."
+
+        return (newLocation, playerMsg)
