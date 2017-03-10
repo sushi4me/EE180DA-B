@@ -52,14 +52,14 @@ def run():
     # Gesture  Constants
     #--------------------
     gesturedetected = 0  #1 = freeze; 2 = cloak; 3 = grenade
-    gestureoccured = 9
+    gestureoccured = 8
     
     downcount1 = 0
     downcount1z = 0
     downcount2 = 0
     downcount2y = 0
     downcount3 = 0
-    downcount3x = 0
+    downcount3z = 0
     
     prereq1 = 0
     prereq2 = 0
@@ -76,18 +76,17 @@ def run():
     threshold2_ax = -.85  
     threshold2_ay = -.85
 
-    threshold3_ax = -.7
-    threshold3_az = -1.2
+    threshold3_ax = -.6
+    threshold3_az = -1.3
 
     # Loop and read accel, and gyro
     while(1):
         imu.read_accel()
     	imu.read_gyro()
-        print imu.ax
-        
+
         # Gesture 1 Detection
     	if imu.az > threshold1_az:
-            if imu.ax < 0 and imu.ax > -4:
+            if imu.ax < 0 and imu.ax > -.4:
                 occurence1 += prereq1
                 downcount1 = 0
     	else:
@@ -101,6 +100,7 @@ def run():
 
     	if occurence1 >= gestureoccured:
             return 1
+            #print "GESTURE 1"
             gesturedetected = 1
             occurence1 = 0
             downcount1 = 0
@@ -116,7 +116,7 @@ def run():
 
         # Gesture 2 Detection
         if imu.ax <= threshold2_ax:
-            if imu.az < 2 and imu.az > -2:
+            if imu.az < .2 and imu.az > -.2:
                 occurence2 += prereq2
                 downcount2 = 0
         else:
@@ -130,6 +130,7 @@ def run():
 
         if occurence2 >= gestureoccured:
             return 2
+            #print "GESTURE 2"
             gesturedetected = 2
             occurence2 = 0
             downcount2 = 0
@@ -144,10 +145,34 @@ def run():
             prereq2 = 0
 
         # Gesture 3 Detection
-        if imu.ax <= threshold3_ax:
-            if imu.ay < -1 and imu.ay > threshold3_ax:
+        if imu.ax < threshold3_ax:
+            if imu.az < 0 and imu.az > -.5:
                 occurence3 += prereq3
                 downcount3 = 0
+        else:
+            downcount3 += 1
+
+        if imu.az > threshold3_az:
+            downcount3z += 1
+        else:
+            downcount3z = 0
+            prereq3 = 1
+
+        if occurence3 >= gestureoccured:
+            return 3
+            #print "GESTURE 3"
+            gesturedetected = 3
+            occurence3 = 0
+            downcount3 = 0
+            prereq3 = 0
+
+        if downcount3 > 5:
+            occurence3 = 0
+            downcount3 = 0
+
+        if downcount3z > 14:
+            occurence3 = 0
+            prereq3 = 0
 
     	
         # Sleep for SLEEP_TIME seconds
