@@ -9,11 +9,12 @@
 #
 #------------------------------------------------
 import location.location 
-from time				import sleep
-from Modules.OLED		import OLED
-from Modules.Globals	import buttons
-from Modules.GetIP		import getIP
-from Miscellaneous.detect import sample_location_number
+import mraa
+from time		    import sleep
+from Modules.OLED	    import OLED
+from Modules.Globals	    import buttons
+from Modules.GetIP	    import getIP
+from Miscellaneous.detect   import sample_location_number
 #----------------------------
 # Initialization
 # Description:
@@ -22,6 +23,11 @@ from Miscellaneous.detect import sample_location_number
 #	smooth transition between screens
 #----------------------------
 oled = OLED()
+# PIN_20 used to bring button pins HIGH after release
+# when using OLED Block w/ GPIO Block
+PIN_20 = mraa.Gpio(20)
+PIN_20.dir(mraa.DIR_OUT)
+PIN_20.write(1)
 oled.clear()
 oled.drawInitScreen()
 sleep(1)
