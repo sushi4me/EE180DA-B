@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from collections	import deque
-#from Modules.Game	import Game
+from Modules.Game	import Game
 from Modules.Player	import Player
 from optparse		import OptionParser
 from random		import randint
@@ -35,10 +35,9 @@ NOTES:
 
 # FUNCTION
 class GameProtocol():
-	NUMBER_OF_PLAYERS = 0
-	MAX_PLAYERS = 1
-	PLAYERS = []
-	FULL_FLAG = False
+        def __init__(self):
+            maxPlayers = 4
+            self.game = Game(maxPlayers)
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
 	def processJSON(self, decoded):
@@ -65,23 +64,24 @@ class GameProtocol():
 		log.msg("Player disconnected.")
 
 	def handleNewPlayer(self, decoded):
-		if not self.FULL_FLAG:
-			self.NUMBER_OF_PLAYERS = self.NUMBER_OF_PLAYERS + 1
-			location = decoded["location"]
-			self.PLAYERS.append(Player(self.NUMBER_OF_PLAYERS, location))
-			log.msg("New player %d at %d" % (self.NUMBER_OF_PLAYERS, location))
-			writeToClient(self.NUMBER_OF_PLAYERS - 1, {"request": "NEWPLAYER", "player_num": self.NUMBER_OF_PLAYERS})
+                if self.game.numPlayers != self.MAX_PLAYERS:
+                    location = decoded["location"]
 
-		if self.NUMBER_OF_PLAYERS == self.MAX_PLAYERS:
-			FULL_FLAG = True
-			log.msg("Start game!")
-			writeToClient(0, {"request": "TURNSTART", "location": self.PLAYERS[0].m_location})
+                    self.game.addPlayer(location)
+                    
+                    log.msg("New player %d at %d" % (self.game.numPlayers, location))
+                    writeToClient(self.game.numPlayers - 1, {"request": "NEWPLAYER", "player_num": self.game.numPlayers})
+                else:
+		    log.msg("Start game!")
+	            writeToClient(0, {"request": "TURNSTART"})
 
 		return
 
 	def handleTurnEnd(self, decoded):
 		player_num = decoded["player_num"] + 1
-		writeToClient(player_num % MAX_PLAYERS, {"request": "TURNSTART", "location": self.PLAYERS[player_num % MAX_PLAYERS].m_location})
+		writeToClient(player_num % self.game.MAX_PLAYERS, {"request": "TURNSTART"})
+
+		return
 
 	def handleUpdate(self, decoded):
 		# TO DO
@@ -90,7 +90,7 @@ class GameProtocol():
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
         def __init__(self):
-        	self.gameObj = GameProtocol()
+        	self.gameprotocol = GameProtocol()
             	log.msg("ServerProtocol constructor called.")
 
 	def connectionMade(self):
@@ -103,7 +103,7 @@ class ServerProtocol(protocol.Protocol):
 		log.msg("You got data!")
 
 		decoded = json.loads(data)
-		detect_thread = Thread(target=self.gameObj.processJSON, 
+		detect_thread = Thread(target=self.gameprotocol.processJSON, 
 			args=(decoded, ))
 		detect_thread.start()
 
