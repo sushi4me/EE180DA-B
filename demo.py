@@ -13,7 +13,7 @@ def killProcess():
     p = subprocess.Popen(['ps'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
-        if 'demo.py' in line:
+        if 'main.py' in line:
             pid = int(line.split(None, 1)[0])
             print "killing process" + str(pid)
             os.kill(pid, signal.SIGKILL)
