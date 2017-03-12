@@ -36,7 +36,7 @@ NOTES:
 # FUNCTION
 class GameProtocol():
         def __init__(self):
-            maxPlayers = 4
+            maxPlayers = 1
             self.game = Game(maxPlayers)
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
@@ -64,16 +64,16 @@ class GameProtocol():
 		log.msg("Player disconnected.")
 
 	def handleNewPlayer(self, decoded):
-                if self.game.numPlayers != self.MAX_PLAYERS:
-                    location = decoded["location"]
+        	if self.game.numPlayers != self.game.MAX_PLAYERS:
+            		location = decoded["location"]
 
-                    self.game.addPlayer(location)
+            		self.game.addPlayer(location)
                     
-                    log.msg("New player %d at %d" % (self.game.numPlayers, location))
-                    writeToClient(self.game.numPlayers - 1, {"request": "NEWPLAYER", "player_num": self.game.numPlayers})
-                else:
-		    log.msg("Start game!")
-	            writeToClient(0, {"request": "TURNSTART"})
+            		log.msg("New player %d at %d" % (self.game.numPlayers, location))
+            		writeToClient(self.game.numPlayers - 1, {"request": "NEWPLAYER", "player_num": self.game.numPlayers})
+                	if self.game.numPlayers == self.game.MAX_PLAYERS:
+		    		log.msg("Start game!")
+	            		writeToClient(0, {"request": "TURNSTART"})
 
 		return
 
@@ -91,15 +91,13 @@ class GameProtocol():
 class ServerProtocol(protocol.Protocol):
         def __init__(self):
         	self.gameprotocol = GameProtocol()
-            	log.msg("ServerProtocol constructor called.")
+            	log.msg("Starting game.\n")
 
 	def connectionMade(self):
 	    	log.msg("Connection made.")
 	    	self.factory.clients.append(self)
 
 	def dataReceived(self, data):
-		global LOOPING
-
 		log.msg("You got data!")
 
 		decoded = json.loads(data)
@@ -122,7 +120,7 @@ def writeToClient(client, msg):
 
 # MAIN
 def main():
-	global LOOPING, m_factory
+	global m_factory
 
 	# Defaults
 	HOST = 'localhost'
@@ -143,6 +141,10 @@ def main():
 		dest="specific_host",
 		default=None,
 		help="Connect to a specific hostname other than localhost.")
+	parser.add_option("-p", "--players",
+		dest="players",
+		default=4,
+		help="Initialize with specific number of players(default=4).")
 
 	options, args = parser.parse_args(sys.argv[1:])
 
@@ -151,6 +153,9 @@ def main():
 
 	if options.specific_host is not None:
 		HOST = options.specific_host
+
+	if options.players is not None:
+		PLAYERS = options.players
 
 	# Logging
 	log.startLogging(sys.stdout)
