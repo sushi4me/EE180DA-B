@@ -41,9 +41,9 @@ class Game:
         # Number of possible player locations
         self.numLocations = 61
 
-    def addPlayer(self):
+    def addPlayer(self, playerLocation):
         playerID = self.numPlayers
-        self.players.append(Player(playerID))
+        self.players.append(Player(playerID, playerLocation))
 
         self.numPlayers += 1
 
