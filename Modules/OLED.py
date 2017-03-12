@@ -406,7 +406,6 @@ class OLED:
 		self.PLAYER_POS = position
 		x = self.POS[self.PLAYER_POS]['COL']
 		y = self.POS[self.PLAYER_POS]['ROW']
-		self.PIXEL_BUFFER[y][x] = "@"
 		self.oled.drawCircleFilled(x, y, 2, 1)
 
 		
@@ -468,7 +467,6 @@ class OLED:
 		if self.PLAYER_POS != -1:
 			x = self.POS[self.PLAYER_POS]['COL']
 			y = self.POS[self.PLAYER_POS]['ROW']
-			self.PIXEL_BUFFER[y][x] = " "
 			if self.ORIENTATION == orientation.NORTH:
 				self.oled.drawCircleFilled(x, y, 2, 0)
 		# Draw New Location
@@ -476,7 +474,6 @@ class OLED:
 		if self.PLAYER_POS != -1:
 			x = self.POS[self.PLAYER_POS]['COL']
 			y = self.POS[self.PLAYER_POS]['ROW']
-			self.PIXEL_BUFFER[y][x] = "@"
 			if self.ORIENTATION == orientation.NORTH:
 				self.oled.drawCircleFilled(x, y, 2, 1)
 		
