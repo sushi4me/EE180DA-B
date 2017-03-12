@@ -22,10 +22,15 @@ class Player:
         self.m_location - location
 
     def changeHP(self, amt):
-        self.m_hp += amt
+        newHP = self.m_hp += amt
+
+        # Make sure HP stays within bounds
+        if newHP > 0 and newHP < 100:
+            self.m_hp = newHP
 
     def setHP(self, amt):
-        self.m_hp = amt
+        if amt > 0 and amt < 100:
+            self.m_hp = amt
 
     def obtainItem(self, item):
         self.m_items.append(item)
