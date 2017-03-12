@@ -25,11 +25,11 @@ class Player:
         newHP = self.m_hp += amt
 
         # Make sure HP stays within bounds
-        if newHP > 0 and newHP < 100:
+        if newHP >= 0 and newHP <= 100:
             self.m_hp = newHP
 
     def setHP(self, amt):
-        if amt > 0 and amt < 100:
+        if amt >= 0 and amt <= 100:
             self.m_hp = amt
 
     def obtainItem(self, item):
