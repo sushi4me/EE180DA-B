@@ -58,9 +58,7 @@ class ClientProtocol(protocol.Protocol):
                 time.sleep(1)
 
 	def dataReceived(self, data):
-		decoded = json.loads(data)
-		log.msg("%s" % data)
-		
+		decoded = json.loads(data)		
 		processJSON(decoded)
 
 
