@@ -22,7 +22,7 @@ class Player:
         self.m_location - location
 
     def changeHP(self, amt):
-        newHP = self.m_hp += amt
+        newHP = self.m_hp + amt
 
         # Make sure HP stays within bounds
         if newHP >= 0 and newHP <= 100:
