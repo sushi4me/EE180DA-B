@@ -88,7 +88,7 @@ class GameProtocol():
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
         def __init__(self):
-        	self.gameObj = Game()
+        	self.gameprotocol = GameProtocol()
             	log.msg("ServerProtocol constructor called.")
 
 	def connectionMade(self):
@@ -101,7 +101,7 @@ class ServerProtocol(protocol.Protocol):
 		log.msg("You got data!")
 
 		decoded = json.loads(data)
-		detect_thread = Thread(target=self.gameObj.processJSON, 
+		detect_thread = Thread(target=self.gameprotocol.processJSON, 
 			args=(decoded, ))
 		detect_thread.start()
 
