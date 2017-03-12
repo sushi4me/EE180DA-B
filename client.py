@@ -109,11 +109,15 @@ def handleTurnStart(decoded):
 	# Wait for player to arrive at destination and press A
 	DISPLAY.clear()
 	DISPLAY.write("You rolled    a\n    " + str(roll) + "\nPress (A) to continue")
-	while button_select = DISPLAY.waitForUserInput():
+	while True:
+		button_select = DISPLAY.waitForUserInput()
 		if button_select != buttons.A:
 			continue
-		else
+		else:
+			DISPLAY.clear()
+			DISPLAY.write("Hello!")
 			newLocation = location()
+			DISPLAY.clear()
 			DISPLAY.write("You are now at %d" % newLocation)
 
 	DISPLAY.drawEIVMap(newLocation)
