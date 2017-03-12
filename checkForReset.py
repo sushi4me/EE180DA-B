@@ -1,8 +1,9 @@
 #!/usr/bin/python
+import time
+time.sleep(5)
 from multiprocessing import Process
 import subprocess, signal
 import mraa
-import time
 import os
 
 def runDemo():
@@ -35,6 +36,13 @@ def checkButtonHold():
             return True
     return False
 p = []
+print "Creating New demo.py Process"
+temp = Process(target=runDemo)
+print "starting new process"
+temp.start()
+print "continue checking for reset"
+p.append(temp)
+
 while True:
     waitForButtonPress()
     if checkButtonHold() == True:
