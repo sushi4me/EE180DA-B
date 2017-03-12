@@ -19,7 +19,7 @@ class Player:
 
     def __init__(self, player_id, location):
         self.m_id = player_id
-        self.m_location - location
+        self.m_location = location
 
     def changeHP(self, amt):
         newHP = self.m_hp + amt
