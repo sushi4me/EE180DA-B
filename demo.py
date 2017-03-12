@@ -7,7 +7,7 @@ import mraa
 import os
 
 def runDemo():
-    os.system("/home/root/EE180DA-B/demo.py")
+    os.system("/home/root/EE180DA-B/main.py")
 
 def killProcess():
     p = subprocess.Popen(['ps'], stdout=subprocess.PIPE)
