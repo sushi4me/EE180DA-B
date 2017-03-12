@@ -69,9 +69,9 @@ class Game:
         return random.choice([GameEvent.LOSEHEALTH, GameEvent.GAINHEALTH, GameEvent.MONSTRFGHT])
 
     def runTurn(self, playerID, numSpaces):
-        newLocation = move(playerID, numSpaces)
+        newLocation = self.move(playerID, numSpaces)
 
-        event = randomEvent()
+        event = self.randomEvent()
 
         if event == GameEvent.LOSEHEALTH:
             self.players[playerID].changeHP(-10)
@@ -82,7 +82,7 @@ class Game:
 
             playerMsg = "You gained 10 HP!"
         elif event == GameEvent.MONSTRFGHT:
-            battle(playerID)
+            self.battle(playerID)
 
             playerMsg = "You slayed! ;)"
         else:

@@ -51,6 +51,7 @@ class ClientProtocol(protocol.Protocol):
                 
                 log.msg("Determining start location...")
                 startLocation = location()
+                DISPLAY.drawEIVMap(startLocation)
                 log.msg("Done!")
 
                 self.transport.write(json.dumps({"request": "NEWPLAYER", "location": startLocation}))
@@ -68,7 +69,8 @@ class ClientFactory(protocol.ClientFactory):
 def writeToServer(msg):
 	global m_factory
 
-	m_factory.server.transport.write(json.dumps(msg))
+	m_factory.server.transport.getHandle().sendall(json.dumps(msg))
+	#m_factory.server.transport.write(json.dumps(msg))
 	log.msg("Wrote to server!")
 
 
@@ -78,11 +80,18 @@ def processJSON(decoded):
 
 	# Use the request field to execute corresponding function.
 	# If the player can perform a new action, add it here:
-	response = {	"NEWPLAYER": 	handleNewPlayer,
+	response = {	"DISPLAY":	handleDisplay,
+			"NEWPLAYER": 	handleNewPlayer,
 			"TURNSTART": 	handleTurnStart,
 		   }[request](decoded)
 
 	return
+
+def handleDisplay(decoded):
+	# Stuck here
+	DISPLAY.write(str(decoded["msg"]))
+	time.sleep(5)
+	DISPLAY.updateMap(decoded["location"])
 
 def handleNewPlayer(decoded):
 	global PLAYER_ID, DISPLAY
@@ -114,17 +123,21 @@ def handleTurnStart(decoded):
 		else:
 			DISPLAY.clear()
 			DISPLAY.write("Checking...")
-			newLocation = location()
+			#newLocation = location()
+			writeToServer({"request": "ROLL", "player_num": PLAYER_ID, "roll": roll})
+			time.sleep(1)
+			break
+			"""
 			if abs(newLocation - decoded["location"]) <= roll:
 				DISPLAY.clear()
 				DISPLAY.write("You are now at %d" % newLocation)
 				time.sleep(3)
-				DISPLAY.drawEIVMap(int(newLocation))
+				DISPLAY.drawEIVMap(newLocation)
 				break
 			else:
 				continue
-
-	writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
+			"""
+	#writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
 	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID})
 	return
 

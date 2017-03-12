@@ -51,6 +51,7 @@ class GameProtocol():
 		response = {	"ACTION":	self.handleAction,
 				"DISCONNECTED": self.handleDisconnect, # not used?
 				"NEWPLAYER": 	self.handleNewPlayer,
+				"ROLL":		self.handleRoll,
 				"TURNEND": 	self.handleTurnEnd,
 				"UPDATE":	self.handleUpdate
 			   }[request](decoded)
@@ -83,6 +84,12 @@ class GameProtocol():
 
 		return
 
+	def handleRoll(self, decoded):
+		player_num = decoded["player_num"]
+		roll = decoded["roll"]
+		(location, msg) = self.game.runTurn(player_num - 1, roll)
+		writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
+
 	def handleUpdate(self, decoded):
 		# TO DO
 		pass
@@ -98,9 +105,9 @@ class ServerProtocol(protocol.Protocol):
 	    	self.factory.clients.append(self)
 
 	def dataReceived(self, data):
-		log.msg("You got data!")
-
+		log.msg("%s\n", data)
 		decoded = json.loads(data)
+		log.msg("%s\n", decoded)
 		detect_thread = Thread(target=self.gameprotocol.processJSON, 
 			args=(decoded, ))
 		detect_thread.start()
