@@ -301,6 +301,8 @@ class OLED:
 	# 	Draws game initialization screen
 	#----------------------------------
 	def drawInitScreen(self):
+		self.drawBorder()
+		self.oled.refresh()
 		grid = [[" " for x in range(self.MAX_PIXELS_COL)] for y in range(self.MAX_PIXELS_ROW)]
 		grid[self.MAX_PIXELS_ROW//2 - 9] = "                    ****          ******                        "
 		grid[self.MAX_PIXELS_ROW//2 - 8] = "                    * * **      **      **                      "
@@ -322,7 +324,6 @@ class OLED:
 		grid[self.MAX_PIXELS_ROW//2 + 8] = "                    * *                                         "
 		grid[self.MAX_PIXELS_ROW//2 + 9] = "                    ***                                         "
 		self.drawScreen(grid, 1)
-		self.drawBorder()
 		self.oled.refresh()
 
 	#----------------------------------
