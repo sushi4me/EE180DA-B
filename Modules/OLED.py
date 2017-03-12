@@ -284,17 +284,12 @@ class OLED:
 			x = 0
 			# For each character in the string
 			for j in i:
-				# If it is '@' draw player
-				if j == '@':
-					self.oled.drawCircleFilled(x, y, 2, 1)
 				# Any character other than space 
 				# corresponds to a pixel drawn on the map
 				if j != " ":
 					self.oled.drawPixel(x, y, 1)
 					if delay == 1:
 						self.oled.refresh()
-				else:
-					self.oled.drawPixel(x, y, 0)
 				x += 1
 			y += 1
 		if delay == 1:
@@ -400,8 +395,6 @@ class OLED:
 		# Draw Map Reference Points
 		self.oled.setCursor(3,3)
 		self.oled.write("EIV")
-		self.oled.setCursor(39, 56)
-		self.oled.write("0")
 		# Determine Player Position
 		self.PLAYER_POS = position
 		x = self.POS[self.PLAYER_POS]['COL']
