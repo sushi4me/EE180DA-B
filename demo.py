@@ -1,156 +1,59 @@
 #!/usr/bin/python
-#------------------------------------------------
-# Module: Demo.py
-# Description:
-#	This program will be saved under /etc/init.d/ and configured to
-#	run on startup when the wearable device is turned on.  The player
-#	will then be taken to a Main Menu where prompted with the options
-#	to start the game or use development options (collect data/check IP)
-#
-#------------------------------------------------
-import location.location 
+import time
+time.sleep(5)
+from multiprocessing import Process
+import subprocess, signal
 import mraa
-from time		    import sleep
-from Modules.OLED	    import OLED
-from Modules.Globals	    import buttons
-from Modules.GetIP	    import getIP
-from Miscellaneous.detect   import sample_location_number
-#----------------------------
-# Initialization
-# Description:
-#	Initializes the OLED Block Display and displays 
-#	the initialization Screen. Waits 1 second for 
-#	smooth transition between screens
-#----------------------------
-oled = OLED()
-# PIN_20 used to bring button pins HIGH after release
-# when using OLED Block w/ GPIO Block
-PIN_20 = mraa.Gpio(20)
-PIN_20.dir(mraa.DIR_OUT)
-PIN_20.write(1)
-oled.clear()
-oled.drawInitScreen()
-sleep(1)
+import os
 
-#----------------------------
-# Function: runScan
-# Description:
-#	This is used when in developer mode.  Developer
-#	options allows for access point data collection.
-#	This function will save a file with the location
-#	data and additionally display the results on the
-#	OLED display.
-#----------------------------
-def runScan(position):
-	oled.clear()
-	oled.drawBorder()
-	oled.write("Position " + str(position))
-	oled.write(" SCANNING...")
-	locationdata = sample_location_number(position)
-	oled.clear()
-	oled.write(str(locationdata))
-	while True:
-		input = oled.waitForUserInput()
-		if input == buttons.U:
-			oled.scrollUp()
-		elif input == buttons.D:
-			oled.scrollDown()
-		else:
-			break;
+def runDemo():
+    os.system("/home/root/EE180DA-B/demo.py")
 
-#---------------------------
-# Function: runGame
-# Description:
-#	This function is run when the user is ready to 
-#	begin playing the game.  This function imports
-#	the client function and begins running the client
-#	code for the game.
-#----------------------------
-def runGame():
-	oled.clear()
-	oled.drawBorder()
-	oled.write("\n STARTING\n  GAME...")
-	import client
-	client.main()
-	
-#----------------------------
-# Function: runDeveloper
-# Description:
-#	This is the UI for collecting wireless access
-#	point data.  
-# 
-#----------------------------
-def runDeveloper(position):
-	oled.clear()
-	oled.drawBorder()
-	oled.write("POS:" + str(position))
-	oled.setTextCursor(1,0)
-	oled.oled.write("S: SCAN   A: NEXT   B: PREV   L: BACK")
-	oled.oled.refresh()
-	input = oled.waitForUserInput()
-	if input == buttons.S:
-		runScan(position)
-	elif input == buttons.A:
-		if position == 60:
-			position = 0
-		else:
-			position += 1
-	elif input == buttons.B:
-		if position == 0:
-			position = 60
-		else:
-			position -= 1
-	if input != buttons.L:
-		runDeveloper(position)
-		
+def killProcess():
+    p = subprocess.Popen(['ps'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    for line in out.splitlines():
+        if 'demo.py' in line:
+            pid = int(line.split(None, 1)[0])
+            print "killing process" + str(pid)
+            os.kill(pid, signal.SIGKILL)
 
-#----------------------------
-# Function: showIP()
-# Description:
-#	This a developer option to obtain IP for
-#	ssh access.
-#----------------------------
-def showIP():
-	oled.clear()
-	oled.drawBorder()
-	IP = getIP('wlan0')
-	oled.write("IP: " + IP)
-	oled.setTextCursor(4, 0)
-	oled.oled.write("B: BACK")
-	oled.oled.refresh()
-	while True:
-		input = oled.waitForUserInput()
-		if input == buttons.B:
-			break;
+BUTTON_A = mraa.Gpio(47)
+BUTTON_B = mraa.Gpio(32)
+BUTTON_A.dir(mraa.DIR_IN)
+BUTTON_B.dir(mraa.DIR_IN)
 
+def waitForButtonPress():
+    while(BUTTON_A.read() != 0 and BUTTON_B.read() != 0):
+        time.sleep(3)
 
-#----------------------------
-# Function: mainMenu
-# Description:
-#	Run at startup.  Presents the user with a 
-#	series of options including, START game,
-#	DEVELOP options, ShowIP, and EXIT
-#----------------------------
-def mainMenu():
-	optionsList = [" START", " DEVELOP", " ShowIP", " EXIT"]
-	buttonsList = ["A", "B", "S", "U"]
-	refreshScreen = True
-	while True:
-		if refreshScreen == True:
-			oled.drawMenu("Main Menu", buttonsList, optionsList)
-		input = oled.waitForUserInput()
-		if input == buttons.A:
-			runGame()
-		elif input == buttons.B:
-			runDeveloper(0)
-		elif input == buttons.S:
-			showIP()
-		elif input == buttons.U:
-			break;
-		else:
-			refreshScreen = False
+def checkButtonHold():
+    i = 0
+    while(BUTTON_A.read() == 0 and BUTTON_B.read() == 0):
+        time.sleep(1)
+        i += 1
+        if i > 3:
+            return True
+    return False
+p = []
+print "Creating New demo.py Process"
+temp = Process(target=runDemo)
+print "starting new process"
+temp.start()
+print "continue checking for reset"
+p.append(temp)
 
-#----------------------------
-# main
-#----------------------------
-mainMenu()
+while True:
+    waitForButtonPress()
+    if checkButtonHold() == True:
+        killProcess()
+        print "Creating New demo.py Process"
+        temp = Process(target=runDemo)
+        print "starting new process"
+        temp.start()
+        print "continue checking for reset"
+        p.append(temp)
+
+for i in p:
+    print "joined new process"
+    i.join()
