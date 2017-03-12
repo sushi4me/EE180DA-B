@@ -92,7 +92,7 @@ def handleNewPlayer(decoded):
 	PLAYER_ID = decoded["player_num"]
 	log.msg("My player ID is %d" % PLAYER_ID)
 	DISPLAY.drawWelcomeScreen(str(decoded["player_num"]))
-	AUDIO.connected()
+	#AUDIO.connected()
 	time.sleep(2)
 
 	return
@@ -115,14 +115,19 @@ def handleTurnStart(decoded):
 			continue
 		else:
 			DISPLAY.clear()
-			DISPLAY.write("Hello!")
+			DISPLAY.write("Checking...")
 			newLocation = location()
-			DISPLAY.clear()
-			DISPLAY.write("You are now at %d" % newLocation)
+			if abs(newLocation - decoded["location"]) <= roll:
+				DISPLAY.clear()
+				DISPLAY.write("You are now at %d" % newLocation)
+				time.sleep(3)
+				DISPLAY.drawEIVMap(int(newLocation))
+				break
+			else:
+				continue
 
-	DISPLAY.drawEIVMap(newLocation)
 	writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
-
+	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID})
 	return
 
 # HELPER FUNCTIONS

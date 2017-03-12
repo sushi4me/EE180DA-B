@@ -34,7 +34,7 @@ NOTES:
 # GLOBALS
 
 # FUNCTION
-class Game():
+class GameProtocol():
 	NUMBER_OF_PLAYERS = 0
 	MAX_PLAYERS = 1
 	PLAYERS = []
@@ -75,13 +75,13 @@ class Game():
 		if self.NUMBER_OF_PLAYERS == self.MAX_PLAYERS:
 			FULL_FLAG = True
 			log.msg("Start game!")
-			writeToClient(0, {"request": "TURNSTART"})
+			writeToClient(0, {"request": "TURNSTART", "location": self.PLAYERS[0].m_location})
 
 		return
 
 	def handleTurnEnd(self, decoded):
 		player_num = decoded["player_num"] + 1
-		writeToClient(player_num % MAX_PLAYERS, {"request": "TURNSTART"})
+		writeToClient(player_num % MAX_PLAYERS, {"request": "TURNSTART", "location": self.PLAYERS[player_num % MAX_PLAYERS].m_location})
 
 	def handleUpdate(self, decoded):
 		# TO DO
@@ -90,7 +90,7 @@ class Game():
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
         def __init__(self):
-        	self.gameObj = Game()
+        	self.gameObj = GameProtocol()
             	log.msg("ServerProtocol constructor called.")
 
 	def connectionMade(self):
