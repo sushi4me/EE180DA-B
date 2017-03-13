@@ -1,10 +1,15 @@
 # EE180D: Systems Design
 getFlag() Project
 
+Fall 2016 & Winter 2017
+
 ## Contributors
-Edison David Vallejo  \n
-Fernando Pacheco      \n
-Justine Figuerres     \n
+Edison David Vallejo
+
+Fernando Pacheco
+
+Justine Figuerres
+
 Nathan Kong
 
 ## March 8, 2017
