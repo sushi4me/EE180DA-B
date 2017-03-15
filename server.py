@@ -6,13 +6,13 @@ from Modules.Player	import Player
 from optparse		import OptionParser
 from random		import randint
 from threading		import Thread
+from time		import sleep
 from twisted.internet	import reactor, protocol, task
 from twisted.python	import log
 
 import json
 import os			
 import sys			
-import time
 
 """
 NOTES:
@@ -35,15 +35,15 @@ NOTES:
 
 # FUNCTION
 class GameProtocol():
-        def __init__(self):
-            maxPlayers = 1
-            self.game = Game(maxPlayers)
+	def __init__(self):
+		maxPlayers = 1
+		self.game = Game(maxPlayers)
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
 	def processJSON(self, decoded):
 		global m_factory
 
-		log.msg("%s" % decoded)
+		#log.msg("%s" % decoded)
 		request = decoded["request"]
 
 		# Use the request field to execute corresponding function.
@@ -51,6 +51,7 @@ class GameProtocol():
 		response = {	"ACTION":	self.handleAction,
 				"DISCONNECTED": self.handleDisconnect, # not used?
 				"NEWPLAYER": 	self.handleNewPlayer,
+				"ROLL":		self.handleRoll,
 				"TURNEND": 	self.handleTurnEnd,
 				"UPDATE":	self.handleUpdate
 			   }[request](decoded)
@@ -61,19 +62,23 @@ class GameProtocol():
 		pass
 
 	def handleDisconnect(self, decoded):
-		log.msg("Player disconnected.")
+		log.msg("PLAYER DISCONNECTED")
 
 	def handleNewPlayer(self, decoded):
-        	if self.game.numPlayers != self.game.MAX_PLAYERS:
-            		location = decoded["location"]
+		# Reject players when the server is full
+		if self.game.numPlayers != self.game.MAX_PLAYERS:
+			location = decoded["location"]
+			self.game.addPlayer(location)
 
-            		self.game.addPlayer(location)
-                    
-            		log.msg("New player %d at %d" % (self.game.numPlayers, location))
-            		writeToClient(self.game.numPlayers - 1, {"request": "NEWPLAYER", "player_num": self.game.numPlayers})
-                	if self.game.numPlayers == self.game.MAX_PLAYERS:
-		    		log.msg("Start game!")
-	            		writeToClient(0, {"request": "TURNSTART"})
+			# Return to the player a player_num for identification
+			log.msg("NEW PLAYER %d AT %d" % (self.game.numPlayers, location))
+			writeToClient(self.game.numPlayers - 1, 
+				{"request": "NEWPLAYER", "player_num": self.game.numPlayers})
+
+			# If we have enough players we can start the game!
+			if self.game.numPlayers == self.game.MAX_PLAYERS:
+				log.msg("STARTING GAME")
+				writeToClient(0, {"request": "TURNSTART"})
 
 		return
 
@@ -83,30 +88,36 @@ class GameProtocol():
 
 		return
 
+	def handleRoll(self, decoded):
+		player_num = decoded["player_num"]
+		roll = decoded["roll"]
+		(location, msg) = self.game.runTurn(player_num - 1, roll)
+		writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
+
 	def handleUpdate(self, decoded):
 		# TO DO
 		pass
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
-        def __init__(self):
-        	self.gameprotocol = GameProtocol()
-            	log.msg("Starting game.\n")
+	def __init__(self):
+		self.gameprotocol = GameProtocol()
 
 	def connectionMade(self):
-	    	log.msg("Connection made.")
-	    	self.factory.clients.append(self)
+		log.msg("CLIENT CONNECTED")
+		self.factory.clients.append(self)
 
 	def dataReceived(self, data):
-		log.msg("You got data!")
-
+		# Load JSON to decode
+		log.msg("%s", data)
 		decoded = json.loads(data)
+		# Create new thread to handle request
 		detect_thread = Thread(target=self.gameprotocol.processJSON, 
 			args=(decoded, ))
 		detect_thread.start()
 
 	def connectionLost(self, reason):
-		log.msg("Connection lost. Stopping game.")
+		log.msg("CLIENT LOST; STOPPING GAME")
 		reactor.stop()
 
 class ServerFactory(protocol.Factory):
@@ -116,7 +127,7 @@ def writeToClient(client, msg):
 	global m_factory
 
 	m_factory.clients[client].transport.write(json.dumps(msg))
-	log.msg("Wrote to a client.")
+	log.msg("WRITING TO CLIENT: %s" % msg)
 
 # MAIN
 def main():

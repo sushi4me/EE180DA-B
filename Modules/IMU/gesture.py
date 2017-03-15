@@ -51,7 +51,9 @@ def run():
 	
     # Gesture  Constants
     #--------------------
-    gesturedetected = 0  #1 = freeze; 2 = cloak; 3 = grenade
+    #1 = freeze; 2 = cloak; 3 = grenade; 4 = dice
+
+    gesturedetected = 0
     gestureoccured = 8
     
     downcount1 = 0
@@ -78,6 +80,17 @@ def run():
 
     threshold3_ax = -.6
     threshold3_az = -1.3
+
+    # Gesture 4 variables
+    previous = 1 # 1 --> positive
+    current = 0 # 0 --> negative
+    switchcount = 0
+    maxswitchcount = 11 # gesture detected
+    negcount = 0
+    poscount = 0
+    maxdircount = 4 # check if switching fast enough
+    downcount4 = 0
+
 
     # Loop and read accel, and gyro
     while(1):
@@ -173,8 +186,60 @@ def run():
         if downcount3z > 14:
             occurence3 = 0
             prereq3 = 0
+        
+        #Gesture 4 Detection
 
+        # stwitch from neg -> pos
+        if imu.ay < 0 and previous == 1:
+            switchcount += 1
+            current = 0
+            negcount += 1
+            poscount = 0 #reset poscount after switch
+            downcount = 0 #reset downcount after swtich
+
+            #print "switch from neg -> pos" 
+            #print switchcount
+
+        if imu.ay < 0 and previous == 0:
+            if negcount < maxdircount:
+                negcount += 1
+            else:
+                downcount4 += 1
+
+        # switch from pos -> neg
+        if imu.ay > 0 and previous == 0:
+            switchcount += 1
+            current = 1
+            poscount += 1
+            negcount = 0 #reset negcount after switch
+            downcount = 0 #reset downcount after switch
+
+            #print "switch from pos -> neg"
+            #print switchcount
+
+        if imu.ay > 0 and previous == 1:
+            if poscount < maxdircount:
+                poscount += 1
+            else:
+                downcount4 += 1
+
+        if switchcount >= maxswitchcount:
+            return 4
+            #print "GESTURE 4"
+            gesturedetected = 4
+            switchcount = 0
+            negcount = 0
+            poscount = 0
     	
+        if downcount4 >= 3:
+            downcount4 = 0
+            switchcount = 0
+            negcount = 0
+            poscount = 0
+            #print "Reset"
+
+        previous = current
+
         # Sleep for SLEEP_TIME seconds
     	time.sleep(SLEEP_TIME)
 

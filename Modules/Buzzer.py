@@ -51,14 +51,27 @@ class Buzzer:
     # Cloak
     #------------------------
     sound_cloak = [ 1, 1, 1, 4, 8 ] 
-    beat_cloak = [ 4, 4, 4, 32, 16 ] 
+    beat_cloak = [ 4, 4, 4, 32, 16 ]
+
+    #------------------------
+    # Star Wars
+    #------------------------
+    sound_starwars = [4, 4, 4, 7, 11, 10, 9, 8, 14, 11, 10, 9, 8, 14, 11, 10, 9, 10, 8]
+    beat_starwars = [5, 5, 5, 15, 15, 5, 5, 5, 15, 15, 5, 5, 5, 15, 15, 5, 5, 5, 15] 
 
     
     def __init__(self):
         self.buzzer = upmBuzzer.Buzzer(0)
         self.chords = [upmBuzzer.DO, upmBuzzer.RE, upmBuzzer.MI, upmBuzzer.FA,
-                        upmBuzzer.SOL, upmBuzzer.LA, upmBuzzer.SI, upmBuzzer.DO,
-                        upmBuzzer.SI, 4000, 6000];
+                        upmBuzzer.SOL, upmBuzzer.LA, upmBuzzer.SI, 1900, 1725,
+                        1533, 1361, 1283, 1140, 1011, 952, 845, 748, 663, 624,
+                        552, 488, 458, 405, 357, 314, 294, 258, 226];
+
+        self.chords2 = [upmBuzzer.DO, upmBuzzer.RE, upmBuzzer.MI, upmBuzzer.FA,
+                        upmBuzzer.SOL, upmBuzzer.LA, upmBuzzer.SI, 1900, 1725,
+                        1533, 1361, 1283, 1140, 1011, 952, 845, 748, 663, 624,
+                        552, 488, 458, 405, 357, 314, 294, 258, 226];
+
         self.buzzer.stopSound()
         self.buzzer.setVolume(0.01)
 
@@ -69,7 +82,7 @@ class Buzzer:
     # Play sound
     def play(self, sound, beat):
         for i in range (0, len(sound)):
-            self.buzzer.playSound(self.chords[sound[i]], 
+            self.buzzer.playSound(self.chords2[sound[i]], 
                     beat[i] * self.tick)
             time.sleep(self.sleeptime)
 
@@ -96,6 +109,10 @@ class Buzzer:
     # Play Power up
     def powerUp(self):
         self.play(self.sound_powerUp, self.beat_powerup)
+
+    # Play Star Wars Theme Song
+    def starWars(self):
+        self.play(self.sound_starwars, self.beat_starwars)
 
     def __del__(self):
         del self.buzzer

@@ -107,9 +107,9 @@ class Game:
     def runTurn(self, playerID, numSpaces):
         player = self.players[playerID]
 
-        newLocation = move(player, numSpaces)
-
-        event = randomEvent()
+        newLocation = self.move(player, numSpaces)
+        
+        event = self.randomEvent()
 
         hpAmt = 10 
 
@@ -122,7 +122,7 @@ class Game:
 
             playerMsg = "You gained {0} HP!".format(hpAmt)
         elif event == GameEvent.MONSTRFGHT:
-            playerMsg = monstrBattle(player)
+            playerMsg = self.monstrBattle(player)
         else:
             playerMsg = "Your turn was a little boring..."
 

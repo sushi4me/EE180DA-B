@@ -289,10 +289,14 @@ class OLED:
 				if j != " ":
 					self.oled.drawPixel(x, y, 1)
 					if delay == 1:
+						self.drawBorder()
 						self.oled.refresh()
+				else:
+					self.oled.drawPixel(x, y, 0)
 				x += 1
 			y += 1
 		if delay == 1:
+			self.drawBorder()
 			self.oled.refresh()
 
 	#----------------------------------
@@ -391,16 +395,6 @@ class OLED:
 		# Clear Screen
 		self.oled.clearScreenBuffer()
 		self.oled.clear()
-		# Draw outline
-		self.drawBorder()
-		# Draw Map Reference Points
-		self.oled.setCursor(3,3)
-		self.oled.write("EIV")
-		# Determine Player Position
-		self.PLAYER_POS = position
-		x = self.POS[self.PLAYER_POS]['COL']
-		y = self.POS[self.PLAYER_POS]['ROW']
-		self.oled.drawCircleFilled(x, y, 2, 1)
 
 		
 		# Initialize MAP array of strings
@@ -426,6 +420,16 @@ class OLED:
 
 		# Draw EIV Map
 		self.drawScreen(grid)
+		# Draw outline
+		self.drawBorder()
+		# Draw Map Reference Points
+		self.oled.setCursor(3,3)
+		self.oled.write("EIV")
+		# Determine Player Position
+		self.PLAYER_POS = position
+		x = self.POS[self.PLAYER_POS]['COL']
+		y = self.POS[self.PLAYER_POS]['ROW']
+		self.oled.drawCircleFilled(x, y, 2, 1)
 		self.oled.refresh()
 		
 
@@ -471,13 +475,14 @@ class OLED:
 			if self.ORIENTATION == orientation.NORTH:
 				self.oled.drawCircleFilled(x, y, 2, 1)
 		
+		# BELOW NOT YET IMPLEMENTED
 		# ReDraw Map Position References based on orientation of screen
 		#------------------------------
 		# IMU Facing NORTH
 		#------------------------------
 		if self.ORIENTATION == orientation.NORTH:
 			self.setTextCursor(0, 0)
-			self.oled.write("EIV")
+			#self.oled.write("EIV")
 			# self.oled.setCursor(39, 56)
 			# self.oled.write("S")
 			# self.oled.setCursor(39, 2)
@@ -656,49 +661,111 @@ class OLED:
 
 	def displayDiceRoll(self):
 		self.clear()
-		self.drawBorder()
 		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
 		MID_SCREEN = self.MAX_PIXELS_ROW//2
-		grid[MID_SCREEN - 14]= "                                *                               "
-		grid[MID_SCREEN - 13]= "                              * * *                             "
-		grid[MID_SCREEN - 12]= "                            *   *   *                           "
-		grid[MID_SCREEN - 11]= "                          *     *     *                         "
-		grid[MID_SCREEN - 10]= "                        *       *       *                       "
-		grid[MID_SCREEN - 9] = "                      *         *     *   *                     "
-		grid[MID_SCREEN - 8] = "                    *           *    ***    *                   "
-		grid[MID_SCREEN - 7] = "                  *           *   *   *       *                 "
-		grid[MID_SCREEN - 6] = "                *   *       *       *           *               "
-		grid[MID_SCREEN - 5] = "              *    ***    *           *        *  *             "
-		grid[MID_SCREEN - 4] = "            *       *   *               *     ***   *           "
-		grid[MID_SCREEN - 3] = "          *           *                   *    *      *         "
-		grid[MID_SCREEN - 2] = "          *         *         *             *         *         "
-		grid[MID_SCREEN - 1] = "          *       *          ***              *       *         "
-		grid[MID_SCREEN + 0] = "          *     *             *                 *     *         "
-		grid[MID_SCREEN + 1] = "          *   *                                   *   *         "
-		grid[MID_SCREEN + 2] = "          * *        *                  *           * *         "
-		grid[MID_SCREEN + 3] = "          *         ***                ***            *         "
-		grid[MID_SCREEN + 4] = "            *        *                  *           *           "
-		grid[MID_SCREEN + 5] = "              *                                   *             "
-		grid[MID_SCREEN + 6] = "                *                               *               "
-		grid[MID_SCREEN + 7] = "                  *            *              *                 "
-		grid[MID_SCREEN + 8] = "                    *         ***           *                   "
-		grid[MID_SCREEN + 9] = "                      *        *          *                     "
-		grid[MID_SCREEN + 10]= "                        *               *                       "
-		grid[MID_SCREEN + 11]= "                          *           *                         "
-		grid[MID_SCREEN + 12]= "                            *       *                           "
-		grid[MID_SCREEN + 13]= "                              *   *                             "
-		grid[MID_SCREEN + 14]= "                                *                               "
-		TOP_DICE = MID_SCREEN - 14
-		BOT_DICE = MID_SCREEN + 14
-		for i in range(20):
+		grid[MID_SCREEN - 19]= "                                *                               "
+		grid[MID_SCREEN - 18]= "                              * * *                             "
+		grid[MID_SCREEN - 17]= "                            *   *   *                           "
+		grid[MID_SCREEN - 16]= "                          *     *     *                         "
+		grid[MID_SCREEN - 15]= "                        *       *       *                       "
+		grid[MID_SCREEN - 14]= "                      *         *         *                     "
+		grid[MID_SCREEN - 13]= "                    *           *           *                   "
+		grid[MID_SCREEN - 12]= "                  *             *     *       *                 "
+		grid[MID_SCREEN - 11]= "                *               *    ***        *               "
+		grid[MID_SCREEN - 10]= "              *                 *     *           *             "
+		grid[MID_SCREEN - 9] = "            *                   *                   *           "
+		grid[MID_SCREEN - 8] = "          *   *                 *                 *   *         "
+		grid[MID_SCREEN - 7] = "          *  ***    *           *                ***  *         "
+		grid[MID_SCREEN - 6] = "          *   *    ***     *    *           *     *   *         "
+		grid[MID_SCREEN - 5] = "          *         *     ***   *          ***        *         "
+		grid[MID_SCREEN - 4] = "          *                *    *     *     *         *         "
+		grid[MID_SCREEN - 3] = "          *                     *    ***              *         "
+		grid[MID_SCREEN - 2] = "          *                   *   *   *               *         "
+		grid[MID_SCREEN - 1] = "          *                 *       *                 *         "
+		grid[MID_SCREEN - 0] = "          *               *           *               *         "
+		grid[MID_SCREEN + 1] = "          *             *               *        *    *         "
+		grid[MID_SCREEN + 2] = "          *           *         *         *     ***   *         "
+		grid[MID_SCREEN + 3] = "          *         *          ***          *    *    *         "
+		grid[MID_SCREEN + 4] = "          *       *             *             *       *         "
+		grid[MID_SCREEN + 5] = "          *     *                               *     *         "
+		grid[MID_SCREEN + 6] = "          *   *                                   *   *         "
+		grid[MID_SCREEN + 7] = "          * *        *                     *        * *         "
+		grid[MID_SCREEN + 8] = "          *         ***                   ***         *         "
+		grid[MID_SCREEN + 9] = "            *        *                     *        *           "
+		grid[MID_SCREEN + 10]= "              *                                   *             "
+		grid[MID_SCREEN + 11]= "                *                               *               "
+		grid[MID_SCREEN + 12]= "                  *             *             *                 "
+		grid[MID_SCREEN + 13]= "                    *          ***          *                   "
+		grid[MID_SCREEN + 14]= "                      *         *         *                     "
+		grid[MID_SCREEN + 15]= "                        *               *                       "
+		grid[MID_SCREEN + 16]= "                          *           *                         "
+		grid[MID_SCREEN + 17]= "                            *       *                           "
+		grid[MID_SCREEN + 18]= "                              *   *                             "
+		grid[MID_SCREEN + 19]= "                                *                               "
+		TOP_DICE = MID_SCREEN - 19
+		BOT_DICE = MID_SCREEN + 19
+		for i in range(15):
 			self.drawScreen(grid)
 			self.drawBorder()
 			self.oled.refresh()
-			for y in range(14):
+			for y in range(19):
 				temp = grid[TOP_DICE + y]
 				grid[TOP_DICE + y] = grid[BOT_DICE - y]
 				grid[BOT_DICE - y] = temp
-			time.sleep(0.1)
+			time.sleep(0.25)
+
+
+	def drawMonster(self):
+		self.clear()
+		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
+		MID_SCREEN = self.MAX_PIXELS_ROW//2
+		grid[MID_SCREEN - 19]= "                    _________________________                   "
+		grid[MID_SCREEN - 18]= "                ___|                        |___                "
+		grid[MID_SCREEN - 17]= "             ___|                              |___             "
+		grid[MID_SCREEN - 16]= "           __|                                    |___          "
+		grid[MID_SCREEN - 15]= "          |                                           |         "
+		grid[MID_SCREEN - 14]= "          |       ______                 _____        |         "
+		grid[MID_SCREEN - 13]= "          |             \               /             |         "
+		grid[MID_SCREEN - 12]= "          |              \             /              |         "
+		grid[MID_SCREEN - 11]= "          |               \           /               |         "
+		grid[MID_SCREEN - 10]= "          |                \         /                |         "
+		grid[MID_SCREEN - 9] = "          |_       *******  \       /  ******        _|         "
+		grid[MID_SCREEN - 8] = "           |_       *******           *******       _|          "
+		grid[MID_SCREEN - 7] = "            |       **    **         **    **       |           "
+		grid[MID_SCREEN - 6] = "            |      ***    **         **    ***      |           "
+		grid[MID_SCREEN - 5] = "            |      ***    ***        **    ***      |           "
+		grid[MID_SCREEN - 4] = "            |      *********         *********      |           "
+		grid[MID_SCREEN - 3] = "           _|                                       |_          "
+		grid[MID_SCREEN - 2] = "          |___                                      __|         "
+		grid[MID_SCREEN - 1] = "          |  |                  ***                 | |         "
+		grid[MID_SCREEN - 0] = "          |  \                 *****               /  |         "
+		grid[MID_SCREEN + 1] = "          |   \                *****              /   |         "
+		grid[MID_SCREEN + 2] = "          |_   \       \       *****     /       /   _|         "
+		grid[MID_SCREEN + 3] = "           |_   \       \               /       /   _|          "
+		grid[MID_SCREEN + 4] = "            |_   \       \_____________/       /   _|           "
+		grid[MID_SCREEN + 5] = "             |_   \         /\   /  \         /   _|            "
+		grid[MID_SCREEN + 6] = "              |    \       /  \ / \ /\       /    |             "
+		grid[MID_SCREEN + 7] = "             _|     \     /    \   \  \     /     |_            "
+		grid[MID_SCREEN + 8] = "           _|        \   /             \   /        |_          "
+		grid[MID_SCREEN + 9] = "                      \ /               \ /                     "
+		grid[MID_SCREEN + 10]= "                       \                 /                      "
+		grid[MID_SCREEN + 11]= "                                                                "
+		grid[MID_SCREEN + 12]= "                                                                "
+		grid[MID_SCREEN + 13]= "                                                                "
+		grid[MID_SCREEN + 14]= "                                                                "
+		grid[MID_SCREEN + 15]= "                                                                "
+		grid[MID_SCREEN + 16]= "                                                                "
+		grid[MID_SCREEN + 17]= "                                                                "
+		grid[MID_SCREEN + 18]= "                                                                "
+		grid[MID_SCREEN + 19]= "                                                                "
+		TOP_DICE = MID_SCREEN - 19
+		BOT_DICE = MID_SCREEN + 19
+		self.drawScreen(grid)
+		self.drawBorder()
+		self.setTextCursor(4, 1)
+		self.oled.write("GRRRRR!!!")
+		self.oled.refresh()
+
 
 	def connecting(self):
 		self.clear()
