@@ -32,7 +32,7 @@ class GameEvent(IntEnum):
 #----------------------------
 class Game:
     def __init__(self, maxPlayers):
-        # Players
+        # Players metadata
         self.players     = []
         self.numPlayers  = 0
 
@@ -40,6 +40,24 @@ class Game:
    
         # Number of possible player locations
         self.numLocations = 61
+
+        self.flagLocation = self.randomFlagLocation()
+
+    def randomFlagLocation(self):
+        while True:
+            count = 0 # count how many players are at flag location 
+
+            flagLocation = random.randint(0, self.numLocations-1)
+            
+            for player in self.players:
+                if player.m_location == flagLocation
+                    count += 1
+
+            # No players at flagLocation, ok to break
+            if count == 0:
+                break
+
+        return flagLocation
 
     def addPlayer(self, playerLocation):
         playerID = self.numPlayers
@@ -52,39 +70,59 @@ class Game:
 
         self.numPlayers -= 1
 
-    def move(self, playerID, numSpaces):
-        currentLocation = self.players[playerID].m_location
+    def move(self, player, numSpaces):
+        currentLocation = player.m_location
 
         newLocation = (currentLocation + numSpaces) % self.numLocations
-        self.players[playerID].setLocation(newLocation)
+        player.setLocation(newLocation)
 
         return newLocation
 
-    def battle(self, playerID):
-        playerDmg = random.randint(0, 1) * -5
+    def monstrBattle(self, player):
+        monsterHP = 25
 
-        self.players[playerID].changeHP(playerDmg)
+        hpAmt = 5
+
+        while player.isAlive() and monsterHp > 0:
+            playerDmg = random.randint(0, 1) * hpAmt
+            player.changeHP(playerDmg)
+
+            monsterHP -= randint(0, 1) * hpAmt
+
+        if player.isAlive():
+            return "You battled... and won!"
+        else:
+            return "You battled... and lost!"
             
     def randomEvent(self):
-        return random.choice([GameEvent.LOSEHEALTH, GameEvent.GAINHEALTH, GameEvent.MONSTRFGHT])
+        return random.choice([event for event in GameEvent])
+
+    def anyWinner(self):
+        for player in self.players:
+            if player.m_location == self.flagLocation:
+                return player.m_id
+
+        return None
 
     def runTurn(self, playerID, numSpaces):
-        newLocation = move(playerID, numSpaces)
+        player = self.players[playerID]
+
+        newLocation = move(player, numSpaces)
 
         event = randomEvent()
 
+        hpAmt = 10 
+
         if event == GameEvent.LOSEHEALTH:
-            self.players[playerID].changeHP(-10)
+            player.changeHP(-hpAmt)
 
-            playerMsg = "You lost 10 HP!"
+            playerMsg = "You lost {0} HP!".format(hpAmt)
         elif event == GameEvent.GAINHEALTH:
-            self.players[playerID].changeHP(10)
+            player.changeHP(hpAmt)
 
-            playerMsg = "You gained 10 HP!"
+            playerMsg = "You gained {0} HP!".format(hpAmt)
         elif event == GameEvent.MONSTRFGHT:
-            battle(playerID)
-
-            playerMsg = "You slayed! ;)"
+            playerMsg = monstrBattle(player)
         else:
             playerMsg = "Your turn was a little boring..."
 
