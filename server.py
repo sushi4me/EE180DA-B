@@ -3,6 +3,7 @@
 from collections	import deque
 from Modules.Game	import Game
 from Modules.Player	import Player
+from Modules.GetIP      import getIP
 from optparse		import OptionParser
 from random		import randint
 from threading		import Thread
@@ -38,6 +39,8 @@ class GameProtocol():
 	def __init__(self):
 		maxPlayers = 1
 		self.game = Game(maxPlayers)
+                self.ipaddress = getIP('wlan0')
+                
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
 	def processJSON(self, decoded):
