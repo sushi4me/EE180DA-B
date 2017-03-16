@@ -10,4 +10,4 @@
 
 FILE=ipaddress.txt
 FILEID=`gdrive list | grep $FILE | awk '{print $1}'`
-gdrive download $FILEID > /dev/null
+gdrive download $FILEID

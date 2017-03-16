@@ -168,8 +168,7 @@ def main():
 	exe = "/home/root/EE180DA-B/Modules/getServerIP.sh"
 	subprocess.call([exe])
 	fd = open('ipaddress.txt', 'r')
-	hostname = fd.readline()
-	print "Server's IP Address: %s\n" % hostname
+	hostname = fd.readline().strip("\n")
 	HOST = hostname
 
 	# Option parser
@@ -197,6 +196,8 @@ def main():
 		TESTING = options.testing
 
 	# Start
+	print "Server's IP Address: %s" % HOST
+	
 	log.startLogging(sys.stdout)
 
 	m_factory = ClientFactory()
