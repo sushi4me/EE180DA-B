@@ -165,7 +165,7 @@ def main():
 	PORT = 8080
 
 	# Default IP grab
-	exe = "/home/root/EE 180DA-B/Modules/getServerIP.sh"
+	exe = "/home/root/EE180DA-B/Modules/getServerIP.sh"
 	subprocess.call([exe])
 	fd = open('ipaddress.txt', 'r')
 	hostname = fd.readline()
