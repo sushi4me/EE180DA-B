@@ -163,6 +163,13 @@ def main():
 	HOST = 'localhost'
 	PORT = 8080
 
+	# Default IP grab
+	exe = "/home/root/EE 180DA-B/Modules/getServerIP.sh"
+	subprocess.call([exe, ip_address])
+	fd = open('ipaddress.txt', 'r')
+	ip_address = fd.readline()
+	print "Server's IP Address: %s\n" % ip_address
+
 	# Option parser
 	version_msg = "sclient.py--3.8.17"
 	usage_msg = """%prog [OPTIONS] ...

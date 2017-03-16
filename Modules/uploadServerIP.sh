@@ -10,5 +10,5 @@
 FILE=ipaddress.txt
 echo $1 > $FILE
 FILEID=`gdrive list | grep $FILE | awk '{print $1}'`
-gdrive delete $FILEID
-gdrive upload $FILE
+gdrive delete $FILEID > /dev/null
+gdrive upload --delete $FILE > /dev/null
