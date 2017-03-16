@@ -26,6 +26,7 @@ class GameEvent(IntEnum):
     LOSEHEALTH = 1
     GAINHEALTH = 2
     MONSTRFGHT = 3
+    ITEMPICKUP = 4
 
 #----------------------------
 # Game Class
@@ -117,12 +118,18 @@ class Game:
             player.changeHP(-hpAmt)
 
             playerMsg = "You lost {0} HP!".format(hpAmt)
+
         elif event == GameEvent.GAINHEALTH:
             player.changeHP(hpAmt)
 
             playerMsg = "You gained {0} HP!".format(hpAmt)
+
         elif event == GameEvent.MONSTRFGHT:
             playerMsg = self.monstrBattle(player)
+
+        elif event == GameEvent.ITEMPICKUP:
+            playerMsg = "Item acquired!"
+
         else:
             playerMsg = "Your turn was a little boring..."
 
