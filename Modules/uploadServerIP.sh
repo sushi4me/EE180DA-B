@@ -9,4 +9,6 @@
 
 FILE=ipaddress.txt
 echo $1 > $FILE
+FILEID=`gdrive list | grep $FILE | awk '{print $1}'`
+gdrive delete $FILEID
 gdrive upload $FILE
