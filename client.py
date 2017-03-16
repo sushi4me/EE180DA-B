@@ -165,10 +165,11 @@ def main():
 
 	# Default IP grab
 	exe = "/home/root/EE 180DA-B/Modules/getServerIP.sh"
-	subprocess.call([exe, ip_address])
+	subprocess.call([exe])
 	fd = open('ipaddress.txt', 'r')
-	ip_address = fd.readline()
-	print "Server's IP Address: %s\n" % ip_address
+	hostname = fd.readline()
+	print "Server's IP Address: %s\n" % hostname
+	HOST = hostname
 
 	# Option parser
 	version_msg = "sclient.py--3.8.17"
