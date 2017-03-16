@@ -160,7 +160,7 @@ def handleWinnder(decoded):
 	DISPLAY.clear()
 	if winner == PLAYER_ID:
 		DISPLAY.write("WINNER!")
-	else
+	else:
 		DISPLAY.write("LOSER!")
 
 # HELPER FUNCTIONS
