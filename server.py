@@ -154,9 +154,10 @@ def main():
 
 	# Default IP grab
 	ip_address = getIP('wlp4s0')
-	print "Server IP Address: %s\n" % ip_address
 	exe = "/home/nathan/Desktop/EE 180DA-B/Modules/uploadServerIP.sh"
 	subprocess.call([exe, ip_address])
+	with open('ipaddress.txt') as fd:
+		HOST = fd.readline().strip("\n")
 
 	# Option parser
 	version_msg = "server.py--3.8.17"
@@ -190,6 +191,7 @@ def main():
 		PLAYERS = options.players
 
 	# Logging
+	print "Server IP Address: %s\n" % HOST
 	log.startLogging(sys.stdout)
 
 	# Start
