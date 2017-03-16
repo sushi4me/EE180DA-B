@@ -50,7 +50,7 @@ class Game:
             flagLocation = random.randint(0, self.numLocations-1)
             
             for player in self.players:
-                if player.m_location == flagLocation
+                if player.m_location == flagLocation:
                     count += 1
 
             # No players at flagLocation, ok to break

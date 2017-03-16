@@ -3,17 +3,23 @@
 from collections	import deque
 from Modules.Game	import Game
 from Modules.Player	import Player
-from Modules.GetIP      import getIP
+#from Modules.GetIP      import getIP
 from optparse		import OptionParser
 from random		import randint
 from threading		import Thread
-from time		import sleep
+from time		import sleep, gmtime, strftime
 from twisted.internet	import reactor, protocol, task
 from twisted.python	import log
 
+import datetime
+import fcntl
 import json
-import os			
-import sys			
+import os
+import socket
+import struct
+import subprocess			
+import sys	
+import time		
 
 """
 NOTES:
@@ -39,7 +45,6 @@ class GameProtocol():
 	def __init__(self):
 		maxPlayers = 1
 		self.game = Game(maxPlayers)
-                self.ipaddress = getIP('wlan0')
                 
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
@@ -132,6 +137,13 @@ def writeToClient(client, msg):
 	m_factory.clients[client].transport.write(json.dumps(msg))
 	log.msg("WRITING TO CLIENT: %s" % msg)
 
+def getIP(ifname):
+	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	return socket.inet_ntoa(fcntl.ioctl(
+		s.fileno(),
+		0x8915,  # SIOCGIFADDR
+		struct.pack('256s', ifname[:15]))[20:24])
+
 # MAIN
 def main():
 	global m_factory
@@ -139,6 +151,12 @@ def main():
 	# Defaults
 	HOST = 'localhost'
 	PORT = 8080
+
+	# Default IP grab
+	ip_address = getIP('wlp4s0')
+	print "Server IP Address: %s\n" % ip_address
+	exe = "/home/nathan/Desktop/EE 180DA-B/Modules/uploadServerIP.sh"
+	subprocess.call([exe, ip_address])
 
 	# Option parser
 	version_msg = "server.py--3.8.17"
