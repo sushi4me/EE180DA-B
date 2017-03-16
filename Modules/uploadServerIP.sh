@@ -8,7 +8,7 @@
 #--------------------------------------
 
 FILE=ipaddress.txt
-echo $1 > $FILE
+host $1 | sed 's/.*\(wifi-\)/\1/; s/.$//g' > $FILE
 FILEID=`gdrive list | grep $FILE | awk '{print $1}'`
 gdrive delete $FILEID > /dev/null
 gdrive upload --delete $FILE > /dev/null
