@@ -89,6 +89,7 @@ def processJSON(decoded):
 	response = {	"DISPLAY":	handleDisplay,
 			"NEWPLAYER": 	handleNewPlayer,
 			"TURNSTART": 	handleTurnStart,
+			"WINNER":	handleWinner,
 		   }[request](decoded)
 
 	return
@@ -132,10 +133,10 @@ def handleTurnStart(decoded):
 			# after the button press.  Right now we simply send the roll back to
 			# the server and generate a random event.
 			DISPLAY.clear()
-			DISPLAY.write("")
+			#DISPLAY.write("")
 			#newLocation = location()
-			writeToServer({"request": "ROLL", "player_num": PLAYER_ID, "roll": roll})
-			sleep(1)
+			#writeToServer({"request": "ROLL", "player_num": PLAYER_ID, "roll": roll})
+			#sleep(1)
 			break
 			"""
 			if abs(newLocation - decoded["location"]) <= roll:
@@ -148,8 +149,19 @@ def handleTurnStart(decoded):
 				continue
 			"""
 	#writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
-	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID})
+	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID, "roll": roll})
 	return
+
+def handleWinnder(decoded):
+	global PLAYER_ID
+
+	winner = decoded["player_num"]
+
+	DISPLAY.clear()
+	if winner == PLAYER_ID:
+		DISPLAY.write("WINNER!")
+	else
+		DISPLAY.write("LOSER!")
 
 # HELPER FUNCTIONS
 def rollDice(max=6):

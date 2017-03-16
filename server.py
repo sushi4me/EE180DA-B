@@ -45,6 +45,8 @@ class GameProtocol():
 	def __init__(self):
 		maxPlayers = 1
 		self.game = Game(maxPlayers)
+		log.msg("FLAG LOCATION: %d" % self.game.flagLocation)
+		self.game.flagLocation = 6
                 
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
@@ -91,8 +93,16 @@ class GameProtocol():
 		return
 
 	def handleTurnEnd(self, decoded):
-		player_num = decoded["player_num"] + 1
-		writeToClient(player_num % self.game.MAX_PLAYERS, {"request": "TURNSTART"})
+		player_num = decoded["player_num"]
+		roll = decoded["roll"]
+		(location, msg) = self.game.runTurn(player_num - 1, roll)
+		if self.game.anyWinner() is not None:
+			for player in self.game.players:
+				writeToClient(player.m_id, {"request": "WINNER", "player_num": player_num})
+		else:
+			writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
+			next_player = decoded["player_num"] + 1
+			writeToClient(next_player % self.game.MAX_PLAYERS, {"request": "TURNSTART"})
 
 		return
 
@@ -100,7 +110,10 @@ class GameProtocol():
 		player_num = decoded["player_num"]
 		roll = decoded["roll"]
 		(location, msg) = self.game.runTurn(player_num - 1, roll)
-		writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
+		if self.game.anyWinner() is not None:
+			writeToClient()
+		else:
+			writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
 
 	def handleUpdate(self, decoded):
 		# TO DO
