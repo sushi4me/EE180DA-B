@@ -24,7 +24,7 @@ BUTTON_A.dir(mraa.DIR_IN)
 BUTTON_B.dir(mraa.DIR_IN)
 
 def waitForButtonPress():
-    while(BUTTON_A.read() != 0 and BUTTON_B.read() != 0):
+    while(BUTTON_A.read() != 0 or BUTTON_B.read() != 0):
         time.sleep(3)
 
 def checkButtonHold():
@@ -44,6 +44,7 @@ print "continue checking for reset"
 p.append(temp)
 
 while True:
+    print "waiting for button press"
     waitForButtonPress()
     if checkButtonHold() == True:
         killProcess()
