@@ -102,7 +102,7 @@ class GameProtocol():
 		else:
 			writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
 			sleep(1)
-			next_player = decoded["player_num"] + 1 % self.game.MAX_PLAYERS
+			next_player = player_num % self.game.MAX_PLAYERS
 			writeToClient(next_player, {"request": "TURNSTART"})
 
 		return
@@ -122,8 +122,9 @@ class GameProtocol():
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
-	def __init__(self):
-		self.gameprotocol = GameProtocol()
+	#def __init__(self):
+	#	log.msg("STARTING GAMEPROTOCOL")
+	gameprotocol = GameProtocol()
 
 	def connectionMade(self):
 		log.msg("CLIENT CONNECTED")
@@ -148,9 +149,9 @@ class ServerFactory(protocol.Factory):
 def writeToClient(client, msg):
 	global m_factory
 
+	log.msg("WRITING TO CLIENT {0}: {1}".format(client, msg))
 	m_factory.clients[client].transport.getHandle().sendall(json.dumps(msg))
 	#m_factory.clients[client].transport.write(json.dumps(msg))
-	log.msg("WRITING TO CLIENT: %s" % msg)
 
 def getIP(ifname):
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

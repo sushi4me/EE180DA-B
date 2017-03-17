@@ -166,7 +166,7 @@ def handleWinner(decoded):
 # HELPER FUNCTIONS
 def rollDice(max=6):
 	random.seed(time())
-	return random.randint(0, max)
+	return random.randint(1, max)
 
 # MAIN
 def main():
