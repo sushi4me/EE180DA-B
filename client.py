@@ -89,7 +89,7 @@ def processJSON(decoded):
 	response = {	"DISPLAY":	handleDisplay,
 			"NEWPLAYER": 	handleNewPlayer,
 			"TURNSTART": 	handleTurnStart,
-			"WINNER":	handleWinner,
+			"WINNER":	handleWinner
 		   }[request](decoded)
 
 	return
@@ -152,7 +152,7 @@ def handleTurnStart(decoded):
 	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID, "roll": roll})
 	return
 
-def handleWinnder(decoded):
+def handleWinner(decoded):
 	global PLAYER_ID
 
 	winner = decoded["player_num"]
