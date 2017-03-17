@@ -43,7 +43,7 @@ NOTES:
 # FUNCTION
 class GameProtocol():
 	def __init__(self):
-		maxPlayers = 1
+		maxPlayers = 2
 		self.game = Game(maxPlayers)
 		log.msg("FLAG LOCATION: %d" % self.game.flagLocation)
 		self.game.flagLocation = 6
