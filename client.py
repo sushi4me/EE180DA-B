@@ -96,9 +96,10 @@ def processJSON(decoded):
 
 def handleDisplay(decoded):
 	DISPLAY.write(str(decoded["msg"]))
-	sleep(5)
+	sleep(3)
 	DISPLAY.clear()
-	DISPLAY.updateMap(decoded["location"])
+	DISPLAY.write("Waiting for other player...")
+	#DISPLAY.updateMap(decoded["location"])
 
 
 def handleNewPlayer(decoded):
@@ -132,7 +133,7 @@ def handleTurnStart(decoded):
 			# Depending what you place in here you will have different game logic
 			# after the button press.  Right now we simply send the roll back to
 			# the server and generate a random event.
-			DISPLAY.clear()
+			#DISPLAY.clear()
 			#DISPLAY.write("")
 			#newLocation = location()
 			#writeToServer({"request": "ROLL", "player_num": PLAYER_ID, "roll": roll})
