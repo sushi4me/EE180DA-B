@@ -101,7 +101,7 @@ class GameProtocol():
 				writeToClient(player.m_id, {"request": "WINNER", "player_num": player_num})
 		else:
 			writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
-			next_player = decoded["player_num"] + 1
+			next_player = decoded["player_num"] + 1 % self.game.MAX_PLAYERS
 			writeToClient(next_player % self.game.MAX_PLAYERS, {"request": "TURNSTART"})
 
 		return
@@ -147,7 +147,8 @@ class ServerFactory(protocol.Factory):
 def writeToClient(client, msg):
 	global m_factory
 
-	m_factory.clients[client].transport.write(json.dumps(msg))
+	m_factory.clients[client].transport.getHandle().sendall(json.dumps(msg))
+	#m_factory.clients[client].transport.write(json.dumps(msg))
 	log.msg("WRITING TO CLIENT: %s" % msg)
 
 def getIP(ifname):

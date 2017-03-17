@@ -84,7 +84,7 @@ class Game:
 
         hpAmt = 5
 
-        while player.isAlive() and monsterHp > 0:
+        while player.isAlive() and monsterHP > 0:
             playerDmg = random.randint(0, 1) * hpAmt
             player.changeHP(playerDmg)
 
