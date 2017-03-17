@@ -88,7 +88,7 @@ class Game:
             playerDmg = random.randint(0, 1) * hpAmt
             player.changeHP(playerDmg)
 
-            monsterHP -= randint(0, 1) * hpAmt
+            monsterHP -= random.randint(0, 1) * hpAmt
 
         if player.isAlive():
             return "You battled... and won!"
