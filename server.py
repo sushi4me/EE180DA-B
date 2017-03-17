@@ -43,7 +43,7 @@ NOTES:
 # FUNCTION
 class GameProtocol():
 	def __init__(self):
-		maxPlayers = 1
+		maxPlayers = 2
 		self.game = Game(maxPlayers)
 		log.msg("FLAG LOCATION: %d" % self.game.flagLocation)
 		self.game.flagLocation = 6
@@ -101,8 +101,9 @@ class GameProtocol():
 				writeToClient(player.m_id, {"request": "WINNER", "player_num": player_num})
 		else:
 			writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
+			sleep(1)
 			next_player = decoded["player_num"] + 1 % self.game.MAX_PLAYERS
-			writeToClient(next_player % self.game.MAX_PLAYERS, {"request": "TURNSTART"})
+			writeToClient(next_player, {"request": "TURNSTART"})
 
 		return
 
