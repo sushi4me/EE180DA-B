@@ -737,6 +737,7 @@ class OLED:
 		        y = (j * im.size[1])//self.MAX_PIXELS_ROW
 		    # Scale image width to MAX_PIXELS_COL
 		    x = (i * im.size[0])//self.MAX_PIXELS_COL
+		self.drawBorder()
 		self.oled.refresh()
 
 	def drawMonster(self):
