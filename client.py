@@ -162,13 +162,6 @@ def main():
 	HOST = 'localhost'
 	PORT = 8080
 
-	# Default IP grab
-	exe = "/home/root/EE180DA-B/Modules/getServerIP.sh"
-	subprocess.call([exe])
-	fd = open('ipaddress.txt', 'r')
-	hostname = fd.readline().strip("\n")
-	HOST = hostname
-
 	# Option parser
 	version_msg = "sclient.py--3.8.17"
 	usage_msg = """%prog [OPTIONS] ...
@@ -176,8 +169,9 @@ def main():
 
 	parser = OptionParser(version=version_msg, usage=usage_msg)
 	parser.add_option("-s", "--specificHost",
+		action="store_true",
 		dest="specific_host",
-		default=None,
+		default=False,
 		help="Connect to a specific hostname other than localhost.")
 	parser.add_option("-t", "--testing",
 		action="store_true",
@@ -187,8 +181,12 @@ def main():
 
 	options, args = parser.parse_args(sys.argv[1:])
 
-	if options.specific_host is not None:
-		HOST = options.specific_host
+	if options.specific_host is True:
+		# Default IP grab
+		exe = "/home/root/EE180DA-B/Modules/getServerIP.sh"
+		subprocess.call([exe])
+		with open('ipaddress.txt', 'r') as fd:
+			HOST = fd.readline().strip("\n")
 
 	if options.testing is not None:
 		TESTING = options.testing

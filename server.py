@@ -39,15 +39,17 @@ NOTES:
 """
 
 # GLOBALS
+PLAYERS = 4
 
 # FUNCTION
 class GameProtocol():
 	def __init__(self):
+		global PLAYERS
 		maxPlayers = 2
 		self.game = Game(maxPlayers)
 		# Hard-coded flag
 		self.game.flagLocation = 6
-		log.msg("FLAG LOCATION: %d" % self.game.flagLocation)
+		log.msg("PLAYERS: %d" % self.game.MAX_PLAYERS)
                 
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
@@ -125,9 +127,9 @@ class GameProtocol():
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
-	#def __init__(self):
+	def __init__(self):
 	#	log.msg("STARTING GAMEPROTOCOL")
-	gameprotocol = GameProtocol()
+		self.gameprotocol = GameProtocol()
 
 	def connectionMade(self):
 		log.msg("CLIENT CONNECTED")
@@ -135,7 +137,7 @@ class ServerProtocol(protocol.Protocol):
 
 	def dataReceived(self, data):
 		# Load JSON to decode
-		log.msg("%s", data)
+		log.msg(data)
 		decoded = json.loads(data)
 		# Create new thread to handle request
 		detect_thread = Thread(target=self.gameprotocol.processJSON, 
@@ -147,7 +149,8 @@ class ServerProtocol(protocol.Protocol):
 		reactor.stop()
 
 class ServerFactory(protocol.Factory):
-	protocol = ServerProtocol
+	def __init__(self):
+		self.protocol = ServerProtocol
 
 def writeToClient(client, msg):
 	global m_factory
@@ -165,18 +168,11 @@ def getIP(ifname):
 
 # MAIN
 def main():
-	global m_factory
+	global PLAYERS, m_factory
 
 	# Defaults
 	HOST = 'localhost'
 	PORT = 8080
-
-	# Default IP grab
-	ip_address = getIP('wlp4s0')
-	exe = "/home/nathan/Desktop/EE 180DA-B/Modules/uploadServerIP.sh"
-	subprocess.call([exe, ip_address])
-	with open('ipaddress.txt') as fd:
-		HOST = fd.readline().strip("\n")
 
 	# Option parser
 	version_msg = "server.py--3.8.17"
@@ -189,10 +185,10 @@ def main():
 		dest="looping", 
 		default=False, 
 		help="Uses LoopingCall.")
-	parser.add_option("-s", "--specificHost",
-		dest="specific_host",
+	parser.add_option("-i", "--iphost",
+		dest="ip_host",
 		default=None,
-		help="Connect to a specific hostname other than localhost.")
+		help="Automatically use current hostname as server.")
 	parser.add_option("-p", "--players",
 		dest="players",
 		default=4,
@@ -203,8 +199,13 @@ def main():
 	if options.looping is not None:
 		LOOPING = options.looping
 
-	if options.specific_host is not None:
-		HOST = options.specific_host
+	if options.ip_host is not None:
+		# Default IP grab
+		ip_address = getIP('wlp4s0')
+		exe = "/home/nathan/Desktop/EE 180DA-B/Modules/uploadServerIP.sh"
+		subprocess.call([exe, ip_address])
+		with open('ipaddress.txt', 'w') as fd:
+			HOST = fd.readline().strip("\n")
 
 	if options.players is not None:
 		PLAYERS = options.players
