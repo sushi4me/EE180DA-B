@@ -53,12 +53,13 @@ class ClientProtocol(protocol.Protocol):
 			startLocation = location()
 		else:
 			startLocation = 1
-		DISPLAY.drawEIVMap(startLocation)
 
 		# Request for player_num identification
 		self.transport.write(json.dumps({"request": "NEWPLAYER", "location": startLocation}))
 		DISPLAY.connected()
 		sleep(1)
+		DISPLAY.drawEIVMap(startLocation)
+		sleep(3)
 
 	def dataReceived(self, data):
 		log.msg("%s" % data)
@@ -123,7 +124,7 @@ def handleTurnStart(decoded):
 	DISPLAY.promptDiceRoll()
 	gesture = detectGesture()
 	roll = rollDice()
-	DISPLAY.displayDiceRoll()
+	DISPLAY.drawDiceRoll()
 
 	# Wait for player to arrive at destination and press A
 	DISPLAY.clear()
@@ -136,6 +137,23 @@ def handleTurnStart(decoded):
 			# TO DO: Pass control to player, unless no event
 			break
 
+	DISPLAY.clear()
+	DISPLAY.write(" Monster\nApproaching...")
+	sleep(2)
+	DISPLAY.clear()
+	DISPLAY.write("GET READY TO TAKE \nDOWN SOME\nMONSTERS!")
+	sleep(2)
+	DISPLAY.drawMonster1()
+	while DISPLAY.waitForUserInput != 1:
+		pass
+	DISPLAY.clear()
+	DISPLAY.write("Monster\n  Dead!")
+	sleep(3)
+	DISPLAY.clear()
+	DISPLAY.write("Nice Job!")
+	sleep(3)
+	DISPLAY.clear()
+	DISPLAY.write("Waiting for other players")
 	#writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
 	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID, "roll": roll})
 	return
@@ -149,9 +167,13 @@ def handleWinner(decoded):
 	if winner == PLAYER_ID:
 		# TO DO: Winner display
 		DISPLAY.write("WINNER!")
+		sleep(3)
 	else:
 		# TO DO: Loser display
 		DISPLAY.write("LOSER!")
+		sleep(3)
+		DISPLAY.drawDead()
+		sleep(3)
 
 # HELPER FUNCTIONS
 def rollDice(max=6):
