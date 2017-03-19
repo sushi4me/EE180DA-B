@@ -743,14 +743,23 @@ class OLED:
 		self.drawBorder()
 		self.oled.refresh()
 
-	def drawMonster(self):
-		self.drawImage("monster.png")
+	def drawMonster1(self):
+		self.drawImage("Images/monster1.jpg")
+
+	def drawMonster2(self):
+		self.drawImage("Images/monster2.jpg")
+
+	def drawMonster3(self):
+		self.drawImage("Images/monster3.jpg")
 
 	def drawDiceRoll(self):
 		for i in range(1, 10):
-			self.drawImage("diceImages/dice0" + str(i) + ".PNG", 0, 140)
+			self.drawImage("Images/diceImages/dice0" + str(i) + ".PNG", 0, 140)
 			time.sleep(0.2)
-		self.drawImage("diceImages/dice10.PNG", 0, 140)
+		self.drawImage("Images/diceImages/dice10.PNG", 0, 140)
+
+	def drawDead(self):
+		self.drawImage("Images/dead.png")
 
 	def connecting(self):
 		self.clear()
