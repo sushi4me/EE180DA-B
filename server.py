@@ -39,16 +39,14 @@ NOTES:
 """
 
 # GLOBALS
-PLAYERS = 4
 
 # FUNCTION
 class GameProtocol():
 	def __init__(self):
-		global PLAYERS
-		maxPlayers = 2
+		maxPlayers = 1
 		self.game = Game(maxPlayers)
 		# Hard-coded flag
-		self.game.flagLocation = 6
+		self.game.flagLocation = 30
 		log.msg("PLAYERS: %d" % self.game.MAX_PLAYERS)
                 
 
@@ -127,9 +125,8 @@ class GameProtocol():
 
 # TWISTED NETWORKING
 class ServerProtocol(protocol.Protocol):
-	def __init__(self):
-	#	log.msg("STARTING GAMEPROTOCOL")
-		self.gameprotocol = GameProtocol()
+	#def __init__(self):
+	gameprotocol = GameProtocol()
 
 	def connectionMade(self):
 		log.msg("CLIENT CONNECTED")
@@ -149,8 +146,7 @@ class ServerProtocol(protocol.Protocol):
 		reactor.stop()
 
 class ServerFactory(protocol.Factory):
-	def __init__(self):
-		self.protocol = ServerProtocol
+	protocol = ServerProtocol
 
 def writeToClient(client, msg):
 	global m_factory
@@ -168,7 +164,7 @@ def getIP(ifname):
 
 # MAIN
 def main():
-	global PLAYERS, m_factory
+	global m_factory
 
 	# Defaults
 	HOST = 'localhost'
@@ -180,11 +176,6 @@ def main():
 	Hosts server on HOST & waits for clients to connect."""
 
 	parser = OptionParser(version=version_msg, usage=usage_msg)
-	parser.add_option("-l", "--looping", 
-		action="store_true",
-		dest="looping", 
-		default=False, 
-		help="Uses LoopingCall.")
 	parser.add_option("-i", "--iphost",
 		dest="ip_host",
 		default=None,
@@ -196,9 +187,6 @@ def main():
 
 	options, args = parser.parse_args(sys.argv[1:])
 
-	if options.looping is not None:
-		LOOPING = options.looping
-
 	if options.ip_host is not None:
 		# Default IP grab
 		ip_address = getIP('wlp4s0')
@@ -207,21 +195,17 @@ def main():
 		with open('ipaddress.txt', 'w') as fd:
 			HOST = fd.readline().strip("\n")
 
+	# Not in use
 	if options.players is not None:
 		PLAYERS = options.players
 
 	# Logging
-	print "Server IP Address: %s\n" % HOST
+	print "SERVER HOSTNAME: %s\n" % HOST
 	log.startLogging(sys.stdout)
 
 	# Start
 	m_factory = ServerFactory()
 	m_factory.clients = []
-
-	# LoopingCall version
-	if LOOPING:
-		check = task.LoopingCall(gameObj.detect)
-		check.start(0)
 
 	reactor.listenTCP(PORT, m_factory, interface=HOST)
 	reactor.run()
