@@ -8,6 +8,7 @@ import mraa
 import pyupm_i2clcd as oledObj
 from Globals import buttons
 from Globals import orientation
+from PIL import Image
 
 #--------------------------------------
 # OLED Class (Sparkfun OLED Block)
@@ -714,58 +715,33 @@ class OLED:
 				grid[BOT_DICE - y] = temp
 			time.sleep(0.25)
 
-
-	def drawMonster(self):
+	def drawImage(self, pathToImage):
 		self.clear()
-		grid = [" " for y in range(self.MAX_PIXELS_ROW)]
-		MID_SCREEN = self.MAX_PIXELS_ROW//2
-		grid[MID_SCREEN - 19]= "                    _________________________                   "
-		grid[MID_SCREEN - 18]= "                ___|                        |___                "
-		grid[MID_SCREEN - 17]= "             ___|                              |___             "
-		grid[MID_SCREEN - 16]= "           __|                                    |___          "
-		grid[MID_SCREEN - 15]= "          |                                           |         "
-		grid[MID_SCREEN - 14]= "          |       ______                 _____        |         "
-		grid[MID_SCREEN - 13]= "          |             \               /             |         "
-		grid[MID_SCREEN - 12]= "          |              \             /              |         "
-		grid[MID_SCREEN - 11]= "          |               \           /               |         "
-		grid[MID_SCREEN - 10]= "          |                \         /                |         "
-		grid[MID_SCREEN - 9] = "          |_       *******  \       /  ******        _|         "
-		grid[MID_SCREEN - 8] = "           |_       *******           *******       _|          "
-		grid[MID_SCREEN - 7] = "            |       **    **         **    **       |           "
-		grid[MID_SCREEN - 6] = "            |      ***    **         **    ***      |           "
-		grid[MID_SCREEN - 5] = "            |      ***    ***        **    ***      |           "
-		grid[MID_SCREEN - 4] = "            |      *********         *********      |           "
-		grid[MID_SCREEN - 3] = "           _|                                       |_          "
-		grid[MID_SCREEN - 2] = "          |___                                      __|         "
-		grid[MID_SCREEN - 1] = "          |  |                  ***                 | |         "
-		grid[MID_SCREEN - 0] = "          |  \                 *****               /  |         "
-		grid[MID_SCREEN + 1] = "          |   \                *****              /   |         "
-		grid[MID_SCREEN + 2] = "          |_   \       \       *****     /       /   _|         "
-		grid[MID_SCREEN + 3] = "           |_   \       \               /       /   _|          "
-		grid[MID_SCREEN + 4] = "            |_   \       \_____________/       /   _|           "
-		grid[MID_SCREEN + 5] = "             |_   \         /\   /  \         /   _|            "
-		grid[MID_SCREEN + 6] = "              |    \       /  \ / \ /\       /    |             "
-		grid[MID_SCREEN + 7] = "             _|     \     /    \   \  \     /     |_            "
-		grid[MID_SCREEN + 8] = "           _|        \   /             \   /        |_          "
-		grid[MID_SCREEN + 9] = "                      \ /               \ /                     "
-		grid[MID_SCREEN + 10]= "                       \                 /                      "
-		grid[MID_SCREEN + 11]= "                                                                "
-		grid[MID_SCREEN + 12]= "                                                                "
-		grid[MID_SCREEN + 13]= "                                                                "
-		grid[MID_SCREEN + 14]= "                                                                "
-		grid[MID_SCREEN + 15]= "                                                                "
-		grid[MID_SCREEN + 16]= "                                                                "
-		grid[MID_SCREEN + 17]= "                                                                "
-		grid[MID_SCREEN + 18]= "                                                                "
-		grid[MID_SCREEN + 19]= "                                                                "
-		TOP_DICE = MID_SCREEN - 19
-		BOT_DICE = MID_SCREEN + 19
-		self.drawScreen(grid)
+		# Open the desired image
+		im = Image.open(pathToImage)
+		# Obtain the pixel values (tuple or int)
+		pix = im.load()
+		# column index
+		x = 0
+		for i in range(self.MAX_PIXELS_COL):
+		    # row index
+		    y = 0
+		    for j in range(self.MAX_PIXELS_ROW):
+		    	# check pix is tuple
+		        if type(pix[x,y]) == tuple and pix[x,y][0] < 240:
+		            self.oled.drawPixel(i, j, 1)
+		        # check if pix is int
+		        elif type(pix[x,y]) == int and pix[x,y] > 0:
+		        	self.oled.drawPixel(i, j, 1)
+		        # Scale image height to MAX_PIXELS_ROW
+		        y = (j * im.size[1])//self.MAX_PIXELS_ROW
+		    # Scale image width to MAX_PIXELS_COL
+		    x = (i * im.size[0])//self.MAX_PIXELS_COL
 		self.drawBorder()
-		self.setTextCursor(4, 1)
-		self.oled.write("GRRRRR!!!")
 		self.oled.refresh()
 
+	def drawMonster(self):
+		self.drawImage("monster.png")
 
 	def connecting(self):
 		self.clear()
@@ -781,4 +757,3 @@ class OLED:
 		self.clear()
 		self.drawBorder()
 		self.write("\n   Roll\n   Dice!")
-
