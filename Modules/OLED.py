@@ -715,8 +715,10 @@ class OLED:
 				grid[BOT_DICE - y] = temp
 			time.sleep(0.25)
 
-	def drawImage(self, pathToImage):
+	def drawImage(self, pathToImage, invert=1):
 		self.clear()
+		if invert == 0:
+			self.oled.fillScreen(1)
 		# Open the desired image
 		im = Image.open(pathToImage)
 		# Obtain the pixel values (tuple or int)
@@ -728,11 +730,11 @@ class OLED:
 		    y = 0
 		    for j in range(self.MAX_PIXELS_ROW):
 		    	# check pix is tuple
-		        if type(pix[x,y]) == tuple and pix[x,y][0] < 240:
-		            self.oled.drawPixel(i, j, 1)
+		        if type(pix[x,y]) == tuple and pix[x,y][0] < 100:
+		            self.oled.drawPixel(i, j, invert)
 		        # check if pix is int
 		        elif type(pix[x,y]) == int and pix[x,y] > 0:
-		        	self.oled.drawPixel(i, j, 1)
+		        	self.oled.drawPixel(i, j, invert)
 		        # Scale image height to MAX_PIXELS_ROW
 		        y = (j * im.size[1])//self.MAX_PIXELS_ROW
 		    # Scale image width to MAX_PIXELS_COL
