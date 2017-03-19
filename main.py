@@ -10,11 +10,12 @@
 #------------------------------------------------
 import location.location 
 import mraa
-from time		    import sleep
-from Modules.OLED	    import OLED
-from Modules.Globals	    import buttons
-from Modules.GetIP	    import getIP
-from Miscellaneous.detect   import sample_location_number
+from time		    	import sleep
+from Modules.OLED	    	import OLED
+from Modules.Globals	    	import buttons
+from Modules.GetIP	    	import getIP
+from Miscellaneous.detect   	import sample_location_number
+from multiprocessing 		import Process
 #----------------------------
 # Initialization
 # Description:
@@ -57,6 +58,17 @@ def runScan(position):
 			oled.scrollDown()
 		else:
 			break;
+
+#---------------------------
+# Function: runServer
+# Description:
+#	This function is run when the user is ready to 
+#	begin playing the game.  This function imports
+#	should be run in a new process
+#----------------------------
+def runServer():
+	import server
+	server.main()
 
 #---------------------------
 # Function: runGame
@@ -135,11 +147,18 @@ def mainMenu():
 	optionsList = [" START", " DEVELOP", " ShowIP", " EXIT"]
 	buttonsList = ["A", "B", "S", "U"]
 	refreshScreen = True
+	p = []
 	while True:
 		if refreshScreen == True:
 			oled.drawMenu("Main Menu", buttonsList, optionsList)
 		input = oled.waitForUserInput()
 		if input == buttons.A:
+			print "Creating New Server Process"
+    			temp = Process(target=runServer)
+    			print "starting server"
+    			temp.start()
+    			p.append(temp)
+    			sleep(2)
 			runGame()
 		elif input == buttons.B:
 			runDeveloper(0)
@@ -149,6 +168,9 @@ def mainMenu():
 			break;
 		else:
 			refreshScreen = False
+	print "joined process"
+    	for i in p:
+    		i.join()
 
 #----------------------------
 # main
