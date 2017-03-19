@@ -177,7 +177,7 @@ def main():
 
 	parser = OptionParser(version=version_msg, usage=usage_msg)
 	parser.add_option("-i", "--iphost",
-		action=store_true,
+		action="store_true",
 		dest="ip_host",
 		default=None,
 		help="Automatically use current hostname as server.")
