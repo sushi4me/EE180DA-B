@@ -194,9 +194,9 @@ def main():
 	getFlag?!"""
 
 	parser = OptionParser(version=version_msg, usage=usage_msg)
-	parser.add_option("-s", "--specificHost",
+	parser.add_option("-i", "--ipHost",
 		action="store_true",
-		dest="specific_host",
+		dest="ip_host",
 		default=False,
 		help="Connect to a specific hostname other than localhost.")
 	parser.add_option("-t", "--testing",
@@ -207,7 +207,7 @@ def main():
 
 	options, args = parser.parse_args(sys.argv[1:])
 
-	if options.specific_host is True:
+	if options.ip_host is True:
 		# Default IP grab
 		exe = "/home/root/EE180DA-B/Modules/getServerIP.sh"
 		subprocess.call([exe])
