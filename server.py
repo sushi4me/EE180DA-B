@@ -45,8 +45,9 @@ class GameProtocol():
 	def __init__(self):
 		maxPlayers = 2
 		self.game = Game(maxPlayers)
-		log.msg("FLAG LOCATION: %d" % self.game.flagLocation)
+		# Hard-coded flag
 		self.game.flagLocation = 6
+		log.msg("FLAG LOCATION: %d" % self.game.flagLocation)
                 
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
@@ -68,7 +69,7 @@ class GameProtocol():
 
 	# HANDLER FUNCTIONS
 	def handleAction(self, decoded):
-		# TO DO
+		# TO DO: Handle player commands during a turn.
 		pass
 
 	def handleDisconnect(self, decoded):
@@ -116,8 +117,10 @@ class GameProtocol():
 		else:
 			writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
 
+		return
+
 	def handleUpdate(self, decoded):
-		# TO DO
+		# TO DO: Not yet in use.
 		pass
 
 # TWISTED NETWORKING

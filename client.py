@@ -3,11 +3,10 @@
 """
 NOTES:
 	SEND:
-	{"request": "ACTION", "player_num": player_num, "powerup": powerup}
+	{"request": "ACTION", "player_num": player_num, "action": action}
 	{"request": "DISCONNECTED", "player_num": player_num}
 	("request": "NEWPLAYER")
 	{"request": "TURNEND", "player_num:" player_num}
-	{"request": "UPDATE", "player_num": player_num, "location": location}
 
 	RECEIVE:
 	{"request": "NEWPLAYER", "player_num": player_num}
@@ -37,9 +36,9 @@ import sys
 
 # GLOBALS
 global DISPLAY
-DISPLAY = OLED()
 global PLAYER_ID
 global Buzzer
+DISPLAY = OLED()
 AUDIO = Buzzer()
 
 # TWISTED NETWORKING
@@ -47,10 +46,9 @@ class ClientProtocol(protocol.Protocol):
 	def connectionMade(self):
 		global DISPLAY, TESTING
 		DISPLAY.connecting()
-		log.msg("CONNECTED")
+		log.msg("CONNECTED TO SERVER")
 		self.factory.server = self
 
-		log.msg("LOCATING START LOCATION")
 		if not TESTING:
 			startLocation = location()
 		else:
@@ -79,7 +77,6 @@ def writeToServer(msg):
 	#m_factory.server.transport.write(json.dumps(msg))
 	log.msg("WRITING TO SERVER: %s" % msg)
 
-
 def processJSON(decoded):
 	#log.msg("%s" % decoded)
 	request = decoded["request"]
@@ -97,10 +94,12 @@ def processJSON(decoded):
 def handleDisplay(decoded):
 	DISPLAY.write(str(decoded["msg"]))
 	sleep(3)
+	# TO DO: Battle, event, nothing?
+
 	DISPLAY.clear()
+	# TO DO: Waiting display
 	DISPLAY.write("Waiting for other player...")
 	#DISPLAY.updateMap(decoded["location"])
-
 
 def handleNewPlayer(decoded):
 	global PLAYER_ID, DISPLAY
@@ -116,7 +115,7 @@ def handleNewPlayer(decoded):
 def handleTurnStart(decoded):
 	global PLAYER_ID, DISPLAY, AUDIO
 	
-	log.msg("START TURN")
+	log.msg("START MY TURN")
 	DISPLAY.promptDiceRoll()
 	gesture = detectGesture()
 	roll = rollDice()
@@ -130,25 +129,9 @@ def handleTurnStart(decoded):
 		if button_select != buttons.A:
 			continue
 		else:
-			# Depending what you place in here you will have different game logic
-			# after the button press.  Right now we simply send the roll back to
-			# the server and generate a random event.
-			#DISPLAY.clear()
-			#DISPLAY.write("")
-			#newLocation = location()
-			#writeToServer({"request": "ROLL", "player_num": PLAYER_ID, "roll": roll})
-			#sleep(1)
+			# TO DO: Pass control to player, unless no event
 			break
-			"""
-			if abs(newLocation - decoded["location"]) <= roll:
-				DISPLAY.clear()
-				DISPLAY.write("You are now at %d" % newLocation)
-				sleep(3)
-				DISPLAY.drawEIVMap(newLocation)
-				break
-			else:
-				continue
-			"""
+
 	#writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
 	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID, "roll": roll})
 	return
@@ -160,8 +143,10 @@ def handleWinner(decoded):
 
 	DISPLAY.clear()
 	if winner == PLAYER_ID:
+		# TO DO: Winner display
 		DISPLAY.write("WINNER!")
 	else:
+		# TO DO: Loser display
 		DISPLAY.write("LOSER!")
 
 # HELPER FUNCTIONS
