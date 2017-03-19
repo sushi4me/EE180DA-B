@@ -715,8 +715,7 @@ class OLED:
 				grid[BOT_DICE - y] = temp
 			time.sleep(0.25)
 
-	def drawImage(self, pathToImage, invert=1):
-		self.clear()
+	def drawImage(self, pathToImage, invert=1, threshold=0):
 		if invert == 0:
 			self.oled.fillScreen(1)
 		# Open the desired image
@@ -730,11 +729,13 @@ class OLED:
 		    y = 0
 		    for j in range(self.MAX_PIXELS_ROW):
 		    	# check pix is tuple
-		        if type(pix[x,y]) == tuple and pix[x,y][0] < 100:
+		        if type(pix[x,y]) == tuple and pix[x,y][0] < 240 - threshold:
 		            self.oled.drawPixel(i, j, invert)
 		        # check if pix is int
-		        elif type(pix[x,y]) == int and pix[x,y] > 0:
+		        elif type(pix[x,y]) == int and pix[x,y] > 0 + threshold:
 		        	self.oled.drawPixel(i, j, invert)
+		        else:
+		        	self.oled.drawPixel(i, j, (invert+1)&1)
 		        # Scale image height to MAX_PIXELS_ROW
 		        y = (j * im.size[1])//self.MAX_PIXELS_ROW
 		    # Scale image width to MAX_PIXELS_COL
@@ -744,6 +745,12 @@ class OLED:
 
 	def drawMonster(self):
 		self.drawImage("monster.png")
+
+	def drawDiceRoll(self):
+		for i in range(1, 10):
+			self.drawImage("diceImages/dice0" + str(i) + ".PNG", 0, 140)
+			time.sleep(0.2)
+		self.drawImage("diceImages/dice10.PNG", 0, 140)
 
 	def connecting(self):
 		self.clear()
