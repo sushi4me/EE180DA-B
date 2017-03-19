@@ -51,16 +51,18 @@ class IMU:
         self.x.address(self.G.ADDRESS)
         resp = self.x.readReg(self.G.WHO_AM_I)
         if resp == self.G.WHO_AM_I_OK:
-            print "Gyro init success!"
+            #print "Gyro init success!"
+            pass
         else:
-            print "Gyro init failed"
+            print "FAILED: GYROSCOPE"
         # Check accel/mag - expect back 0x49 = 73L if connected to 9dof breakout
         self.x.address(self.XM.ADDRESS)
         resp = self.x.readReg(self.XM.WHO_AM_I)
         if resp == self.XM.WHO_AM_I_OK:
-            print "Accel/Mag init success!"
+            #print "Accel/Mag init success!"
+            pass
         else:
-            print "Accel/Mag init failed"
+            print "FAILED: ACCELEROMETER/MAGNETOMETER"
 
     # Enables the accelerometer, 100 Hz continuous in X, Y, and Z
     def enable_accel(self):

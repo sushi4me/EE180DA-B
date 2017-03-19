@@ -14,12 +14,12 @@ NOTES:
 """
 
 from datetime			import datetime
-from location.location 		import location
+from location.location		import location
 from Modules.Buzzer		import Buzzer
-#from Modules.DOF 		import DOFsensor
-from Modules.IMU.gesture 	import run as detectGesture
+#from Modules.DOF		import DOFsensor
+from Modules.IMU.gesture	import run as detectGesture
 from Modules.OLED		import OLED
-from Modules.Globals 		import buttons
+from Modules.Globals		import buttons
 from optparse			import OptionParser
 from random			import randint
 from time			import sleep, time
@@ -92,9 +92,13 @@ def processJSON(decoded):
 	return
 
 def handleDisplay(decoded):
+	DISPLAY.clear()
 	DISPLAY.write(str(decoded["msg"]))
 	sleep(3)
 	# TO DO: Battle, event, nothing?
+	"""
+	Need display screen, detect gesture for action like dice roll!
+	"""
 
 	DISPLAY.clear()
 	# TO DO: Waiting display
@@ -192,7 +196,7 @@ def main():
 		TESTING = options.testing
 
 	# Start
-	print "Server's IP Address: %s" % HOST
+	print "SERVER HOSTNAME: %s" % HOST
 	
 	log.startLogging(sys.stdout)
 
