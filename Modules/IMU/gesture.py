@@ -13,10 +13,6 @@ import time
 SLEEP_TIME = 0.05
 # Position Threshold to start recording gesture
 
-# Gesture 2 Constants
-#--------------------
-
-
 #---------------------------------
 # Initialize IMU
 #---------------------------------
@@ -82,14 +78,18 @@ def run():
     threshold3_az = -1.3
 
     # Gesture 4 variables
-    previous = 1 # 1 --> positive
-    current = 0 # 0 --> negative
-    switchcount = 0
-    maxswitchcount = 11 # gesture detected
-    negcount = 0
-    poscount = 0
-    maxdircount = 4 # check if switching fast enough
-    downcount4 = 0
+    start_4 = 0
+    counter_4 = 0
+    resetCounter_4 = 0
+    peak = 0
+    # previous = 1 # 1 --> positive
+    # current = 0 # 0 --> negative
+    # switchcount = 0
+    # maxswitchcount = 11 # gesture detected
+    # negcount = 0
+    # poscount = 0
+    # maxdircount = 4 # check if switching fast enough
+    # downcount4 = 0
 
 
     # Loop and read accel, and gyro
@@ -186,59 +186,86 @@ def run():
         if downcount3z > 14:
             occurence3 = 0
             prereq3 = 0
+
+
+        # Gesutre 4 Detection
+        # Detect the begining of the gesture
+        if abs(imu.ax) < 3 and abs(imu.az) < 7:
+            print "start"
+            start_4 = 1
+            resetCounter_4 = 0
+        else: # Detect deviasion per tick
+            resetCounter_4 += 1
         
-        #Gesture 4 Detection
+        # Detect highs and lows of gesture in y axis
+        if imu.ay > 10 and peak == 0:
+            counter_4 += start_4
+            peak = 1
+        elif imu.ay < 2 and peak == 1:
+            counter_4 += start_4
+            peak = 0
 
-        # stwitch from neg -> pos
-        if imu.ay < 0 and previous == 1:
-            switchcount += 1
-            current = 0
-            negcount += 1
-            poscount = 0 #reset poscount after switch
-            downcount = 0 #reset downcount after swtich
+        # Detect the end of the gesture
+        if counter_4 == 5:
+            return 4 
 
-            #print "switch from neg -> pos" 
-            #print switchcount
+        print counter_4
+        print resetCounter_4
+        # Detect deviation from gesture
+        if resetCounter_4 > 9:
+            resetCounter_4 = 0
+            counter_4 = 0
 
-        if imu.ay < 0 and previous == 0:
-            if negcount < maxdircount:
-                negcount += 1
-            else:
-                downcount4 += 1
+        # # stwitch from neg -> pos
+        # if imu.ay < 0 and previous == 1:
+        #     switchcount += 1
+        #     current = 0
+        #     negcount += 1
+        #     poscount = 0 #reset poscount after switch
+        #     downcount = 0 #reset downcount after swtich
 
-        # switch from pos -> neg
-        if imu.ay > 0 and previous == 0:
-            switchcount += 1
-            current = 1
-            poscount += 1
-            negcount = 0 #reset negcount after switch
-            downcount = 0 #reset downcount after switch
+        #     #print "switch from neg -> pos" 
+        #     #print switchcount
 
-            #print "switch from pos -> neg"
-            #print switchcount
+        # if imu.ay < 0 and previous == 0:
+        #     if negcount < maxdircount:
+        #         negcount += 1
+        #     else:
+        #         downcount4 += 1
 
-        if imu.ay > 0 and previous == 1:
-            if poscount < maxdircount:
-                poscount += 1
-            else:
-                downcount4 += 1
+        # # switch from pos -> neg
+        # if imu.ay > 0 and previous == 0:
+        #     switchcount += 1
+        #     current = 1
+        #     poscount += 1
+        #     negcount = 0 #reset negcount after switch
+        #     downcount = 0 #reset downcount after switch
 
-        if switchcount >= maxswitchcount:
-            return 4
-            #print "GESTURE 4"
-            gesturedetected = 4
-            switchcount = 0
-            negcount = 0
-            poscount = 0
+        #     #print "switch from pos -> neg"
+        #     #print switchcount
+
+        # if imu.ay > 0 and previous == 1:
+        #     if poscount < maxdircount:
+        #         poscount += 1
+        #     else:
+        #         downcount4 += 1
+
+        # if switchcount >= maxswitchcount:
+        #     return 4
+        #     #print "GESTURE 4"
+        #     gesturedetected = 4
+        #     switchcount = 0
+        #     negcount = 0
+        #     poscount = 0
     	
-        if downcount4 >= 3:
-            downcount4 = 0
-            switchcount = 0
-            negcount = 0
-            poscount = 0
-            #print "Reset"
+        # if downcount4 >= 3:
+        #     downcount4 = 0
+        #     switchcount = 0
+        #     negcount = 0
+        #     poscount = 0
+        #     #print "Reset"
 
-        previous = current
+        # previous = current
 
         # Sleep for SLEEP_TIME seconds
     	time.sleep(SLEEP_TIME)
