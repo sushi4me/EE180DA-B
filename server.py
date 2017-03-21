@@ -15,6 +15,7 @@ import datetime
 import fcntl
 import json
 import os
+import random
 import socket
 import struct
 import subprocess			
@@ -66,7 +67,13 @@ class GameProtocol():
 	# HANDLER FUNCTIONS
 	def handleAction(self, decoded):
 		# TO DO: Handle player commands during a turn.
-		pass
+		monster_act = monsterAction()
+		player_act = decoded["action"]
+		player_num = decoded["player_num"] - 1
+
+		msg = self.game.monstrBattle(self.game.players[player_num], player_act, monster_act)
+		writeToClient(player_num, {"request": "RESULT", "msg": msg})
+		return
 
 	def handleDisconnect(self, decoded):
 		log.msg("PLAYER DISCONNECTED")
@@ -115,7 +122,6 @@ class GameProtocol():
 		roll = decoded["roll"]
 		(location, msg, event_num) = self.game.runTurn(player_num - 1, roll)
 		writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location, "event": event_num})
-		sleep(1)
 		return
 
 	def handleUpdate(self, decoded):
@@ -147,6 +153,7 @@ class ServerProtocol(protocol.Protocol):
 class ServerFactory(protocol.Factory):
 	protocol = ServerProtocol
 
+# HELPER FUNCTIONS
 def writeToClient(client, msg):
 	global m_factory
 
@@ -160,6 +167,10 @@ def getIP(ifname):
 		s.fileno(),
 		0x8915,  # SIOCGIFADDR
 		struct.pack('256s', ifname[:15]))[20:24])
+
+def monsterAction(max=3):
+	random.seed()
+	return random.randint(1, max)
 
 # MAIN
 def main():

@@ -42,6 +42,19 @@ class Game:
         # Number of possible player locations
         self.numLocations = 61
 
+        # Dictionary for battle results
+        self.actDict = {
+        	(1, 1): ("DRAW!", 5),
+        	(1, 2): ("You lost!", 10),
+        	(1, 3): ("You won!", 0),
+        	(2, 1): ("You won!", 0),
+        	(2, 2): ("DRAW!", 5),
+        	(2, 3): ("You lost!", 10),
+        	(3, 1): ("You lost!", 10),
+        	(3, 2): ("You won!", 0),
+        	(3, 3): ("DRAW!", 5)
+        }
+
     def randomFlagLocation(self):
         while True:
             count = 0 # count how many players are at flag location 
@@ -75,21 +88,11 @@ class Game:
 
         return newLocation
 
-    def monstrBattle(self, player):
-        monsterHP = 25
+    def monstrBattle(self, player, player_act, monster_act):
+        (msg, hpAmt) = self.actDict[(player_act, monster_act)]
+        player.changeHP(-hpAmt)
+        return msg
 
-        hpAmt = 5
-
-        while player.isAlive() and monsterHP > 0:
-            playerDmg = random.randint(0, 1) * hpAmt
-            player.changeHP(playerDmg)
-
-            monsterHP -= random.randint(0, 1) * hpAmt
-
-        if player.isAlive():
-            return "You battled... and won!"
-        else:
-            return "You battled... and lost!"
             
     def randomEvent(self):
         return random.choice([event for event in GameEvent])
@@ -121,7 +124,8 @@ class Game:
             playerMsg = "You gained {0} HP!".format(hpAmt)
 
         elif event == GameEvent.MONSTRFGHT:
-            playerMsg = self.monstrBattle(player)
+            playerMsg = "You run into a monster! Prepare to battle!"
+
 
         elif event == GameEvent.ITEMPICKUP:
             playerMsg = "Item acquired!"

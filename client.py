@@ -10,6 +10,7 @@ NOTES:
 	RECEIVE:
 	{"request": "DISPLAY", "msg": msg, "location": location, "event": event_num}
 	{"request": "NEWPLAYER", "player_num": PLAYER_ID}
+	{"request": "RESULT",	"result": result}
 	{"request": "TURNSTART"}
 	{"request": "WINNER", "player_num": PLAYER_ID}
 
@@ -88,6 +89,7 @@ def processJSON(decoded):
 	# If the player can perform a new action, add it here:
 	response = {	"DISPLAY":	handleDisplay,
 			"NEWPLAYER": 	handleNewPlayer,
+			"RESULT":	handleTurnResult,
 			"TURNSTART": 	handleTurnStart,
 			"WINNER":	handleWinner
 		   }[request](decoded)
@@ -111,17 +113,21 @@ def handleDisplay(decoded):
 
 		DISPLAY.clear()
 		if action == 1:
-			DISPLAY.write("Action 1")
+			# Sword
+			DISPLAY.write("You attacked with a sword!")
 		elif action == 2:
-			DISPLAY.write("Action 2")
+			# Shield
+			DISPLAY.write("You attempt to block the attack!")
 		elif action == 3:
-			DISPLAY.write("Action 3")
-	sleep(3)
-	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID})
-	DISPLAY.clear()
-	# TO DO: Waiting display
-	DISPLAY.write("Waiting for other player...")
+			# Magic
+			DISPLAY.write("You cast a magical spell!")
+
+		sleep(3)
+	else:
+		writeToServer({"request": "TURNEND", "player_num": PLAYER_ID})
+
 	#DISPLAY.updateMap(decoded["location"])
+	return
 
 def handleNewPlayer(decoded):
 	global PLAYER_ID, DISPLAY
@@ -132,6 +138,22 @@ def handleNewPlayer(decoded):
 	#AUDIO.connected()
 	sleep(2)
 
+	return
+
+def handleTurnResult(decoded):
+	global PLAYER_ID
+
+	msg = decoded["msg"]
+
+	DISPLAY.clear()
+	DISPLAY.write(str(msg))
+	sleep(3)
+	
+	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID})
+	
+	DISPLAY.clear()
+	# TO DO: Waiting display
+	DISPLAY.write("Waiting for other player...")
 	return
 
 def handleTurnStart(decoded):
@@ -153,26 +175,6 @@ def handleTurnStart(decoded):
 		else:
 			# TO DO: Pass control to player, unless no event
 			break
-	"""
-	DISPLAY.clear()
-	DISPLAY.write("\nMONSTER\nAPPROACHING......")
-	sleep(3)
-	DISPLAY.clear()
-	DISPLAY.write("GET READY TO TAKE \nDOWN SOME\nMONSTERS!")
-	sleep(3)
-	DISPLAY.drawMonster1()
-	sleep(2)
-	detectGesture()
-	DISPLAY.clear()
-	DISPLAY.write("\n  Monster\n  Dead!")
-	sleep(3)
-	DISPLAY.clear()
-	DISPLAY.write("\n\n  Nice\n    Job!")
-	sleep(3)
-	DISPLAY.clear()
-	DISPLAY.write("Waiting for other players")
-	writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
-	"""
 	writeToServer({"request": "ROLL", "player_num": PLAYER_ID, "roll": roll})
 	return
 
