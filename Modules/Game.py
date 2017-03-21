@@ -42,13 +42,11 @@ class Game:
         # Number of possible player locations
         self.numLocations = 61
 
-        self.flagLocation = self.randomFlagLocation()
-
     def randomFlagLocation(self):
         while True:
             count = 0 # count how many players are at flag location 
 
-            flagLocation = random.randint(0, self.numLocations-1)
+            self.flagLocation = random.randint(0, self.numLocations-1)
             
             for player in self.players:
                 if player.m_location == flagLocation:
@@ -57,8 +55,6 @@ class Game:
             # No players at flagLocation, ok to break
             if count == 0:
                 break
-
-        return flagLocation
 
     def addPlayer(self, playerLocation):
         playerID = self.numPlayers
