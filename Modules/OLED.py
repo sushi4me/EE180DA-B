@@ -746,13 +746,13 @@ class OLED:
 		self.oled.refresh()
 
 	def drawMonster1(self):
-		self.drawImage("Images/monster1.jpg")
+		self.drawImage("Images/monster1.png")
 
 	def drawMonster2(self):
-		self.drawImage("Images/monster2.jpg")
+		self.drawImage("Images/monster2.png")
 
 	def drawMonster3(self):
-		self.drawImage("Images/monster3.jpg")
+		self.drawImage("Images/monster3.png")
 
 	def drawDiceRoll(self):
 		for i in range(1, 10):

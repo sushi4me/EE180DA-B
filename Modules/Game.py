@@ -44,15 +44,15 @@ class Game:
 
         # Dictionary for battle results
         self.actDict = {
-        	(1, 1): ("DRAW!", 5),
-        	(1, 2): ("You lost!", 10),
-        	(1, 3): ("You won!", 0),
-        	(2, 1): ("You won!", 0),
-        	(2, 2): ("DRAW!", 5),
-        	(2, 3): ("You lost!", 10),
-        	(3, 1): ("You lost!", 10),
-        	(3, 2): ("You won!", 0),
-        	(3, 3): ("DRAW!", 5)
+        	(1, 1): ("\n\nDRAW!", 5),
+        	(1, 2): ("\n\nYou lost!", 10),
+        	(1, 3): ("\n\nYou won!", 0),
+        	(2, 1): ("\n\nYou won!", 0),
+        	(2, 2): ("\n\nDRAW!", 5),
+        	(2, 3): ("\n\nYou lost!", 10),
+        	(3, 1): ("\n\nYou lost!", 10),
+        	(3, 2): ("\n\nYou won!", 0),
+        	(3, 3): ("\n\nDRAW!", 5)
         }
 
     def randomFlagLocation(self):
@@ -116,19 +116,19 @@ class Game:
         if event == GameEvent.LOSEHEALTH:
             player.changeHP(-hpAmt)
 
-            playerMsg = "You lost {0} HP!".format(hpAmt)
+            playerMsg = "\nYou lost  {0} HP!".format(hpAmt)
 
         elif event == GameEvent.GAINHEALTH:
             player.changeHP(hpAmt)
 
-            playerMsg = "You gained {0} HP!".format(hpAmt)
+            playerMsg = "\nYou gained {0} HP!".format(hpAmt)
 
         elif event == GameEvent.MONSTRFGHT:
-            playerMsg = "You run into a monster! Prepare to battle!"
+            playerMsg = "You run into a monster! Prepare for battle!"
 
 
         elif event == GameEvent.ITEMPICKUP:
-            playerMsg = "Item acquired!"
+            playerMsg = "\n   Item\n   acquired!"
 
         else:
             playerMsg = "Your turn was a little boring..."

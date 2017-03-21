@@ -101,8 +101,17 @@ def handleDisplay(decoded):
 	DISPLAY.write(str(decoded["msg"]))
 	sleep(3)
 	if decoded["event"] == 3:
+		monster_generator = rollDice(3)
+		if monster_generator == 1:
+			DISPLAY.drawMonster1()
+		elif monster_generator == 2:
+			DISPLAY.drawMonster2()
+		elif monster_generator == 3:
+			DISPLAY.drawMonster3()
+		sleep(3)
+
 		DISPLAY.clear()
-		DISPLAY.write("What to do?!")
+		DISPLAY.write("What will you do?!  > SWORD\n> SHIELD\n>MAGIC")
 		# TO DO: Battle, event, nothing?
 		"""
 		Need display screen, detect gesture for action like dice roll!
@@ -134,6 +143,7 @@ def handleNewPlayer(decoded):
 	
 	PLAYER_ID = decoded["player_num"]
 	log.msg("PLAYER ID IS %d" % PLAYER_ID)
+	DISPLAY.clear()
 	DISPLAY.drawWelcomeScreen(str(decoded["player_num"]))
 	#AUDIO.connected()
 	sleep(2)
@@ -186,11 +196,11 @@ def handleWinner(decoded):
 	DISPLAY.clear()
 	if winner == PLAYER_ID:
 		# TO DO: Winner display
-		DISPLAY.write("WINNER!")
+		DISPLAY.write("\n\nWINNER!")
 		sleep(3)
 	else:
 		# TO DO: Loser display
-		DISPLAY.write("LOSER!")
+		DISPLAY.write("\n\nLOSER!")
 		sleep(3)
 		DISPLAY.drawDead()
 		sleep(3)
