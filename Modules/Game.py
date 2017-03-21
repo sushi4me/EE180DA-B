@@ -112,25 +112,31 @@ class Game:
         
         event = self.randomEvent()
 
-        hpAmt = 10 
+        hpAmt = 10
+
+        eventNum = 0
 
         if event == GameEvent.LOSEHEALTH:
             player.changeHP(-hpAmt)
 
             playerMsg = "You lost {0} HP!".format(hpAmt)
 
+            eventNum = 1
         elif event == GameEvent.GAINHEALTH:
             player.changeHP(hpAmt)
 
             playerMsg = "You gained {0} HP!".format(hpAmt)
 
+            eventNum = 2
         elif event == GameEvent.MONSTRFGHT:
             playerMsg = self.monstrBattle(player)
 
+            eventNum = 3
         elif event == GameEvent.ITEMPICKUP:
             playerMsg = "Item acquired!"
 
+            eventNum = 4
         else:
             playerMsg = "Your turn was a little boring..."
 
-        return (newLocation, playerMsg)
+        return (newLocation, playerMsg, eventNum)

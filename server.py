@@ -74,6 +74,7 @@ class GameProtocol():
 
 	def handleDisconnect(self, decoded):
 		log.msg("PLAYER DISCONNECTED")
+		return
 
 	def handleNewPlayer(self, decoded):
 		# Reject players when the server is full
@@ -90,33 +91,31 @@ class GameProtocol():
 			if self.game.numPlayers == self.game.MAX_PLAYERS:
 				log.msg("STARTING GAME")
 				writeToClient(0, {"request": "TURNSTART"})
-
 		return
 
 	def handleTurnEnd(self, decoded):
 		player_num = decoded["player_num"]
-		roll = decoded["roll"]
-		(location, msg) = self.game.runTurn(player_num - 1, roll)
+		#roll = decoded["roll"]
+		#(location, msg, event_num) = self.game.runTurn(player_num - 1, roll)
 		if self.game.anyWinner() is not None:
 			for player in self.game.players:
 				writeToClient(player.m_id, {"request": "WINNER", "player_num": player_num})
 		else:
-			writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
-			sleep(1)
+			#writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location, "event": event_num})
+			#sleep(1)
+			#if event_num == 3:
+			#	return
+			#else:
 			next_player = player_num % self.game.MAX_PLAYERS
 			writeToClient(next_player, {"request": "TURNSTART"})
-
 		return
 
 	def handleRoll(self, decoded):
 		player_num = decoded["player_num"]
 		roll = decoded["roll"]
-		(location, msg) = self.game.runTurn(player_num - 1, roll)
-		if self.game.anyWinner() is not None:
-			writeToClient()
-		else:
-			writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location})
-
+		(location, msg, event_num) = self.game.runTurn(player_num - 1, roll)
+		writeToClient(player_num - 1, {"request": "DISPLAY", "msg": msg, "location": location, "event": event_num})
+		sleep(1)
 		return
 
 	def handleUpdate(self, decoded):

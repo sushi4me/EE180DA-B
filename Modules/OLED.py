@@ -383,6 +383,8 @@ class OLED:
 	#----------------------------------
 	def drawWelcomeScreen(self, playerID):
 		self.clear()
+		self.drawInitScreen()
+		self.clear()
 		self.write("\n  Welcome\n  Player\n    " + playerID)
 
 	#----------------------------------

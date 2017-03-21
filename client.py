@@ -96,11 +96,26 @@ def handleDisplay(decoded):
 	DISPLAY.clear()
 	DISPLAY.write(str(decoded["msg"]))
 	sleep(3)
-	# TO DO: Battle, event, nothing?
-	"""
-	Need display screen, detect gesture for action like dice roll!
-	"""
+	if decoded["event"] == 3:
+		DISPLAY.clear()
+		DISPLAY.write("What to do?!")
+		# TO DO: Battle, event, nothing?
+		"""
+		Need display screen, detect gesture for action like dice roll!
+		"""
+		action = detectGesture()
+		writeToServer({"request": "ACTION", "player_num": PLAYER_ID, "action": action})
+		sleep(1)
 
+		DISPLAY.clear()
+		if action == 1:
+			DISPLAY.write("Action 1")
+		elif action == 2:
+			DISPLAY.write("Action 2")
+		elif action == 3:
+			DISPLAY.write("Action 3")
+	sleep(3)
+	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID})
 	DISPLAY.clear()
 	# TO DO: Waiting display
 	DISPLAY.write("Waiting for other player...")
@@ -128,7 +143,7 @@ def handleTurnStart(decoded):
 
 	# Wait for player to arrive at destination and press A
 	DISPLAY.clear()
-	DISPLAY.write("ROLL: " + str(roll) + "\n\nMove & \npress A to\ncontinue")
+	DISPLAY.write("ROLL: " + str(roll) + "\nMove & \npress A to continue")
 	while True:
 		button_select = DISPLAY.waitForUserInput()
 		if button_select != buttons.A:
@@ -136,7 +151,7 @@ def handleTurnStart(decoded):
 		else:
 			# TO DO: Pass control to player, unless no event
 			break
-
+	"""
 	DISPLAY.clear()
 	DISPLAY.write("\nMONSTER\nAPPROACHING......")
 	sleep(3)
@@ -154,8 +169,9 @@ def handleTurnStart(decoded):
 	sleep(3)
 	DISPLAY.clear()
 	DISPLAY.write("Waiting for other players")
-	#writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
-	writeToServer({"request": "TURNEND", "player_num": PLAYER_ID, "roll": roll})
+	writeToServer({"request": "UPDATE", "player_num": PLAYER_ID, "location": newLocation})
+	"""
+	writeToServer({"request": "ROLL", "player_num": PLAYER_ID, "roll": roll})
 	return
 
 def handleWinner(decoded):
