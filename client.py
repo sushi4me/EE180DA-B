@@ -3,14 +3,16 @@
 """
 NOTES:
 	SEND:
-	{"request": "ACTION", "player_num": player_num, "action": action}
-	{"request": "DISCONNECTED", "player_num": player_num}
-	("request": "NEWPLAYER")
-	{"request": "TURNEND", "player_num:" player_num}
+	{"request": "ACTION", "player_num": PLAYER_ID, "action": action}
+	{"request": "TURNEND", "player_num": PLAYER_ID}
+	{"request": "ROLL", "player_num": PLAYER_ID, "roll": roll}
 
 	RECEIVE:
-	{"request": "NEWPLAYER", "player_num": player_num}
+	{"request": "DISPLAY", "msg": msg, "location": location, "event": event_num}
+	{"request": "NEWPLAYER", "player_num": PLAYER_ID}
 	{"request": "TURNSTART"}
+	{"request": "WINNER", "player_num": PLAYER_ID}
+
 """
 
 from datetime			import datetime

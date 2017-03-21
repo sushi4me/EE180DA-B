@@ -30,11 +30,10 @@ NOTES:
 	{"request": "TURNSTART"}
 
 	RECEIVE:
-	{"request": "ACTION", "player_num": player_num, "powerup": powerup}
-	{"request": "DISCONNECTED", "player_num": player_num}
-	("request": "NEWPLAYER", "location": location)
-	{"request": "TURNEND", "player_num:" player_num}
-	{"request": "UPDATE", "player_num": player_num, "location": location}
+	{"request": "ACTION", 	"player_num": PLAYER_ID, 	"action": action})
+	{"request": "TURNEND", 	"player_num": PLAYER_ID})
+	{"request": "ROLL", 	"player_num": PLAYER_ID,	"roll": roll})
+
 
 """
 
