@@ -208,7 +208,6 @@ def run():
         if counter_4 == 5:
             return 4 
 
-        print resetCounter_4
         # Detect deviation from gesture
         if resetCounter_4 > 9:
             resetCounter_4 = 0
