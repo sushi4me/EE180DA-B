@@ -49,6 +49,11 @@ class ClientProtocol(protocol.Protocol):
 	def connectionMade(self):
 		global DISPLAY, TESTING
 		DISPLAY.connecting()
+		sleep(1)
+		DISPLAY.connected()
+		AUDIO.connected()
+		sleep(1)
+		DISPLAY.gettingLocation()
 		log.msg("CONNECTED TO SERVER")
 		self.factory.server = self
 
@@ -59,8 +64,6 @@ class ClientProtocol(protocol.Protocol):
 
 		# Request for player_num identification
 		self.transport.write(json.dumps({"request": "NEWPLAYER", "location": startLocation}))
-		DISPLAY.connected()
-		sleep(1)
 		DISPLAY.drawEIVMap(startLocation)
 		sleep(3)
 
@@ -117,19 +120,22 @@ def handleDisplay(decoded):
 		Need display screen, detect gesture for action like dice roll!
 		"""
 		action = detectGesture()
+		AUDIO.powerUp()
 		writeToServer({"request": "ACTION", "player_num": PLAYER_ID, "action": action})
-		sleep(1)
 
 		DISPLAY.clear()
 		if action == 1:
 			# Sword
 			DISPLAY.write("You attacked with a sword!")
+			AUDIO.shoot()
 		elif action == 2:
 			# Shield
 			DISPLAY.write("You attempt to block the attack!")
+			AUDIO.cloak()
 		elif action == 3:
 			# Magic
 			DISPLAY.write("You cast a magical spell!")
+			AUDIO.powerUP()
 
 		sleep(3)
 	else:
@@ -180,6 +186,7 @@ def handleTurnStart(decoded):
 	DISPLAY.write("ROLL: " + str(roll) + "\nMove & \npress A to continue")
 	while True:
 		button_select = DISPLAY.waitForUserInput()
+		AUDIO.starWars()
 		if button_select != buttons.A:
 			continue
 		else:
@@ -197,6 +204,7 @@ def handleWinner(decoded):
 	if winner == PLAYER_ID:
 		# TO DO: Winner display
 		DISPLAY.write("\n\nWINNER!")
+		AUDIO.disconnected()
 		sleep(3)
 	else:
 		# TO DO: Loser display

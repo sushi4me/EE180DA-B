@@ -108,7 +108,7 @@ class Buzzer:
 
     # Play Power up
     def powerUp(self):
-        self.play(self.sound_powerUp, self.beat_powerup)
+        self.play(self.sound_powerUp, self.beat_powerUp)
 
     # Play Star Wars Theme Song
     def starWars(self):

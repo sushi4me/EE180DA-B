@@ -777,3 +777,8 @@ class OLED:
 		self.clear()
 		self.drawBorder()
 		self.write("\n   Roll\n   Dice!")
+
+	def gettingLocation(self):
+		self.clear()
+		self.drawBorder()
+		self.write("\nDetecting\nLocation..")
