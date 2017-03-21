@@ -45,10 +45,7 @@ class GameProtocol():
 	def __init__(self):
 		maxPlayers = 1
 		self.game = Game(maxPlayers)
-		# Hard-coded flag
-		self.game.flagLocation = 30
 		log.msg("PLAYERS: %d" % self.game.MAX_PLAYERS)
-                
 
 	# CALLED BY SERVER CODE TO PROCESS JSON
 	def processJSON(self, decoded):
@@ -90,6 +87,10 @@ class GameProtocol():
 			# If we have enough players we can start the game!
 			if self.game.numPlayers == self.game.MAX_PLAYERS:
 				log.msg("STARTING GAME")
+
+                                # Generate flag location
+                                self.game.randomFlagLocation()
+
 				writeToClient(0, {"request": "TURNSTART"})
 		return
 
