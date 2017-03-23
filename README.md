@@ -12,11 +12,8 @@ Justine Figuerres
 
 Nathan Kong
 
-## March 8, 2017
-* client.py & server.py needs revising
-* Miscellaneous/client_test.py & server_test.py has new implementation.
-
-## March 12, 2017
-* Newly revised server.py implements a GameProtocol and Game class.
-* The revised version is tested for 1 player and simply picks a random event depending on roll.
-* Needs game logic implementation as to UI for events & equipment.
+## Important!
+Be sure to check server.py and client.py for the hard-coded paths for the -i option!
+You will also need a gdrive configuration file, this can be found on how to setup via
+their GitHub page.  You will need it to access a Google Drive to create and download
+the file using the -i option.  There is no gdrive file here included.
